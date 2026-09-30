@@ -1,0 +1,9 @@
+.shared-context { margin: 10px 16px 0; flex: none; border: 1px solid var(--line); border-radius: 11px; background: var(--surface-alt); color: var(--muted); }
+.shared-context summary { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; padding: 9px 11px; cursor: pointer; font-size: 10px; }
+.shared-context summary small { margin-left: auto; color: var(--soft); font-size: 9px; }
+.shared-context summary svg { color: var(--accent); }
+.shared-context__messages { padding: 0 11px 11px; max-height: 180px; overflow-y: auto; font-size: 11px; }
+.shared-context__messages > p { font-size: 10px; line-height: 1.6; }
+.shared-context__messages article { padding: 8px 0; border-top: 1px solid var(--line); }
+.shared-context__messages article p { margin: 5px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+.chat-page > .shared-context { margin: 10px 24px 0; }
