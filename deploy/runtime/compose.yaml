@@ -1,0 +1,18 @@
+services:
+  runtime:
+    build:
+      context: ./app
+      dockerfile: deploy/runtime/Dockerfile
+    container_name: wendler-runtime
+    network_mode: host
+    environment:
+      WENDLER_TAILSCALE_HOST: faux-poweredge-t110-ii.tail212b91.ts.net
+      WENDLER_REMOTE_ORIGIN: https://faux-poweredge-t110-ii.tail212b91.ts.net
+    volumes:
+      - ./data:/data
+      - ./codex:/home/node/.codex
+      - ./secrets:/run/secrets:ro
+    mem_limit: 2800m
+    memswap_limit: 2800m
+    cpus: 2
+    restart: unless-stopped

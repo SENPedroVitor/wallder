@@ -1,0 +1,5 @@
+import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core'
+export const records = sqliteTable('records', { key: text('key').primaryKey(), revision: integer('revision').notNull(), blob: text('blob').notNull() })
+export const bridge = sqliteTable('bridge', { id: text('id').primaryKey(), heartbeat: integer('heartbeat').notNull(), status: text('status').notNull() })
+export const jobs = sqliteTable('jobs', { id: text('id').primaryKey(), method: text('method').notNull(), path: text('path').notNull(), request: text('request').notNull(), created: integer('created').notNull(), status: text('status').notNull(), code: integer('code'), headers: text('headers'), response: text('response'), seq: integer('seq').notNull().default(0) }, table => [index('jobs_status_created').on(table.status, table.created)])
+export const chunks = sqliteTable('chunks', { id: text('id').primaryKey(), job: text('job').notNull(), seq: integer('seq').notNull(), payload: text('payload').notNull() }, table => [index('chunks_job_seq').on(table.job, table.seq)])

@@ -1,0 +1,32 @@
+.team-quick__close, .team-quick__together { border: 0; background: transparent; }
+.team-quick { position: relative; }
+.team-quick__trigger { display: inline-flex; align-items: center; gap: 10px; min-height: 43px; padding: 0 6px 0 15px; border: 1px solid var(--line); border-radius: 24px; background: color-mix(in srgb, var(--surface) 62%, transparent); backdrop-filter: blur(18px) saturate(150%); font-size: 12px; font-weight: 600; transition: transform .2s, background .2s, box-shadow .2s; }
+.team-quick__trigger:hover { transform: translateY(-2px); background: var(--surface); box-shadow: 0 5px 20px #00000008; }
+.team-quick__trigger:active { transform: translateY(0) scale(.97); }
+.team-quick__panel { position: absolute; right: 0; top: calc(100% + 16px); z-index: 100; width: min(370px, calc(100vw - 24px)); padding: 22px 20px 15px; border: 1px solid var(--line); border-radius: 25px; background: color-mix(in srgb, var(--surface) 82%, transparent); backdrop-filter: blur(24px) saturate(150%); box-shadow: 0 20px 60px #00000024, inset 0 1px 0 #ffffff15; transform-origin: top right; animation: team-quick-in .25s cubic-bezier(.22,1,.5,1); }
+.team-quick__panel h2 { margin: 0 22px 7px 0; font-size: 16px; font-weight: 600; letter-spacing: -.4px; }
+.team-quick__panel p { margin: 0; font-size: 12px; line-height: 1.6; color: var(--muted); }
+.team-quick__close { position: absolute; right: 12px; top: 12px; display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; color: var(--muted); }
+.team-quick__close:hover { background: var(--hover); }
+.team-quick__agents { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 5px; margin-top: 21px; }
+.team-quick__agents button { border: 0; position: relative; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; min-width: 0; min-height: 83px; border-radius: 14px; background: var(--surface-alt); transition: transform .2s, background .2s; }
+.team-quick__agents button:first-child { border-top-left-radius: 21px; border-bottom-left-radius: 21px; }
+.team-quick__agents button:last-child { border-top-right-radius: 21px; border-bottom-right-radius: 21px; }
+.team-quick__agents button:hover, .team-quick__agents button:focus-visible { transform: translateY(-4px); background: var(--surface); }
+.team-quick__agents button span:not(.mascot) { font-size: 10px; color: var(--muted); }
+.team-quick__arrow { position: absolute; top: 7px; right: 7px; opacity: 0; transition: opacity .18s; color: var(--accent); }
+.team-quick__agents button:hover .team-quick__arrow, .team-quick__agents button:focus-visible .team-quick__arrow { opacity: 1; }
+.team-quick__together { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 39px; margin-top: 12px; border-radius: 14px; font-size: 12px; color: var(--muted); }
+.team-quick__together:hover { background: var(--hover); color: var(--text); }
+.team-quick__panel small { display: block; text-align: center; font-size: 10px; color: var(--muted); margin-top: 6px; }
+@keyframes team-quick-in { from { opacity: 0; transform: translateY(-8px) scale(.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 640px) { .team-quick__trigger { padding: 0 3px; min-height: 40px; } .team-quick__trigger > span:not(.mascot) { display: none; } .team-quick__panel { position: fixed; top: 76px; right: 12px; } }
+@media (prefers-reduced-motion: reduce) { .team-quick *, .team-quick *::before { animation: none !important; transition: none !important; } }
+
+.topbar:has(.team-quick[data-open="true"]) { position: relative; z-index: 40; }
+
+.team-quick__panel { width: min(440px, calc(100vw - 24px)); max-height: calc(100dvh - 100px); overflow-y: auto; }
+.team-quick__agents { grid-template-columns: repeat(6,minmax(0,1fr)); gap: 6px; margin-bottom: 14px; }
+.team-quick__agents button { padding: 8px 2px; min-height: 82px; }
+.team-quick__agents button span:not(.mascot) { text-align: center; font-size: 9px; line-height: 1.3; }
+@media (max-width:640px) { .team-quick__agents { grid-template-columns: repeat(4,minmax(0,1fr)); } }

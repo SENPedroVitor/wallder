@@ -1,0 +1,290 @@
+[
+  {
+    "id": "nARBK",
+    "name": "Chat · Clima"
+  },
+  {
+    "id": "c5Iuyf",
+    "name": "Chat · Gastos"
+  },
+  {
+    "id": "LJ0Tl",
+    "name": "Chat · Gastos · compacto"
+  },
+  {
+    "id": "p5jsN",
+    "name": "Chat · Progresso do projeto"
+  },
+  {
+    "id": "M4n7Wo",
+    "name": "Chat · Progresso · compacto"
+  },
+  {
+    "id": "P4yvSf",
+    "name": "Chat · Tarefas"
+  },
+  {
+    "id": "gtNSM",
+    "name": "Chat · Tarefas · compacto"
+  },
+  {
+    "id": "P7hBF",
+    "name": "Chat · Agenda"
+  },
+  {
+    "id": "LZevf",
+    "name": "Chat · Agenda · compacto"
+  },
+  {
+    "id": "gcPRJ",
+    "name": "Chat · Comparação"
+  },
+  {
+    "id": "nywbZ",
+    "name": "Chat · Pesquisa com fontes"
+  },
+  {
+    "id": "r4nGZt",
+    "name": "Chat · Arquivos e entregas"
+  },
+  {
+    "id": "spGVJ",
+    "name": "Chat · Aprovação"
+  },
+  {
+    "id": "IsRrk",
+    "name": "Chat · Resumo diário"
+  },
+  {
+    "id": "Iwd2J",
+    "name": "Chat · Execução da equipe"
+  },
+  {
+    "id": "vUkbX",
+    "name": "Chat · Viagem · roteiro"
+  },
+  {
+    "id": "uxJpe",
+    "name": "Chat · Receita"
+  },
+  {
+    "id": "y57ZsF",
+    "name": "Chat · Estudos · flashcard"
+  },
+  {
+    "id": "jdsv3",
+    "name": "Chat · Hábitos"
+  },
+  {
+    "id": "pAthg",
+    "name": "Chat · Cinema e séries"
+  },
+  {
+    "id": "qQdX3",
+    "name": "Chat · Notícias"
+  },
+  {
+    "id": "BgeNi",
+    "name": "Chat · Tradução"
+  },
+  {
+    "id": "zTs3M",
+    "name": "Chat · Cores e estilo"
+  },
+  {
+    "id": "msI7t",
+    "name": "Chat · Foco"
+  },
+  {
+    "id": "GxcxF",
+    "name": "Chat · Enquete"
+  },
+  {
+    "id": "u12s9",
+    "name": "Chat · Lugares próximos"
+  },
+  {
+    "id": "f7dKo",
+    "name": "Chat · Estudos · quiz"
+  },
+  {
+    "id": "lk4e2",
+    "name": "Chat · Cinema · escolher sessão"
+  },
+  {
+    "id": "OXXh4",
+    "name": "Chat · Cinema · ingresso comprado"
+  },
+  {
+    "id": "DAoP0",
+    "name": "Chat · Ônibus · comparar passagem"
+  },
+  {
+    "id": "dS6cT",
+    "name": "Chat · Avião · comparar passagem"
+  },
+  {
+    "id": "xhCob",
+    "name": "Chat · Ônibus · passagem comprada"
+  },
+  {
+    "id": "nWGck",
+    "name": "Chat · Avião · passagem comprada"
+  },
+  {
+    "id": "erYaE",
+    "name": "Chat · Entrega · resumo"
+  },
+  {
+    "id": "mgy5J",
+    "name": "Chat · Entrega · histórico"
+  },
+  {
+    "id": "d8LQmS",
+    "name": "Chat · Promoções de produto"
+  },
+  {
+    "id": "Dba0J",
+    "name": "Chat · Matemática · fórmula"
+  },
+  {
+    "id": "Y3QFN",
+    "name": "Chat · Matemática · ajustar coeficiente"
+  },
+  {
+    "id": "PgMBp",
+    "name": "Chat · Meus cartões"
+  },
+  {
+    "id": "HTERN",
+    "name": "Chat · Meu Pix"
+  },
+  {
+    "id": "BSGRA",
+    "name": "Chat · Pix · gasto registrado"
+  },
+  {
+    "id": "P2S5bS",
+    "name": "Chat · Histórico financeiro"
+  },
+  {
+    "id": "YdPCY",
+    "name": "Chat · Fatura do cartão"
+  },
+  {
+    "id": "w3HtWh",
+    "name": "Chat · Bolsa de valores"
+  },
+  {
+    "id": "u5mua",
+    "name": "Chat · CDB · detalhes"
+  },
+  {
+    "id": "O40g8u",
+    "name": "Chat · Opções de investimento"
+  },
+  {
+    "id": "Q3iNn",
+    "name": "Chat · Meus investimentos"
+  },
+  {
+    "id": "F16rPY",
+    "name": "Chat · Distribuição da carteira"
+  },
+  {
+    "id": "jKERl",
+    "name": "Chat · Detalhe do investimento"
+  },
+  {
+    "id": "N9SE8",
+    "name": "Chat · Simulador de investimento"
+  },
+  {
+    "id": "Sd1JR",
+    "name": "Chat · Resumo financeiro"
+  },
+  {
+    "id": "keLNn",
+    "name": "Chat com Pam · Contas a vencer"
+  },
+  {
+    "id": "nOyFv",
+    "name": "Chat com Pam · Assinaturas"
+  },
+  {
+    "id": "G4SE8",
+    "name": "Chat com Pam · Compras parceladas"
+  },
+  {
+    "id": "TUXbW",
+    "name": "Chat com Pam · Meta de economia"
+  },
+  {
+    "id": "aTSOz",
+    "name": "Chat com Pam · Dividir despesas"
+  },
+  {
+    "id": "g4Bg1j",
+    "name": "Chat com Pam · Dinheiro a receber"
+  },
+  {
+    "id": "ttZXT",
+    "name": "Chat com Pam · Calendário financeiro"
+  },
+  {
+    "id": "X8oACU",
+    "name": "Chat com Pam · Alerta de gasto"
+  },
+  {
+    "id": "FHoJ6",
+    "name": "Chat com Pam · Comprovante organizado"
+  },
+  {
+    "id": "lE5rN",
+    "name": "Chat com Pam · À vista ou parcelado"
+  },
+  {
+    "id": "zzUnR",
+    "name": "Chat com Pam · Reserva de emergência"
+  },
+  {
+    "id": "Qic7B",
+    "name": "Chat com Pam · Custo total de uma compra"
+  },
+  {
+    "id": "CJpUn",
+    "name": "Chat com Pam · Aniversários"
+  },
+  {
+    "id": "yVWCe",
+    "name": "Chat com Pam · Futebol"
+  },
+  {
+    "id": "B2O9N",
+    "name": "Chat com Pam · Basquete · NBA"
+  },
+  {
+    "id": "NDMkE",
+    "name": "Chat com Pam · Futebol americano · NFL"
+  },
+  {
+    "id": "btv80",
+    "name": "Chat com Pam · Beisebol · MLB"
+  },
+  {
+    "id": "h08Q5U",
+    "name": "Chat com Pam · Hóquei · NHL"
+  },
+  {
+    "id": "knL0w",
+    "name": "Chat com Pam · Lançamentos de música"
+  },
+  {
+    "id": "eV6jQ",
+    "name": "Chat com Pam · Lançamentos de séries"
+  },
+  {
+    "id": "oErgh",
+    "name": "Chat com Pam · Minha agenda pessoal"
+  }
+]

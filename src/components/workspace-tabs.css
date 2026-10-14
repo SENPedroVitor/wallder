@@ -1,0 +1,24 @@
+.workspace-tabs{height:42px;flex:none;min-width:0;background:var(--sidebar);border-bottom:1px solid var(--line);position:relative;font-family:var(--font-system);color:var(--text)}
+.workspace-tabs__scroll{height:100%;display:flex;align-items:flex-end;gap:3px;overflow-x:auto;overflow-y:hidden;padding:5px 12px 0;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.workspace-tabs__item{position:relative;display:flex;align-items:center;flex:0 0 auto;min-width:104px;max-width:190px;height:36px;padding:0 4px 0 0;border-radius:11px 11px 0 0;color:var(--muted);transition:background .16s ease,opacity .16s ease,transform .16s ease}
+.workspace-tabs__item:hover{background:var(--hover);color:var(--text)}
+.workspace-tabs__item.is-active{background:var(--bg);color:var(--text);z-index:1}
+.workspace-tabs__item.is-active::before,.workspace-tabs__item.is-active::after{content:"";position:absolute;bottom:0;width:11px;height:11px;pointer-events:none}
+.workspace-tabs__item.is-active::before{left:-11px;border-radius:0 0 11px 0;box-shadow:5px 5px 0 5px var(--bg)}
+.workspace-tabs__item.is-active::after{right:-11px;border-radius:0 0 0 11px;box-shadow:-5px 5px 0 5px var(--bg)}
+.workspace-tabs__item.is-dragging{opacity:.48}
+.workspace-tabs__tab{height:100%;min-width:0;flex:1;display:flex;align-items:center;gap:8px;padding:0 8px 0 14px;border:0;background:transparent;text-align:left;color:inherit;font-size:11px;font-weight:650;white-space:nowrap}
+.workspace-tabs__tab span{overflow:hidden;text-overflow:ellipsis}
+.workspace-tabs__tab svg{flex:none;color:var(--accent)}
+.workspace-tabs__more,.workspace-tabs__close,.workspace-tabs__add{border:0;background:transparent;color:var(--soft);display:grid;place-items:center;flex:none;border-radius:6px}
+.workspace-tabs__more,.workspace-tabs__close{width:23px;height:23px;opacity:0}
+.workspace-tabs__item:hover .workspace-tabs__more,.workspace-tabs__item:hover .workspace-tabs__close,.workspace-tabs__item:focus-within .workspace-tabs__more,.workspace-tabs__item:focus-within .workspace-tabs__close{opacity:1}
+.workspace-tabs__item.is-active .workspace-tabs__close{opacity:1}
+.workspace-tabs__more:hover,.workspace-tabs__close:hover,.workspace-tabs__add:hover{background:var(--selected);color:var(--text)}
+.workspace-tabs__add{width:29px;height:29px;margin:0 4px 4px 6px;align-self:flex-end}
+.workspace-tabs__menu{position:fixed;z-index:60;width:188px;padding:5px;background:var(--surface);border:1px solid var(--line);border-radius:9px;box-shadow:var(--shadow)}
+.workspace-tabs__menu button{display:block;width:100%;min-height:32px;padding:7px 9px;border:0;border-radius:5px;background:transparent;color:var(--text);text-align:left;font-size:11px}
+.workspace-tabs__menu button:hover:not(:disabled),.workspace-tabs__menu button:focus-visible{background:var(--hover)}
+.workspace-tabs__menu button:disabled{color:var(--soft);opacity:.55}
+@media(max-width:640px){.workspace-tabs{height:40px}.workspace-tabs__scroll{padding-left:7px;padding-right:7px}.workspace-tabs__item{min-width:98px;max-width:150px;height:34px}.workspace-tabs__tab{padding-left:10px;gap:6px}.workspace-tabs__more,.workspace-tabs__close{opacity:1}}
+@media(prefers-reduced-motion:reduce){.workspace-tabs__item{transition:none}}
