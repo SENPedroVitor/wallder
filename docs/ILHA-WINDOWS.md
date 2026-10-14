@@ -51,3 +51,6 @@ O servidor reutiliza leituras por no máximo 15 segundos; a ilha consulta o serv
 O acompanhamento é salvo no servidor e retomado após reinício, por até 36 horas; o usuário pode encerrá-lo pelo botão do placar. Conversas privadas não podem iniciar esse acompanhamento compartilhado. A aprovação de ações dos agentes continua tendo prioridade sobre o placar.
 
 Largura, altura e cantos agora usam uma única transição interrompível de 420 ms. A abertura pelo cursor tem espera de 180 ms e respeita a preferência do Windows de reduzir movimento. Clicar fora da ilha recolhe o painel mesmo quando ela não recebeu foco. O aplicativo lê apenas o estado do botão principal do mouse no Windows, sem registrar teclas, texto ou histórico de cliques. O comportamento foi validado com um clique real em outra janela.
+
+O placar compacto tem um botão X com a descrição ‘Remover placar da ilha’. Ele encerra o acompanhamento no servidor e mantém a conversa e o histórico. O painel expandido oferece a mesma ação em cada partida.
+

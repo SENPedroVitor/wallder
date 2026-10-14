@@ -51,8 +51,8 @@ test('island renders and its real controls dispatch the intended actions across 
     await page.evaluate(()=>{window.fixture.sports[0].away.score=3;window.fixture.sports[0].stale=true})
     await page.waitForFunction(()=>document.querySelector('.compact-sports strong')?.textContent==='0 : 3')
     assert.ok(await page.$eval('.compact-sports',node=>node.textContent.includes('Sem atualização')))
-    await page.click('[aria-label="Expandir placar"]');await page.waitForSelector('.island-score');await new Promise(resolve=>setTimeout(resolve,500))
-    await page.click('[aria-label="Parar de acompanhar LASK Linz e Liverpool"]');await page.waitForFunction(()=>!document.querySelector('.island-score'))
+    await page.click('[aria-label="Remover placar da ilha"]');await page.mouse.move(0,0);await page.waitForSelector('[data-state="idle"]')
+    assert.equal(await page.$('.island-score'),null)
     assert.equal(errors.length, 0, errors.join('\n'))
   } finally { await browser.close(); await new Promise(resolve => server.close(resolve)) }
 })
