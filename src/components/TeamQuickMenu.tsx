@@ -48,7 +48,7 @@ export default function TeamQuickMenu<T extends MascotAgent>({ agents, onChoose,
         <Mascot agent={agent.id} size={43} animated={open} /><span>{agent.name}</span><ArrowUpRight className="team-quick__arrow" size={12} />
       </button>)}</div>
       <small>{available.length} agentes disponíveis · mini chat em paralelo</small>
-      <small>Conversas demonstrativas nesta versão.</small>
+      <small>Abra uma conversa ao lado e compartilhe contexto quando quiser.</small>
     </div>}
   </div>
 }

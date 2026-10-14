@@ -1,8 +1,8 @@
 import type { MascotAgent } from './components/Mascot'
 export type TaskStatus = 'thinking' | 'running' | 'waiting' | 'blocked' | 'done'
 export type ContextEntry = { speaker: string; text: string }
-export type ChatTask = { id: string; chatId: string; agent: MascotAgent; title: string; instruction: string; status: TaskStatus; created: number; updated: number; history: { status: TaskStatus; at: number }[]; context: ContextEntry[]; result?: string }
-export type ChatMessage = { id: string; sender: MascotAgent | 'you'; text: string; at: number; kind?: 'handoff' | 'routine' | 'context'; attachment?: { name: string; size: number; data: string }; taskId?: string; transfer?: { from: string; to: string[]; entries: ContextEntry[] } }
+export type ChatTask = { id: string; chatId: string; agent: MascotAgent; title: string; instruction: string; status: TaskStatus; created: number; updated: number; history: { status: TaskStatus; at: number }[]; context: ContextEntry[]; result?: string; provider?: 'codex' }
+export type ChatMessage = { id: string; sender: MascotAgent | 'you'; text: string; at: number; kind?: 'handoff' | 'routine' | 'context'; attachment?: { name: string; size: number; data: string }; taskId?: string; provider?: 'codex'; transfer?: { from: string; to: string[]; entries: ContextEntry[] } }
 export const taskLabels: Record<TaskStatus, string> = { thinking: 'Pensando', running: 'Em execução', waiting: 'Aguardando você', blocked: 'Bloqueada', done: 'Concluída' }
 export const taskStorageKey = 'wendler:tasks:v1'
 export function taskTitle(text: string): string {
@@ -27,3 +27,5 @@ export function transitionTask(task: ChatTask, status: TaskStatus, at = Date.now
   const result = status === 'done' ? `# ${task.title}\n\nRascunho demonstrativo, preparado localmente.\n\n## Pedido\n${task.instruction}\n\n## Trechos de contexto\n${task.context.length} mensagens disponíveis. O contexto completo está nos detalhes da tarefa.\n\n${excerpts || 'Nenhuma mensagem anterior.'}\n\n## Próximo passo\nRevisar o pedido e conectar o motor de IA para produzir o resultado real.\n\nNenhuma ferramenta externa foi executada.` : task.result
   return { ...task, status, updated: at, result, history: [...task.history, { status, at }] }
 }
+
+export function conversationRecipients<T extends {id:string;name:string}>(text:string,agents:T[],primary:string){const mentioned=mentionedAgents(text,agents);return mentioned.length?mentioned:agents.filter(agent=>agent.id===primary)}

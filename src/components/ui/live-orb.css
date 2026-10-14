@@ -1,0 +1,4 @@
+.canvas-mascot--moving{animation:live-mascot-float 6s ease-in-out infinite;will-change:transform}
+@keyframes live-mascot-float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-3px) rotate(1deg)}}
+[data-motion="reduced"] .canvas-mascot--moving{animation:none;will-change:auto}
+@media(prefers-reduced-motion:reduce){.canvas-mascot--moving{animation:none;will-change:auto}}

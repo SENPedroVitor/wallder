@@ -1,6 +1,6 @@
 import type { MascotAgent } from './components/Mascot'
 
-export type MiniThread = { draft: string; messages: { text: string; sender: 'you' | 'agent' }[] }
+export type MiniThread = { draft: string; messages: { text: string; sender: 'you' | 'agent'; provider?: 'codex' }[] }
 export type LinkedThreads = Record<string, Partial<Record<MascotAgent, MiniThread>>>
 export const linkedStorageKey = 'wendler:linked-mini-chats:v2'
 export const emptyMiniThread: MiniThread = { draft: '', messages: [] }

@@ -1,0 +1,862 @@
+[
+  {
+    "id": "bi8Au",
+    "name": "01.01 — Boas-vindas"
+  },
+  {
+    "id": "s8DdPp",
+    "name": "01.02 — Primeira conversa"
+  },
+  {
+    "id": "Cg59o",
+    "name": "01.03 — Conversa e agentes"
+  },
+  {
+    "id": "wt1yu",
+    "name": "01.04 — Indiana Jones e rotina"
+  },
+  {
+    "id": "U0nGO",
+    "name": "01.05 — Resumo da manhã"
+  },
+  {
+    "id": "zhy44",
+    "name": "01.06 — West · Resposta com widget de clima"
+  },
+  {
+    "id": "YpQF3",
+    "name": "02.01 — Projeto e equipe"
+  },
+  {
+    "id": "QxEK4",
+    "name": "02.02 — Criar canal ou projeto"
+  },
+  {
+    "id": "uJByS",
+    "name": "02.03 — Projeto e arquivo"
+  },
+  {
+    "id": "NWmxS",
+    "name": "02.04 — Projetos — lista vazia"
+  },
+  {
+    "id": "g9zB4F",
+    "name": "02.05 — Projetos — carregando"
+  },
+  {
+    "id": "T7K4Z",
+    "name": "02.06 — Projetos — erro ao carregar"
+  },
+  {
+    "id": "oHDSQ",
+    "name": "02.07 — Projeto · Quadro Kanban"
+  },
+  {
+    "id": "eGwLf",
+    "name": "03.01 — Novo agente e canal"
+  },
+  {
+    "id": "i2u6KS",
+    "name": "03.02 — Personalização do agente"
+  },
+  {
+    "id": "D1sTUd",
+    "name": "03.03 — Ajustar foto do agente"
+  },
+  {
+    "id": "I17fw",
+    "name": "04.01 — Rotinas · Calendário semanal"
+  },
+  {
+    "id": "fshle",
+    "name": "04.02 — Configurar rotina"
+  },
+  {
+    "id": "V0sONO",
+    "name": "04.03 — Editar rotina"
+  },
+  {
+    "id": "Ltgjq",
+    "name": "04.04 — Confirmar pausa da rotina"
+  },
+  {
+    "id": "Y2Ied",
+    "name": "04.05 — Rotina pausada"
+  },
+  {
+    "id": "S4ZS0",
+    "name": "04.06 — Confirmar exclusão da rotina"
+  },
+  {
+    "id": "DzUwg",
+    "name": "04.07 — Rotinas · Histórico de entregas"
+  },
+  {
+    "id": "K4ewO",
+    "name": "04.08 — Detalhes da rotina e ação pendente"
+  },
+  {
+    "id": "V2cOB",
+    "name": "05.01 — Plugins"
+  },
+  {
+    "id": "QATq3",
+    "name": "05.02 — Configurações de conexões"
+  },
+  {
+    "id": "KDiS5",
+    "name": "05.03 — Adicionar conexão / MCP"
+  },
+  {
+    "id": "mve2e",
+    "name": "05.04 — Teste MCP — conexão bem-sucedida"
+  },
+  {
+    "id": "Xoqix",
+    "name": "05.05 — Teste MCP — falha na conexão"
+  },
+  {
+    "id": "JAr8U",
+    "name": "06.01 — Permissões dos agentes"
+  },
+  {
+    "id": "e95yry",
+    "name": "06.02 — Pedido de aprovação do agente"
+  },
+  {
+    "id": "iwTvk",
+    "name": "07.01 — Configurações de perfil"
+  },
+  {
+    "id": "S1jVwg",
+    "name": "07.02 — Configurações de conta"
+  },
+  {
+    "id": "O2NMX",
+    "name": "07.03 — Configurações de aparência"
+  },
+  {
+    "id": "jPh60",
+    "name": "07.04 — Configurações de notificações"
+  },
+  {
+    "id": "WASyr",
+    "name": "07.05 — Configurações de privacidade"
+  },
+  {
+    "id": "I84gYD",
+    "name": "07.06 — Confirmar exclusão da conta"
+  },
+  {
+    "id": "ppNUk",
+    "name": "07.07 — Confirmar limpeza do histórico"
+  },
+  {
+    "id": "yoGQj",
+    "name": "09.02 — Widgets · Gastos, progresso, tarefas e agenda"
+  },
+  {
+    "id": "nznyB",
+    "name": "09.03 — Widgets · Versões compactas"
+  },
+  {
+    "id": "JiLWm",
+    "name": "09.04 — Widgets · Comparação, pesquisa e arquivos"
+  },
+  {
+    "id": "CUd3j",
+    "name": "09.05 — Widgets · Aprovação, equipe e resumo diário"
+  },
+  {
+    "id": "liPpH",
+    "name": "09.06 — Widgets · Gastos expandidos"
+  },
+  {
+    "id": "GpKqD",
+    "name": "09.07 — Widgets · Progresso expandido"
+  },
+  {
+    "id": "JX0gT",
+    "name": "09.08 — Widgets · Tarefas expandidas"
+  },
+  {
+    "id": "F3v4J",
+    "name": "09.09 — Widgets · Agenda expandida"
+  },
+  {
+    "id": "HCk01",
+    "name": "09.10 — Widgets · Viagem, receitas, estudos e hábitos"
+  },
+  {
+    "id": "BWbDd",
+    "name": "09.11 — Widgets · Cinema, notícias, tradução e cores"
+  },
+  {
+    "id": "IPgq6",
+    "name": "09.12 — Widgets · Foco, enquetes, lugares e quiz"
+  },
+  {
+    "id": "HAUNP",
+    "name": "09.13 — Cinema · Escolher sessão e ingresso comprado"
+  },
+  {
+    "id": "TkLuS",
+    "name": "09.14 — Viagem · Ônibus e avião antes e depois da compra"
+  },
+  {
+    "id": "nlJoS",
+    "name": "09.15 — Widgets · Entrega rastreada"
+  },
+  {
+    "id": "mu2Jw",
+    "name": "09.16 — Widgets · Tabela de promoções"
+  },
+  {
+    "id": "p1c90",
+    "name": "09.17 — Matemática · Fórmula explorável com c igual a 3"
+  },
+  {
+    "id": "du6hM",
+    "name": "09.18 — Matemática · Resultado após ajustar c para 0"
+  },
+  {
+    "id": "nARBK",
+    "name": "10.01 — Chat · Clima"
+  },
+  {
+    "id": "c5Iuyf",
+    "name": "10.02 — Chat · Gastos"
+  },
+  {
+    "id": "LJ0Tl",
+    "name": "10.03 — Chat · Gastos · compacto"
+  },
+  {
+    "id": "p5jsN",
+    "name": "10.04 — Chat · Progresso do projeto"
+  },
+  {
+    "id": "M4n7Wo",
+    "name": "10.05 — Chat · Progresso · compacto"
+  },
+  {
+    "id": "P4yvSf",
+    "name": "10.06 — Chat · Tarefas"
+  },
+  {
+    "id": "gtNSM",
+    "name": "10.07 — Chat · Tarefas · compacto"
+  },
+  {
+    "id": "P7hBF",
+    "name": "10.08 — Chat · Agenda"
+  },
+  {
+    "id": "LZevf",
+    "name": "10.09 — Chat · Agenda · compacto"
+  },
+  {
+    "id": "gcPRJ",
+    "name": "10.10 — Chat · Comparação"
+  },
+  {
+    "id": "nywbZ",
+    "name": "10.11 — Chat · Pesquisa com fontes"
+  },
+  {
+    "id": "r4nGZt",
+    "name": "10.12 — Chat · Arquivos e entregas"
+  },
+  {
+    "id": "spGVJ",
+    "name": "10.13 — Chat · Aprovação"
+  },
+  {
+    "id": "IsRrk",
+    "name": "10.14 — Chat · Resumo diário"
+  },
+  {
+    "id": "Iwd2J",
+    "name": "10.15 — Chat · Execução da equipe"
+  },
+  {
+    "id": "vUkbX",
+    "name": "10.16 — Chat · Viagem · roteiro"
+  },
+  {
+    "id": "uxJpe",
+    "name": "10.17 — Chat · Receita"
+  },
+  {
+    "id": "y57ZsF",
+    "name": "10.18 — Chat · Estudos · flashcard"
+  },
+  {
+    "id": "jdsv3",
+    "name": "10.19 — Chat · Hábitos"
+  },
+  {
+    "id": "pAthg",
+    "name": "10.20 — Chat · Cinema e séries"
+  },
+  {
+    "id": "qQdX3",
+    "name": "10.21 — Chat · Notícias"
+  },
+  {
+    "id": "BgeNi",
+    "name": "10.22 — Chat · Tradução"
+  },
+  {
+    "id": "zTs3M",
+    "name": "10.23 — Chat · Cores e estilo"
+  },
+  {
+    "id": "msI7t",
+    "name": "10.24 — Chat · Foco"
+  },
+  {
+    "id": "GxcxF",
+    "name": "10.25 — Chat · Enquete"
+  },
+  {
+    "id": "u12s9",
+    "name": "10.26 — Chat · Lugares próximos"
+  },
+  {
+    "id": "f7dKo",
+    "name": "10.27 — Chat · Estudos · quiz"
+  },
+  {
+    "id": "lk4e2",
+    "name": "10.28 — Chat · Cinema · escolher sessão"
+  },
+  {
+    "id": "OXXh4",
+    "name": "10.29 — Chat · Cinema · ingresso comprado"
+  },
+  {
+    "id": "DAoP0",
+    "name": "10.30 — Chat · Ônibus · comparar passagem"
+  },
+  {
+    "id": "dS6cT",
+    "name": "10.31 — Chat · Avião · comparar passagem"
+  },
+  {
+    "id": "xhCob",
+    "name": "10.32 — Chat · Ônibus · passagem comprada"
+  },
+  {
+    "id": "nWGck",
+    "name": "10.33 — Chat · Avião · passagem comprada"
+  },
+  {
+    "id": "erYaE",
+    "name": "10.34 — Chat · Entrega · resumo"
+  },
+  {
+    "id": "mgy5J",
+    "name": "10.35 — Chat · Entrega · histórico"
+  },
+  {
+    "id": "d8LQmS",
+    "name": "10.36 — Chat · Promoções de produto"
+  },
+  {
+    "id": "Dba0J",
+    "name": "10.37 — Chat · Matemática · fórmula"
+  },
+  {
+    "id": "Y3QFN",
+    "name": "10.38 — Chat · Matemática · ajustar coeficiente"
+  },
+  {
+    "id": "Sgdaw",
+    "name": "10.39 — Chat · Gastos · painel aberto"
+  },
+  {
+    "id": "N7mTzx",
+    "name": "10.40 — Chat · Progresso · painel aberto"
+  },
+  {
+    "id": "zrOHt",
+    "name": "10.41 — Chat · Tarefas · painel aberto"
+  },
+  {
+    "id": "HSrOc",
+    "name": "10.42 — Chat · Agenda · painel aberto"
+  },
+  {
+    "id": "WbqKy",
+    "name": "11.01 — Finanças · Meus cartões"
+  },
+  {
+    "id": "krKiG",
+    "name": "11.02 — Finanças · Meu Pix"
+  },
+  {
+    "id": "SEFMR",
+    "name": "11.03 — Finanças · Pix · gasto registrado"
+  },
+  {
+    "id": "f2Tghv",
+    "name": "11.04 — Finanças · Histórico financeiro"
+  },
+  {
+    "id": "YmDrv",
+    "name": "11.05 — Finanças · Fatura do cartão"
+  },
+  {
+    "id": "q64EnG",
+    "name": "11.06 — Finanças · Bolsa de valores"
+  },
+  {
+    "id": "O5Fxat",
+    "name": "11.07 — Finanças · CDB · detalhes"
+  },
+  {
+    "id": "LDuee",
+    "name": "11.08 — Finanças · Opções de investimento"
+  },
+  {
+    "id": "j2Cs2P",
+    "name": "11.09 — Finanças · Meus investimentos"
+  },
+  {
+    "id": "QzzKP",
+    "name": "11.10 — Finanças · Distribuição da carteira"
+  },
+  {
+    "id": "Q9h20",
+    "name": "11.11 — Finanças · Detalhe de um investimento"
+  },
+  {
+    "id": "O6x5P",
+    "name": "11.12 — Finanças · Simulador de investimento"
+  },
+  {
+    "id": "wPDRL",
+    "name": "11.13 — Finanças · Resumo financeiro"
+  },
+  {
+    "id": "A0p4rB",
+    "name": "11.14 — Finanças · Cadastrar cartão"
+  },
+  {
+    "id": "NnWRc",
+    "name": "11.15 — Finanças · Cadastrar chave Pix"
+  },
+  {
+    "id": "j8vKli",
+    "name": "11.16 — Finanças · Adicionar investimento"
+  },
+  {
+    "id": "PgMBp",
+    "name": "11.17 — Chat · Meus cartões"
+  },
+  {
+    "id": "HTERN",
+    "name": "11.18 — Chat · Meu Pix"
+  },
+  {
+    "id": "BSGRA",
+    "name": "11.19 — Chat · Pix · gasto registrado"
+  },
+  {
+    "id": "P2S5bS",
+    "name": "11.20 — Chat · Histórico financeiro"
+  },
+  {
+    "id": "YdPCY",
+    "name": "11.21 — Chat · Fatura do cartão"
+  },
+  {
+    "id": "w3HtWh",
+    "name": "11.22 — Chat · Bolsa de valores"
+  },
+  {
+    "id": "u5mua",
+    "name": "11.23 — Chat · CDB · detalhes"
+  },
+  {
+    "id": "O40g8u",
+    "name": "11.24 — Chat · Opções de investimento"
+  },
+  {
+    "id": "Q3iNn",
+    "name": "11.25 — Chat · Meus investimentos"
+  },
+  {
+    "id": "F16rPY",
+    "name": "11.26 — Chat · Distribuição da carteira"
+  },
+  {
+    "id": "jKERl",
+    "name": "11.27 — Chat · Detalhe do investimento"
+  },
+  {
+    "id": "N9SE8",
+    "name": "11.28 — Chat · Simulador de investimento"
+  },
+  {
+    "id": "Sd1JR",
+    "name": "11.29 — Chat · Resumo financeiro"
+  },
+  {
+    "id": "GlyzE",
+    "name": "12.01 — Pam · Contas a vencer"
+  },
+  {
+    "id": "N864ij",
+    "name": "12.02 — Pam · Assinaturas"
+  },
+  {
+    "id": "WWDzk",
+    "name": "12.03 — Pam · Compras parceladas"
+  },
+  {
+    "id": "U0w5er",
+    "name": "12.04 — Pam · Meta de economia"
+  },
+  {
+    "id": "Vt8GT",
+    "name": "12.05 — Pam · Dividir despesas"
+  },
+  {
+    "id": "rBL1j",
+    "name": "12.06 — Pam · Dinheiro a receber"
+  },
+  {
+    "id": "F8P4Y3",
+    "name": "12.07 — Pam · Calendário financeiro"
+  },
+  {
+    "id": "x5dSx",
+    "name": "12.08 — Pam · Alerta de gasto"
+  },
+  {
+    "id": "WkYae",
+    "name": "12.09 — Pam · Comprovante organizado"
+  },
+  {
+    "id": "W2Qx4",
+    "name": "12.10 — Pam · À vista ou parcelado"
+  },
+  {
+    "id": "Zh9jV",
+    "name": "12.11 — Pam · Reserva de emergência"
+  },
+  {
+    "id": "UVDhx",
+    "name": "12.12 — Pam · Custo total de uma compra"
+  },
+  {
+    "id": "keLNn",
+    "name": "12.13 — Chat com Pam · Contas a vencer"
+  },
+  {
+    "id": "nOyFv",
+    "name": "12.14 — Chat com Pam · Assinaturas"
+  },
+  {
+    "id": "G4SE8",
+    "name": "12.15 — Chat com Pam · Compras parceladas"
+  },
+  {
+    "id": "TUXbW",
+    "name": "12.16 — Chat com Pam · Meta de economia"
+  },
+  {
+    "id": "aTSOz",
+    "name": "12.17 — Chat com Pam · Dividir despesas"
+  },
+  {
+    "id": "g4Bg1j",
+    "name": "12.18 — Chat com Pam · Dinheiro a receber"
+  },
+  {
+    "id": "ttZXT",
+    "name": "12.19 — Chat com Pam · Calendário financeiro"
+  },
+  {
+    "id": "X8oACU",
+    "name": "12.20 — Chat com Pam · Alerta de gasto"
+  },
+  {
+    "id": "FHoJ6",
+    "name": "12.21 — Chat com Pam · Comprovante organizado"
+  },
+  {
+    "id": "lE5rN",
+    "name": "12.22 — Chat com Pam · À vista ou parcelado"
+  },
+  {
+    "id": "zzUnR",
+    "name": "12.23 — Chat com Pam · Reserva de emergência"
+  },
+  {
+    "id": "Qic7B",
+    "name": "12.24 — Chat com Pam · Custo total de uma compra"
+  },
+  {
+    "id": "l2qoA",
+    "name": "13.01 — Pam · Aniversários de amigos e família"
+  },
+  {
+    "id": "H6P0B",
+    "name": "13.02 — Pam · Futebol"
+  },
+  {
+    "id": "Q5oiL4",
+    "name": "13.03 — Pam · Basquete · NBA"
+  },
+  {
+    "id": "hVIVG",
+    "name": "13.04 — Pam · Futebol americano · NFL"
+  },
+  {
+    "id": "ntzBi",
+    "name": "13.05 — Pam · Beisebol · MLB"
+  },
+  {
+    "id": "r2wKZB",
+    "name": "13.06 — Pam · Hóquei · NHL"
+  },
+  {
+    "id": "WlSGC",
+    "name": "13.07 — Pam · Lançamentos de música"
+  },
+  {
+    "id": "NELZN",
+    "name": "13.08 — Pam · Séries · novas temporadas e episódios"
+  },
+  {
+    "id": "OkpzA",
+    "name": "13.09 — Pam · Minha agenda pessoal"
+  },
+  {
+    "id": "CJpUn",
+    "name": "13.10 — Chat com Pam · Aniversários"
+  },
+  {
+    "id": "yVWCe",
+    "name": "13.11 — Chat com Pam · Futebol"
+  },
+  {
+    "id": "B2O9N",
+    "name": "13.12 — Chat com Pam · Basquete · NBA"
+  },
+  {
+    "id": "NDMkE",
+    "name": "13.13 — Chat com Pam · Futebol americano · NFL"
+  },
+  {
+    "id": "btv80",
+    "name": "13.14 — Chat com Pam · Beisebol · MLB"
+  },
+  {
+    "id": "h08Q5U",
+    "name": "13.15 — Chat com Pam · Hóquei · NHL"
+  },
+  {
+    "id": "knL0w",
+    "name": "13.16 — Chat com Pam · Lançamentos de música"
+  },
+  {
+    "id": "eV6jQ",
+    "name": "13.17 — Chat com Pam · Lançamentos de séries"
+  },
+  {
+    "id": "oErgh",
+    "name": "13.18 — Chat com Pam · Minha agenda pessoal"
+  },
+  {
+    "id": "cnxqM",
+    "name": "14.01 — UX · Buscar no seu espaço"
+  },
+  {
+    "id": "RqwY6",
+    "name": "14.02 — UX · Voltar ao contexto de uma conversa"
+  },
+  {
+    "id": "kcPij",
+    "name": "14.03 — UX · Nenhum resultado encontrado"
+  },
+  {
+    "id": "y6eiu0",
+    "name": "14.04 — UX · Histórico e itens fixados"
+  },
+  {
+    "id": "Q2ngU5",
+    "name": "14.05 — UX · Meus favoritos"
+  },
+  {
+    "id": "YEgH4",
+    "name": "14.06 — UX · Adicionar ou editar favorito"
+  },
+  {
+    "id": "WMRG0",
+    "name": "14.07 — UX · Cadastrar aniversário"
+  },
+  {
+    "id": "c85VM",
+    "name": "14.08 — UX · Quando quero ser lembrado"
+  },
+  {
+    "id": "vxUWS",
+    "name": "14.09 — UX · Memória dos agentes"
+  },
+  {
+    "id": "sBG3h",
+    "name": "14.10 — UX · De onde veio esta memória?"
+  },
+  {
+    "id": "uqK6F",
+    "name": "14.11 — UX · Editar memória"
+  },
+  {
+    "id": "RhEjh",
+    "name": "14.12 — UX · Apagar esta memória?"
+  },
+  {
+    "id": "A7R2pp",
+    "name": "14.13 — UX · Memória removida"
+  },
+  {
+    "id": "VQ3BI",
+    "name": "15.01 — UX · Conferir o gasto antes de registrar"
+  },
+  {
+    "id": "t7ED64",
+    "name": "15.02 — UX · A Pam precisa de um detalhe"
+  },
+  {
+    "id": "TiVlA",
+    "name": "15.03 — UX · Registro confirmado ou corrigido"
+  },
+  {
+    "id": "SjfGC",
+    "name": "15.04 — UX · Este Pix já foi registrado?"
+  },
+  {
+    "id": "RILMi",
+    "name": "15.05 — UX · Comprovante vinculado"
+  },
+  {
+    "id": "TD9aQ",
+    "name": "15.06 — UX · Confirmar que são dois pagamentos"
+  },
+  {
+    "id": "D12DF0",
+    "name": "15.07 — UX · Gerenciar meus registros"
+  },
+  {
+    "id": "X5W7Tb",
+    "name": "15.08 — UX · Editar cartão"
+  },
+  {
+    "id": "xsiex",
+    "name": "15.09 — UX · Editar investimento"
+  },
+  {
+    "id": "RbbJM",
+    "name": "15.10 — UX · Editar evento ou lembrete"
+  },
+  {
+    "id": "p95ej",
+    "name": "15.11 — UX · Registros arquivados"
+  },
+  {
+    "id": "lMjTc",
+    "name": "15.12 — UX · Arquivar este cartão?"
+  },
+  {
+    "id": "jDQUu",
+    "name": "15.13 — UX · Excluir este cadastro?"
+  },
+  {
+    "id": "EhltC",
+    "name": "16.01 — UX · Alterações salvas"
+  },
+  {
+    "id": "t4yFo9",
+    "name": "16.02 — UX · Não foi possível salvar"
+  },
+  {
+    "id": "nHu0L",
+    "name": "16.03 — UX · Lembrete configurado"
+  },
+  {
+    "id": "E9LOxW",
+    "name": "16.04 — UX · Cartão arquivado"
+  },
+  {
+    "id": "DJHWE",
+    "name": "16.05 — UX · Cadastro excluído"
+  },
+  {
+    "id": "iaCCa",
+    "name": "16.06 — UX · Ação desfeita"
+  },
+  {
+    "id": "ugfLP",
+    "name": "16.07 — UX · Favorito salvo"
+  },
+  {
+    "id": "k6oKd2",
+    "name": "16.08 — UX · O lembrete ainda não está ativo"
+  },
+  {
+    "id": "hfZYd",
+    "name": "16.09 — UX · Conta marcada como paga"
+  },
+  {
+    "id": "Pr96a",
+    "name": "16.10 — UX · Widget Carregando"
+  },
+  {
+    "id": "xkOZS",
+    "name": "16.11 — UX · Widget Sem dados"
+  },
+  {
+    "id": "nRJTD",
+    "name": "16.12 — UX · Widget Desatualizado"
+  },
+  {
+    "id": "QNGYE",
+    "name": "16.13 — UX · Widget Conexão perdida"
+  },
+  {
+    "id": "p5mkIo",
+    "name": "16.14 — UX · Widget Tentativa falhou"
+  },
+  {
+    "id": "wZloy",
+    "name": "16.15 — UX · Widget Atualizado"
+  },
+  {
+    "id": "L1vAz",
+    "name": "16.16 — UX · Memória atualizada"
+  },
+  {
+    "id": "b5IjT",
+    "name": "16.17 — UX · Memória restaurada"
+  },
+  {
+    "id": "F7WBp",
+    "name": "16.18 — UX · Correção do gasto desfeita"
+  },
+  {
+    "id": "vtQNf",
+    "name": "16.19 — UX · Conta voltou às pendências"
+  },
+  {
+    "id": "ODNPO",
+    "name": "16.20 — UX · Deixar de acompanhar este favorito?"
+  },
+  {
+    "id": "r5SIRb",
+    "name": "16.21 — UX · Favorito removido"
+  }
+]

@@ -1,0 +1,12 @@
+import { CanvasScene, replaceCanvasMascot, type CanvasBinding } from './CanvasScene'
+import { readProject } from './projects'
+import type { ProjectWorkspaceProps } from './ProjectWorkspace'
+const original=['Kyle Rayner','Songbird','Sheldon Cooper','Batman']
+const suggestions=['Revisar as telas com Kyle Rayner','Ajustar os componentes com Songbird','Checar a segurança com Capitão América','Organizar as próximas etapas com Batman','Testar a interface com Sheldon Cooper','Comparar as referências de design']
+export function PencilProjectOverview({project,chats,agents,onAgent,onBack,onBoard,onTeamChat}:{onBoard:()=>void}&ProjectWorkspaceProps){
+ const details=readProject(project),team=details.members.map(id=>agents.find(a=>a.id===id)).filter(a=>a!==undefined)
+ const bindings:Record<string,CanvasBinding>={'Nome do projeto':{text:project.title,action:'Conversar com a equipe'},'Mostrar mais sugestões':{text:'Abrir quadro de tarefas',action:'Abrir quadro'}}
+ suggestions.forEach((name,index)=>{bindings['Sugestão — '+name]={text:details.tasks[index]?.title??(index===details.tasks.length?'Adicionar tarefa':''),action:index<=details.tasks.length?'Abrir quadro':undefined}})
+ original.forEach((name,index)=>{const member=team[index],chat=member&&chats.filter(c=>c.agent===member.id&&c.projectId===project.id&&!c.archived).sort((a,b)=>b.updated-a.updated)[0];bindings[name+' — nome']={text:member?.name??'',action:member?'Agente: '+member.id:undefined};bindings[name+' — prévia']={text:chat?.messages.at(-1)?.text.slice(0,80)??member?.role??''};bindings[name+' — horário']={text:chat?new Date(chat.updated).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):''}})
+ return <section className="waddle-scene-page pencil-project-overview"><CanvasScene id="YpQF3" crop={false} bindings={bindings} decorate={root=>{original.forEach((name,index)=>{const avatar=root.querySelector<HTMLElement>('[data-pencil-name="'+name+' — mascote da equipe"]');if(!avatar)return;if(team[index])replaceCanvasMascot(avatar,team[index].id);else avatar.style.display='none'})}} decorationKey={JSON.stringify(details.members)} onAction={event=>{if(event.label==='Abrir quadro')onBoard();else if(event.label==='Conversar com a equipe')onTeamChat?.();else if(event.label.startsWith('Agente: ')){const member=team.find(a=>a.id===event.label.slice(8));if(member)onAgent(member.id)}}}/><button className="pencil-project-overview-back" onClick={onBack}>Voltar aos projetos</button></section>
+}

@@ -19,9 +19,6 @@
 .team-quick__together { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 39px; margin-top: 12px; border-radius: 14px; font-size: 12px; color: var(--muted); }
 .team-quick__together:hover { background: var(--hover); color: var(--text); }
 .team-quick__panel small { display: block; text-align: center; font-size: 10px; color: var(--muted); margin-top: 6px; }
-.team-quick__trigger .mascot__presence { transform: rotate(-7deg); }
-.team-quick[data-open="true"] .team-quick__trigger .mascot__presence { transform: rotate(6deg) scale(1.05); }
-.team-quick[data-open="true"] .team-quick__trigger .mascot__face { animation: none; transform: translate(1px, 4px); }
 @keyframes team-quick-in { from { opacity: 0; transform: translateY(-8px) scale(.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (max-width: 640px) { .team-quick__trigger { padding: 0 3px; min-height: 40px; } .team-quick__trigger > span:not(.mascot) { display: none; } .team-quick__panel { position: fixed; top: 76px; right: 12px; } }
 @media (prefers-reduced-motion: reduce) { .team-quick *, .team-quick *::before { animation: none !important; transition: none !important; } }

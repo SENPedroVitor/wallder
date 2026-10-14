@@ -1,6 +1,6 @@
 # Wendler
 
-Interface local de uma equipe pessoal de agentes. Esta primeira versão é um protótipo de interface: não conecta ao Codex, não chama modelos e não executa ações externas.
+Interface local de uma equipe pessoal de agentes. O chat pode conversar com o Codex CLI instalado neste computador por meio de um serviço Node.js local. Os demais painéis da interface ainda incluem recursos demonstrativos.
 
 Stack do projeto: React com TypeScript, JavaScript no Node.js e CSS. A implementação e as futuras integrações não devem utilizar Python.
 
@@ -10,7 +10,7 @@ Requer Node.js e pnpm.
 
 ```sh
 pnpm install
-pnpm dev --host 127.0.0.1
+pnpm start
 ```
 
 Abra o endereço exibido pelo Vite. Para verificar a compilação:
@@ -19,7 +19,7 @@ Abra o endereço exibido pelo Vite. Para verificar a compilação:
 pnpm build
 ```
 
-O perfil, as preferências e as conversas demonstrativas são armazenados neste navegador. Não há conta ou login. Use dados de exemplo para avaliar a interface.
+Para respostas do modelo, instale o Codex CLI e entre com sua conta ChatGPT neste computador. O serviço local informa quando ele está indisponível. O estado do runtime fica em `.wendler/`; perfil, preferências e dados anteriores da interface continuam neste navegador. Não há conta Wendler nem sincronização entre dispositivos. Consulte [Runtime local](docs/RUNTIME-LOCAL.md) para configuração, armazenamento e limites dos recursos.
 
 ## Organização
 

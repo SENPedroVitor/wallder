@@ -1,0 +1,34 @@
+/* The desktop shell fills the available window; native cards retain their canvas geometry. */
+html,body,#root{margin:0;min-height:100%;background:var(--w-bg)}
+.pencil-app-viewport{height:var(--app-height,100dvh);--pencil-width:800px;--pencil-height:600px;contain:layout paint}
+.pencil-app-frame{width:var(--pencil-width);height:var(--pencil-height)}
+.pencil-app-frame>.waddle-app{width:100%;height:100%;border-radius:0}
+.pencil-app-frame .pencil-sidebar,.pencil-app-frame .pencil-agent-panel{height:100%;align-self:stretch}
+.pencil-app-frame .waddle-app--agent-panel .waddle-main{width:auto;flex:1;min-width:0}
+.pencil-app-frame .pencil-sidebar-agents{height:auto;bottom:76px}
+.pencil-app-frame .pencil-sidebar--widget .pencil-sidebar-agents{bottom:auto;height:200px}
+.pencil-app-frame .pencil-sidebar-profile{position:absolute;bottom:16px;left:18px;right:12px;z-index:900;display:flex;justify-content:flex-start;padding:0;gap:9px;align-items:center;height:28px;text-align:left}
+.pencil-sidebar-profile img{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:none}
+.pencil-sidebar-profile span:not(.canvas-mascot){font-size:12px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;min-width:0}
+.pencil-app-frame .pencil-sidebar-menu{bottom:54px;max-height:calc(100% - 70px)}
+.pencil-app-frame .pencil-tasks-panel{height:100%}
+.pencil-app-frame .pencil-panel-task-list{height:auto;bottom:76px}
+.pencil-app-frame .pencil-create-scrim{width:100%;height:100%}
+.pencil-app-frame .waddle-message-column{max-width:900px;margin:0 auto}
+@media(min-width:1000px){
+ .pencil-app-frame .pencil-sidebar{width:220px!important;border-right:1px solid var(--w-line)}
+ .pencil-sidebar>.canvas-viewport{width:200px}
+ .pencil-sidebar .canvas-scene{transform:scale(1)!important;transform-origin:top left}
+ .pencil-sidebar .canvas-scene>div>div:first-child{border:0!important}
+ .pencil-app-frame .pencil-sidebar-agents{width:calc(100% - 18px);left:9px}
+ .pencil-app-frame .pencil-sidebar-agents strong{font-size:13px}
+ .pencil-app-frame .waddle-header{height:54px;padding:0 24px}
+ .pencil-app-frame .waddle-message,.pencil-app-frame .waddle-app--agent-panel .waddle-bubble{font-size:14px;line-height:1.5}
+ .pencil-app-frame .waddle-message--user .waddle-bubble{max-width:70%}
+ .pencil-app-frame .waddle-app--agent-panel .waddle-bubble{max-width:78%}
+ .pencil-app-frame .waddle-messages{padding:22px 28px 16px}
+ .pencil-app-frame .waddle-composer{padding:12px 28px 22px}
+ .pencil-app-frame .waddle-composer textarea{font-size:14px}
+ .pencil-app-frame .waddle-app--agent-panel .waddle-empty-chat{max-width:536px;margin-top:72px}
+ .pencil-app-frame .waddle-app--agent-panel .waddle-suggestions{grid-template-columns:1fr 1fr}
+}

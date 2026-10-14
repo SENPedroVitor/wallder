@@ -10,6 +10,7 @@ const fixture = () => ({ format: 'wendler-backup', version: 1, created: '2026-09
   ] },
   'wendler:tasks:v1': [{ id: 'task:one', chatId: 'team:one', agent: 'indy', title: 'Pesquisa', instruction: 'Organizar contexto', status: 'done', created: 100, updated: 200, history: [{ status: 'done', at: 200 }], context: [{ speaker: 'Você', text: 'Contexto' }], result: 'Rascunho' }],
   'wendler:routines:v1': [{ id: 'routine:one', chatId: 'team:one', name: 'Revisão', instruction: 'Revisar', frequency: 'Dias úteis', time: '09:30', active: true, runs: [100] }],
+  'waddle:records:v1': [{id:'record:one',kind:'gasto',title:'Registro',fields:{Valor:'12,50'},updated:100}],
   'wendler:plugins:v1': ['figma', 'drive'],
   'wendler-workspace-tabs-v1': { version: 1, activeId: 'tab:one', tabs: [{ id: 'tab:one', view: 'team', chatId: 'team:one' }] },
   'wendler:sidebar-collapsed': true,
@@ -76,3 +77,5 @@ invalid('duplicate message IDs', b => { const c = b.stores['wendler:frontend:v1'
 invalid('duplicate task IDs', b => { b.stores['wendler:tasks:v1'].push(structuredClone(b.stores['wendler:tasks:v1'][0])) })
 invalid('duplicate routine IDs', b => { b.stores['wendler:routines:v1'].push(structuredClone(b.stores['wendler:routines:v1'][0])) })
 invalid('duplicate workspace tab IDs', b => { b.stores['wendler-workspace-tabs-v1'].tabs.push(structuredClone(b.stores['wendler-workspace-tabs-v1'].tabs[0])) })
+
+invalid('invalid financial record', b => { b.stores['waddle:records:v1'][0].fields.Valor = 12 })

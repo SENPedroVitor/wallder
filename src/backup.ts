@@ -1,4 +1,4 @@
-export const backupKeys = ['wendler:frontend:v1', 'wendler:linked-mini-chats:v2', 'wendler:tasks:v1', 'wendler:routines:v1', 'wendler:plugins:v1', 'wendler-workspace-tabs-v1', 'wendler:sidebar-collapsed', 'wendler:context-links:v1'] as const
+export const backupKeys = ['wendler:frontend:v1', 'wendler:linked-mini-chats:v2', 'wendler:tasks:v1', 'wendler:routines:v1', 'wendler:plugins:v1', 'wendler-workspace-tabs-v1', 'wendler:sidebar-collapsed', 'wendler:context-links:v1', 'waddle:records:v1'] as const
 export const recoveryKey = 'wendler:backup-recovery:v1'
 export type Backup = { format: 'wendler-backup'; version: 1; created: string; stores: Record<string, unknown> }
 type Obj = Record<string, unknown>
@@ -27,6 +27,7 @@ export function validateBackup(value: unknown, agents: string[]): Backup {
   if (new Set(front.chats.map(c => (c as Obj).id)).size !== front.chats.length) return fail()
   for (const key of backupKeys.slice(1)) {
     const v = stores[key]; if (v === undefined || v === null) continue
+    if (key === 'waddle:records:v1' && !(Array.isArray(v) && v.every(r => object(r) && string(r.id) && string(r.kind) && string(r.title) && object(r.fields) && Object.values(r.fields).every(string) && finite(r.updated)))) return fail()
     if (key === 'wendler:tasks:v1' && !(Array.isArray(v) && v.every(t => object(t) && string(t.id) && string(t.chatId) && agent(t.agent) && string(t.title) && string(t.instruction) && status(t.status) && finite(t.created) && finite(t.updated) && context(t.context) && Array.isArray(t.history) && t.history.every(h => object(h) && status(h.status) && finite(h.at)) && (t.result === undefined || string(t.result))))) return fail()
     if (key === 'wendler:routines:v1' && !(Array.isArray(v) && v.every(r => object(r) && string(r.id) && string(r.chatId) && string(r.name) && string(r.instruction) && ['Todos os dias', 'Dias úteis', 'Toda segunda-feira'].includes(String(r.frequency)) && string(r.time) && /^([01]\d|2[0-3]):[0-5]\d$/.test(r.time) && typeof r.active === 'boolean' && Array.isArray(r.runs) && r.runs.every(finite)))) return fail()
     if (key === 'wendler:plugins:v1' && !strings(v)) return fail()
@@ -69,5 +70,7 @@ export async function restoreBackup(backup: Backup) {
     }
   }
   if (navigator.locks) await navigator.locks.request('wendler:data', commit); else commit()
+  await saveRestoredStores(backup.stores)
   window.location.reload()
 }
+import { saveRestoredStores } from './syncedStore.ts'

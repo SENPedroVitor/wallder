@@ -1,337 +1,257 @@
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
-import { ArrowRight, ArrowUp, Check, ChevronDown, ChevronRight, CircleHelp, Feather, ImagePlus, Menu, MessageCircle, Moon, MoreHorizontal, PanelLeft, Plug, Monitor, Paperclip, FileText, Search, Settings2, Sparkles, Sun, Trash2, Users, X } from 'lucide-react'
-import Mascot, { mascotStates, type MascotState, type MascotAgent } from './components/Mascot'
-import './sketch-studies.css'
-import TeamQuickMenu from './components/TeamQuickMenu'
-import MiniAgentChat from './components/MiniAgentChat'
-import SharedContext from './components/SharedContext'
-import WorkspaceTabs from './components/WorkspaceTabs'
-import AgentPicker from './components/AgentPicker'
-import './sidebar-layout.css'
-import PluginsDialog from './components/PluginsDialog'
-import WorkPanel from './components/WorkPanel'
-import './conversation-layout.css'
-import ChatMessages from './components/ChatMessages'
-import MentionComposer from './components/MentionComposer'
-import { loadTasks, mentionedAgents, transitionTask, taskLabels, taskStorageKey, taskTitle, type ChatTask, type ChatMessage, type TaskStatus } from './chatWork'
-import { createRoutineFromMessage } from './routines'
+import {ShoppingComparison,type ShoppingComparisonData} from './design/ShoppingComparison'
+import {RunProgress} from './design/RunProgress'
+import { PixWidget, type PixData } from './design/PixWidget'
+import { isClearCommand, restartConversation } from './design/chatCommands'
+import FormattedText from './components/FormattedText'
+import { OfficialWidget, type OfficialWidgetData } from './design/OfficialWidget'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { Monitor, FileText, ArrowLeft, ArrowUp, Check, ChevronRight, History, Menu, MoreHorizontal, Paperclip, Pin, Plus, Search, Settings, Square, Star, Trash2, X } from 'lucide-react'
+import { useRuntime, runtimeJson } from './runtime'
 import { useLocalStore } from './useLocalStore'
-import BackupSettings from './components/BackupSettings'
-import SearchConversation, { type ConversationSearchResult } from './components/SearchConversation'
-import ProjectTeams from './components/project-teams'
-import './components/local-features.css'
-import { permanentChats, rememberContact } from './permanentChats'
-import { loadLinkedThreads, migrateLinkedThreads, linkedStorageKey, emptyMiniThread } from './sharedThreads'
+import { useRoutines } from './design/useRoutines'
+import RoutineList from './design/RoutineList'
+import { useWorkspace } from './design/useWorkspace'
+import { memoryForAgent, memoryRevision } from './design/agentMemory'
+import { notificationAllowed } from './design/notificationPreferences'
+import { PencilTasksPanel } from './design/PencilTasksPanel'
+import { PencilAttachment } from './design/PencilAttachment'
+import { PencilSidebar } from './design/PencilSidebar'
+import './design/pencil-sidebar.css'
+import { PencilAgentPanel } from './design/PencilAgentPanel'
+import './design/pencil-agent-panel.css'
+import { PencilAgent } from './design/PencilAgent'
+import PluginCatalog from './design/PluginCatalog'
+import { PencilSettings } from './design/PencilSettings'
+import { PencilViewport } from './design/PencilViewport'
+import { readSettings, type SettingsSection } from './design/SettingsPage'
+import { ConnectionsPage } from './design/ConnectionsPage'
+import RecordsPage from './design/RecordsPage'
+import { PencilFavorites } from './design/PencilFavorites'
+import { PencilMemories } from './design/PencilMemories'
+import { PencilProjectOverview } from './design/PencilProjectOverview'
+import { PencilProjects, PencilProjectCreator, PencilProjectBoard } from './design/PencilProjects'
+import ProjectWorkspace from './design/ProjectWorkspace'
+import { readProject, writeProject, updateProjectTask } from './design/projects'
+import SearchPanel from './design/SearchPanel'
+import TasksPage from './design/TasksPage'
+import BackendPanel, { type BackendTab } from './design/BackendPanel'
+import ApprovalDetails from './components/ApprovalDetails'
+import { loadTasks, conversationRecipients, taskStorageKey, taskTitle, type ChatTask } from './chatWork'
+import { CanvasIdentityProvider, CanvasMascot, CanvasScene, paintCanvasMascotColor, type SceneAction } from './design/CanvasScene'
+import { FocusWidget, MarketWidget, TasksWidget, type FocusData, type MarketData, type TasksData } from './design/ToolWidgets'
+import { SpendingWidget, WeatherWidget, type SpendingData, type WeatherData } from './design/LiveWidgets'
+import { agentById as baseAgentById, agents as baseAgents, catalog, loadRecords, makeId, normalize, recordsKey, screenByCode, screenCode, type Chat, type Message, type RecordEntry } from './design/workspace'
+import type { MascotAgent } from './components/Mascot'
+import './design/waddle.css'
+import './design/canvas-fidelity.css'
+import './design/desktop-layout.css'
 
-type AgentId = MascotAgent
-type View = 'chat' | 'team' | 'expressions' | 'settings'
-type Theme = 'light' | 'dark'
-type Message = ChatMessage
-type Conversation = { id: string; title: string; agent: AgentId; messages: Message[]; updated: number; members?: AgentId[]; archived?: boolean }
-type Profile = { name: string; nickname: string; avatar: string }
-type AgentPrefs = Record<AgentId, { accessory: boolean; tone: string; humor: string }>
-type Stored = { profile: Profile; theme: Theme; prefs: AgentPrefs; chats: Conversation[]; sidebarAgents: AgentId[]; selected: string | null; onboarded: boolean }
-
-const agents: { id: AgentId; name: string; role: string; tagline: string; color: string }[] = [
-  { id: 'west', name: 'Ash', role: 'Direção criativa', tagline: 'Uma ideia ganha forma quando encontra a equipe certa.', color: '#b46b43' },
-  { id: 'ted', name: 'Ted', role: 'Acervo pessoal', tagline: 'Organiza histórias, obras e tudo que vale lembrar.', color: '#68856f' },
-  { id: 'indy', name: 'Indiana', role: 'Pesquisa', tagline: 'Vai atrás das pistas e volta com contexto.', color: '#a18551' },
-  { id: 'livro', name: 'Livro', role: 'Esportes', tagline: 'Um olhar atento para o que acontece em campo.', color: '#6784a2' },
-  { id: 'figma', name: 'Figma', role: 'Design', tagline: 'Ajuda a dar forma visual às ideias.', color: '#9c75a4' },
-]
-const additionalAgents: { id: AgentId; name: string; role: string; tagline: string; color: string }[] = [
-  ['pam', 'Pam', 'Secretaria'], ['kyle', 'Kyle Rayner', 'Design criativo'],
-  ['sheldon', 'Sheldon Cooper', 'Revisão'], ['dumbledore', 'Dumbledore', 'Mentoria'],
-  ['songbird', 'Songbird', 'Programação'], ['rorschach', 'Rorschach', 'Escrita'],
-  ['homer', 'Homer', 'Computador'], ['c3po', 'C-3PO', 'Análise'],
-  ['batman', 'Batman', 'Planejamento'], ['reed', 'Reed Richards', 'Automação'],
-  ['ultron', 'Ultron', 'Infraestrutura'], ['captain', 'Capitão América', 'Segurança'],
-  ['marilia', 'Marília', 'Acompanhamento'], ['hal', 'Hal Jordan', 'Ideias'],
-  ['tony', 'Tony Stark', 'Engenharia de agentes'],
-].map(([id, name, role]) => ({ id: id as AgentId, name, role, tagline: 'Um espaço para organizar suas ideias e continuar de onde parou.', color: '#a18551' }))
-agents.push(...additionalAgents)
-const defaultPrefs: AgentPrefs = {
-  ...Object.fromEntries(additionalAgents.map(agent => [agent.id, { accessory: true, tone: 'Claro', humor: 'Equilibrado' }])) as AgentPrefs,
-  west: { accessory: true, tone: 'Criativo', humor: 'Equilibrado' },
-  ted: { accessory: true, tone: 'Acolhedor', humor: 'Equilibrado' },
-  indy: { accessory: true, tone: 'Curioso', humor: 'Sutil' },
-  livro: { accessory: true, tone: 'Direto', humor: 'Equilibrado' },
-  figma: { accessory: true, tone: 'Claro', humor: 'Sutil' },
+type Page='favorites'|'memories'|'agent'|'chat'|'projects'|'project'|'settings'|'routines'|'connections'|'records'|'tasks'|'scene'
+type Dialog='search'|'history'|'agents'|null
+const navCodes:Record<string,string>={Projetos:'02.01',Rotinas:'04.01',Conexões:'05.02',Plugins:'05.01',Permissões:'06.01',Perfil:'07.01',Conta:'07.02',Aparência:'07.03',Notificações:'07.04',Privacidade:'07.05','Meus favoritos':'14.05','Memória dos agentes':'14.09'}
+const routeActions:Record<string,Record<string,string>>={
+ '02.01':{'Mostrar mais':'02.07'},'02.02':{'Escolher outros agentes':'03.01'},
+ '04.01':{'Histórico':'04.07','Agenda':'04.01','Nova rotina':'04.02'},'04.03':{'Pausar rotina':'04.04','Excluir rotina':'04.06'},'04.04':{'Pausar':'04.05'},
+ '05.01':{'Adicionar conexão':'05.03'},'05.02':{'Adicionar conexão':'05.03'},
+ '07.02':{'Excluir conta':'07.06'},'07.05':{'Limpar histórico':'07.07'},
+ '10.02':{'Ver detalhes':'10.39'},'10.03':{'Ver detalhes':'10.39'},'10.04':{'Ver projeto':'10.40'},'10.06':{'Ver tarefas':'10.41'},'10.08':{'Ver agenda':'10.42'},
+ '11.01':{'Adicionar cartão':'11.14'},'11.02':{'Adicionar chave':'11.15'},'11.09':{'Adicionar investimento':'11.16'},
+ '14.01':{'Abrir conversa':'14.02','Ver registro':'15.01'},'14.02':{'Ver gasto relacionado':'15.01'},'14.04':{'Abrir projeto':'02.01','Abrir resultado':'10.36'},
+ '14.05':{'Adicionar favorito':'14.06'},'14.07':{'Continuar':'14.08'},'14.09':{'Ver origem':'14.10','Editar':'14.11','Apagar':'14.12'},'14.10':{'Editar memória':'14.11'},
+ '15.01':{'Corrigir':'15.02'},'15.04':{'São dois pagamentos':'15.06','Vincular comprovante':'15.05'},'15.07':{'Arquivados':'15.11'},'15.08':{'Arquivar cartão':'15.12','Excluir cadastro':'15.13'},
+ '16.02':{'Tentar novamente':'16.01'},'16.09':{'Desfazer':'16.19'},'16.17':{'Ver memória':'14.09'},'16.18':{'Revisar gasto':'15.01'},'16.20':{'Remover':'16.21'},
 }
-const initial: Stored = { profile: { name: '', nickname: '', avatar: '' }, theme: 'light', prefs: defaultPrefs, chats: [], sidebarAgents: ['west'], selected: null, onboarded: false }
-const sketchAgents: { id: MascotAgent; name: string }[] = [
-  { id: 'west', name: 'Ash' },
-  { id: 'indy', name: 'Indiana Jones' },
-  { id: 'ted', name: 'Ted Mosby' },
-  { id: 'pam', name: 'Pam' },
-  { id: 'kyle', name: 'Kyle Rayner' },
-  { id: 'sheldon', name: 'Sheldon Cooper' },
-  { id: 'dumbledore', name: 'Dumbledore' },
-  { id: 'songbird', name: 'Songbird' },
-  { id: 'rorschach', name: 'Rorschach' },
-  { id: 'homer', name: 'Homer' },
-  { id: 'c3po', name: 'C-3PO' },
-  { id: 'batman', name: 'Batman' },
-  { id: 'reed', name: 'Reed Richards' },
-  { id: 'ultron', name: 'Ultron' },
-  { id: 'captain', name: 'Capitão América' },
-  { id: 'marilia', name: 'Marília' },
-  { id: 'hal', name: 'Hal Jordan' },
-  { id: 'tony', name: 'Tony Stark' },
-]
-const key = 'wendler:frontend:v1'
-const id = () => Math.random().toString(36).slice(2, 10)
-const agentById = (agent: AgentId) => agents.find(item => item.id === agent) ?? agents[0]
+function askInitialScreen(){const code=new URLSearchParams(location.search).get('screen');return code?screenByCode(code)?.id??null:null}
+function inferKind(code:string){return code.startsWith('02.')?'projeto':code.startsWith('04.')?'rotina':code==='11.14'||code==='15.08'?'cartao':code==='11.15'?'pix':code==='11.16'||code==='15.09'?'investimento':code==='14.06'?'favorito':code==='14.07'?'aniversario':code==='15.10'?'evento':code==='14.11'?'memoria':code.startsWith('15.')?'gasto':'preferencia'}
+function amount(value:string){const cleaned=value.replace(/[^\d,.-]/g,'');return Number(cleaned.includes(',')?cleaned.replace(/\./g,'').replace(',','.'):cleaned)||0}
 
-let migratedChatIds: Record<string, string> = {}
-function load(): Stored {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(key) || 'null') as Partial<Stored> | null
-    if (!parsed) return { ...initial, chats: permanentChats<Conversation>([], agents).chats }
-    const validAgents = new Set(agents.map(agent => agent.id))
-    const loaded: Stored = {
-      ...initial,
-      onboarded: parsed.onboarded === true,
-      theme: parsed.theme === 'dark' ? 'dark' : 'light',
-      selected: typeof parsed.selected === 'string' ? parsed.selected : null,
-      sidebarAgents: [...new Set<AgentId>(['west', ...(Array.isArray(parsed.sidebarAgents) ? parsed.sidebarAgents.filter(agent => validAgents.has(agent)) : [])])],
-      profile: { name: typeof parsed.profile?.name === 'string' ? parsed.profile.name : '', nickname: typeof parsed.profile?.nickname === 'string' ? parsed.profile.nickname : '', avatar: typeof parsed.profile?.avatar === 'string' ? parsed.profile.avatar : '' },
-      prefs: Object.fromEntries(agents.map(agent => [agent.id, { ...defaultPrefs[agent.id], ...parsed.prefs?.[agent.id] }])) as AgentPrefs,
-      chats: Array.isArray(parsed.chats) ? parsed.chats.filter(chat => chat && typeof chat.id === 'string' && typeof chat.title === 'string' && validAgents.has(chat.agent) && Array.isArray(chat.messages)).map(chat => ({ ...chat, members: (() => {
-        const members = Array.isArray(chat.members) ? chat.members.filter(agent => validAgents.has(agent)) : !Array.isArray(parsed.sidebarAgents) && chat.messages.some(message => message?.kind === 'handoff') ? chat.messages.filter(message => message && message.sender !== 'you' && validAgents.has(message.sender)).map(message => message.sender as AgentId) : []
-        const unique = [...new Set(members)]
-        return unique.length >= 2 ? unique : undefined
-      })(), messages: chat.messages.filter(message => message && typeof message.id === 'string' && typeof message.text === 'string' && (message.sender === 'you' || validAgents.has(message.sender))) })) : [],
+export default function App(){
+ const runtime=useRuntime(),[data,setData,storageError]=useWorkspace(),[records,setRecords,recordError]=useLocalStore(recordsKey,loadRecords)
+ const agents=baseAgents.map(a=>({...a,name:String(data.prefs[a.id]?.name||a.name)}))
+ const agentById=(id:string)=>agents.find(a=>a.id===id)??agents[0]
+ const settings=readSettings(data)
+ const routinesAPI=useRoutines(),[tasks,setTasks,taskError]=useLocalStore(taskStorageKey,()=>loadTasks(agents.map(a=>a.id)))
+ const [createMenu,setCreateMenu]=useState(false),[projectCreatorType,setProjectCreatorType]=useState<'project'|'channel'>('project')
+ const [taskPanel,setTaskPanel]=useState(false)
+ const [agentPanel,setAgentPanel]=useState(false)
+ const [pluginsOpen,setPluginsOpen]=useState(false)
+ const [projectAdvancedTab,setProjectAdvancedTab]=useState<'tasks'|'files'>('tasks')
+ const [projectOverview,setProjectOverview]=useState(false)
+ const [projectAdvanced,setProjectAdvanced]=useState(false)
+ const notificationStart=useRef(Date.now()),notified=useRef(new Set<string>())
+ const [settingsSection,setSettingsSection]=useState<SettingsSection>('profile'),[projectCreator,setProjectCreator]=useState(false),[accountMenu,setAccountMenu]=useState(false)
+ const audio=useRef<AudioContext|null>(null)
+ const [photoTarget,setPhotoTarget]=useState<'profile'|MascotAgent>('profile')
+ const [backendTab,setBackendTab]=useState<BackendTab|null>(null),[workMode,setWorkMode]=useState(false),[archivedView,setArchivedView]=useState(false),[selectedRoutine,setSelectedRoutine]=useState<string|null>(null),[projectMembers,setProjectMembers]=useState<MascotAgent[]>(['batman','kyle','songbird','sheldon'])
+ const [page,setPage]=useState<Page>(()=>askInitialScreen()?'scene':'chat'),[scene,setScene]=useState<string|null>(askInitialScreen),[preview,setPreview]=useState(()=>!!askInitialScreen()),[dialog,setDialog]=useState<Dialog>(null),[query,setQuery]=useState(''),[draft,setDraft]=useState(''),[sidebar,setSidebar]=useState(false),[toast,setToast]=useState(''),[menu,setMenu]=useState(false),[busy,setBusy]=useState<Record<string,boolean>>({}),[errors,setErrors]=useState<Record<string,string>>({}),[selectedRecord,setSelectedRecord]=useState<string|null>(null),[attachment,setAttachment]=useState<Message['attachment']>()
+ const widgetJobs=useRef(new Map<string,AbortController>())
+ const jobs=useRef(new Set<string>()),messageEnd=useRef<HTMLDivElement>(null),messageViewport=useRef<HTMLDivElement>(null),fileInput=useRef<HTMLInputElement>(null),profileInput=useRef<HTMLInputElement>(null),returnScene=useRef<string|null>(null),undoRecord=useRef<RecordEntry|null>(null)
+ const selected=data.chats.find(c=>c.id===data.selected&&!c.archived)??null,agent=agentById(selected?.agent??'west'),live=selected?runtime.runs[selected.id]:undefined
+ const respondingAgent=agentById(live?.agent||agent.id)
+ const hasWidgets=!!selected?.messages.some(message=>message.widget),hasMessages=!!selected?.messages.length
+ useEffect(()=>{setAgentPanel(hasMessages&&!hasWidgets)},[selected?.id])
+ const openScene=useCallback((code:string,isPreview=false)=>{
+  setMenu(false);setAccountMenu(false);setDialog(null);setSidebar(false)
+  const sections:Record<string,SettingsSection>={'07.01':'profile','07.02':'account','07.03':'appearance','07.04':'notifications','07.05':'privacy','06.01':'permissions'}
+  if(sections[code]){setSettingsSection(sections[code]);setPage('settings');setScene(null);return}
+  if(code==='05.01'){setPluginsOpen(true);return}
+  if(code.startsWith('05.')){setPage('connections');setScene(null);return}
+  if(code==='02.02'){setProjectCreatorType('project');setProjectCreator(true);return}
+  if(code.startsWith('02.')){setPage('projects');setScene(null);return}
+  if(code==='14.05'||code==='14.06'){setPage('favorites');setScene(null);return}
+  if(code.startsWith('11.')||code.startsWith('12.')||code.startsWith('13.')||code.startsWith('15.')||code==='14.05'||code==='14.06'){setPage('records');setScene(null);return}
+  if(code==='03.02'){setPage('agent');setScene(null);return}
+  if(code==='14.09'){setPage('memories');setScene(null);return}
+  const target=screenByCode(code);if(!target)return;setScene(target.id);setPage('scene');setPreview(isPreview);if(['04.02','11.14','11.15','11.16','14.06'].includes(code)){setSelectedRecord(null);if(code==='04.02')setSelectedRoutine(null)}
+ },[])
+ const notify=(message:string)=>setToast(message)
+ const toggleWorkMode=()=>{if(!settings.permissions.files){openScene('06.01');notify('Ative o acesso a arquivos para criar tarefas de execução.');return}setWorkMode(value=>!value);setMenu(false)}
+ useEffect(()=>{
+  if(typeof Notification==='undefined'||Notification.permission!=='granted'||!document.hidden)return
+  const show=(id:string,kind:'routine'|'approval',title:string,body:string)=>{if(notified.current.has(id))return;notified.current.add(id);if(notificationAllowed(settings.notifications,kind,new Date(),data.profile.timezone))new Notification(title,{body,tag:id})}
+  for(const result of routinesAPI.results)if(Date.parse(result.at)>notificationStart.current)show(result.id,'routine','Rotina concluída',result.status==='completed'?'O resultado está na conversa.':'A execução precisa da sua atenção.')
+  for(const run of Object.values(runtime.runs))if(run.approval)show(run.approval.id,'approval','Sua autorização é necessária',run.approval.title)
+ },[routinesAPI.results,runtime.runs,settings.notifications,data.profile.timezone])
+ useEffect(()=>{const media=matchMedia('(prefers-color-scheme: dark)'),apply=()=>{document.documentElement.dataset.theme=settings.appearance.theme==='system'?(media.matches?'dark':'light'):settings.appearance.theme;document.documentElement.dataset.motion=settings.appearance.reducedMotion?'reduced':'full';document.documentElement.dataset.density=settings.appearance.density??'comfortable';document.documentElement.dataset.textSize=settings.appearance.textSize??'standard';document.documentElement.style.setProperty('--w-yellow',({yellow:'#E8D92F',violet:'#8A69CB',green:'#28966F',blue:'#6689BD',sand:'#CBA787'}[settings.appearance.accent??'yellow']))};apply();media.addEventListener('change',apply);return()=>media.removeEventListener('change',apply)},[settings.appearance.theme,settings.appearance.reducedMotion,settings.appearance.accent,settings.appearance.density,settings.appearance.textSize])
+ useEffect(()=>{if(data.canvasRevision!==2)setData(d=>({...d,canvasRevision:2}))},[data.canvasRevision,setData])
+ useEffect(()=>{if(!toast)return;const timer=setTimeout(()=>setToast(''),5000);return()=>clearTimeout(timer)},[toast])
+ useEffect(()=>{if(selected?.messages.length)messageViewport.current?.scrollTo({top:messageViewport.current.scrollHeight,behavior:'smooth'});else if(messageViewport.current)messageViewport.current.scrollTop=0},[selected?.id,selected?.messages.length,live?.text])
+ useEffect(()=>{const key=(e:KeyboardEvent)=>{if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();setDialog('search')}if(e.key==='Escape'){setCreateMenu(false);setTaskPanel(false);setAgentPanel(false);setPluginsOpen(false);setProjectCreator(false);setAccountMenu(false);setBackendTab(null);setDialog(null);setMenu(false);setSidebar(false)}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key)},[])
+ const newChat=(id:MascotAgent='west')=>{const chat:Chat={id:makeId(),title:'Nova conversa',agent:id,messages:[],private:!settings.privacy.saveHistory,updated:Date.now()};setData(d=>({...d,chats:[chat,...d.chats],selected:chat.id,onboarded:true,sidebarAgents:[...new Set([...d.sidebarAgents,id])]}));setPage('chat');setScene(null);setDialog(null);setSidebar(false);setDraft('');setMenu(false);return chat}
+ const privateCopy=(source:Chat)=>{const chat:Chat={...source,projectId:source.projectId??records.find(r=>r.fields.chatId===source.id)?.id,id:makeId(),messages:[],private:true,pinned:false,updated:Date.now()};setData(d=>({...d,chats:[chat,...d.chats],selected:chat.id}));return chat}
+ const selectChat=(chat:Chat)=>{setData(d=>({...d,selected:chat.id,sidebarAgents:[...new Set([...d.sidebarAgents,chat.agent])]}));setPage('chat');setScene(null);setDialog(null);setSidebar(false);setMenu(false);setDraft('')}
+ const chooseAgent=(id:MascotAgent)=>{const existing=data.chats.filter(c=>c.agent===id&&!c.archived).sort((a,b)=>b.updated-a.updated)[0];if(existing)selectChat(existing);else newChat(id)}
+ const addMessage=(chatId:string,message:Message)=>setData(d=>({...d,chats:d.chats.map(c=>c.id===chatId?{...c,messages:[...c.messages,message],updated:Date.now()}:c)}))
+ useEffect(()=>{
+  if(!routinesAPI.results.length)return
+  const fresh=routinesAPI.results.filter(r=>!data.chats.some(c=>c.messages.some(m=>m.id===r.id))&&Date.parse(r.at)>Number(data.contextResetAt??0)&&data.chats.some(c=>c.id===r.chatId||(r.chatId==='agent:'+c.agent)))
+  if(!fresh.length)return
+  setData(d=>({...d,chats:d.chats.map(c=>{const added=fresh.filter(r=>r.chatId===c.id||(r.chatId==='agent:'+c.agent&&d.chats.find(x=>x.agent===c.agent&&!x.archived)?.id===c.id)).filter(r=>!c.messages.some(m=>m.id===r.id)).map(r=>({id:r.id,sender:agentById(r.agentId).id,text:r.status==='completed'?r.text:'A rotina não concluiu: '+(r.error||'Confira o serviço local.'),at:Date.parse(r.at),kind:'routine' as const,...(r.status==='completed'?{provider:'codex' as const}:{})}));return added.length?{...c,messages:[...c.messages,...added],updated:Date.now()}:c})}))
+ },[routinesAPI.results,data.chats,data.contextResetAt,setData])
+ const send=async(event?:FormEvent,textOverride?:string)=>{
+  event?.preventDefault();const text=(textOverride??draft).trim()||(attachment?'Analise o arquivo anexado.':'');if(!text)return
+  if(isClearCommand(text)){if(selected&&jobs.current.has(selected.id)){notify('Aguarde a resposta terminar antes de limpar o chat.');return}if(selected){const fresh=restartConversation(selected,makeId());setData(d=>({...d,chats:[fresh,...d.chats.map(c=>c.id===selected.id?{...c,archived:true}:c)],selected:fresh.id}));const project=records.find(r=>r.id===selected.projectId&&r.fields.chatId===selected.id);if(project)setRecords(rs=>rs.map(r=>r.id===project.id?{...r,fields:{...r.fields,chatId:fresh.id}}:r))}else newChat(agent.id);setDraft('');setAttachment(undefined);notify('Chat limpo. A conversa anterior está no histórico arquivado.');return}
+  let chat:Chat,user:Message
+  try{chat=selected&&(!settings.privacy.saveHistory&&!selected.private)?privateCopy(selected):selected??newChat('west');if(jobs.current.has(chat.id))return;user={id:makeId(),sender:'you',text,at:Date.now(),...(attachment?{attachment}:{})}}
+  catch(error){notify(error instanceof Error?error.message:'Não foi possível iniciar a mensagem. Seu texto continua no campo.');return}
+  addMessage(chat.id,user)
+  setData(d=>({...d,chats:d.chats.map(c=>c.id===chat.id&&c.title==='Nova conversa'?{...c,title:text.slice(0,56)}:c)}));setDraft('');setAttachment(undefined);setErrors(e=>({...e,[chat.id]:''}));jobs.current.add(chat.id);setBusy(b=>({...b,[chat.id]:true}))
+  try{
+   {
+    const team=conversationRecipients(text,agents,chat.agent)
+    const history=[...chat.messages,user].slice(-30).map(m=>({speaker:m.sender==='you'?'Você':agentById(m.sender).name,text:m.text}))
+    for(const a of team){
+     const authorizedMemory=settings.privacy.shareMemory?memoryForAgent(data.prefs[a.id]?.memory,records,a.id):''
+     const taskId=workMode?makeId():undefined,started=Date.now()
+     if(taskId&&!chat.private){const task:ChatTask={id:taskId,chatId:chat.id,agent:a.id,title:taskTitle(text),instruction:text,status:'running',created:started,updated:started,history:[{status:'running',at:started}],context:history};setTasks(ts=>[task,...ts])}
+     try{
+      const answer=await runtime.start(chat.id,{conversationId:chat.id,projectId:chat.projectId,contextEpoch:[data.contextEpoch,settings.privacy.shareProfile,settings.privacy.shareMemory,settings.permissions.files,settings.permissions.computer,memoryRevision(authorizedMemory)].join('-'),privateHistory:!!chat.private,permissions:settings.permissions,agent:{...a,tone:String(data.prefs[a.id]?.tone??'Claro'),humor:String(data.prefs[a.id]?.humor??'Equilibrado')},message:text,context:history,sharedContext:[...(settings.privacy.shareProfile?[{speaker:'Perfil do usuário',text:[data.profile.name,data.profile.nickname,data.profile.bio].filter(Boolean).join(' · ')}]:[]),...(settings.privacy.shareMemory?[{speaker:'Memória autorizada deste agente',text:authorizedMemory}]:[]),...projectContext(chat.id),...(chat.members?.length?[{speaker:'Equipe do projeto',text:chat.members.map(id=>agentById(id).name).join(', ')}]:[])],mode:workMode&&settings.permissions.files?'work':'chat',...(user.attachment?{attachment:user.attachment}:{})},widget=>addMessage(chat.id,{id:makeId(),sender:a.id,text:'',at:Date.now(),provider:'codex',widget:widget as NonNullable<Message['widget']>}))
+      addMessage(chat.id,{id:makeId(),sender:a.id,text:answer,at:Date.now(),provider:'codex',...(taskId?{taskId}:{})});history.push({speaker:a.name,text:answer})
+      if(taskId)setTasks(ts=>ts.map(t=>t.id===taskId?{...t,status:'done',updated:Date.now(),result:answer,provider:'codex',history:[...t.history,{status:'done',at:Date.now()}]}:t))
+     }catch(e){if(taskId)setTasks(ts=>ts.map(t=>t.id===taskId?{...t,status:'blocked',updated:Date.now(),history:[...t.history,{status:'blocked',at:Date.now()}]}:t));throw e}
     }
-    const migrated = permanentChats(loaded.chats, agents)
-    migratedChatIds = migrated.mapping
-    return { ...loaded, chats: migrated.chats, selected: loaded.selected ? migrated.mapping[loaded.selected] ?? loaded.selected : null }
-  } catch { return { ...initial, chats: permanentChats<Conversation>([], agents).chats } }
+   }
+  }catch(error){setErrors(e=>({...e,[chat.id]:error instanceof Error?(error.name==='AbortError'?'Resposta interrompida. Sua mensagem está salva.':error.message):'Não foi possível concluir. Sua mensagem está salva.'}))}
+  finally{try{if(document.hidden&&notificationAllowed(settings.notifications,workMode?'task':'message',new Date(),data.profile.timezone)&&typeof Notification!=='undefined'&&Notification.permission==='granted'&&!errors[chat.id]){new Notification(agentById(chat.agent).name,{body:'Sua resposta está pronta.',tag:chat.id});if(settings.notifications.sound&&audio.current){const ctx=audio.current,osc=ctx.createOscillator(),gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);gain.gain.setValueAtTime(.06,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.18);osc.frequency.value=660;osc.start();osc.stop(ctx.currentTime+.18)}}}catch{/* Notification support varies by browser. */}widgetJobs.current.delete(chat.id);jobs.current.delete(chat.id);setBusy(b=>({...b,[chat.id]:false}))}
+ }
+ const navigate=(target:Page)=>{if(target==='records')setSelectedRecord(null);setArchivedView(false);setPage(target);setScene(null);setSidebar(false);setAccountMenu(false)}
+ const projectContext=(chatId:string)=>{const project=records.find(r=>r.kind==='projeto'&&(r.fields.chatId===chatId||r.id===data.chats.find(c=>c.id===chatId)?.projectId)&&!r.archived);if(!project)return [];const details=readProject(project);return [{speaker:'Projeto '+project.title,text:JSON.stringify({description:details.description,notes:details.notes,tasks:details.tasks,attachments:details.attachments.map(f=>({name:f.name,reference:f.reference}))})},...details.attachments.flatMap(file=>{if(!file.data||! /\.(txt|md|json|csv|ts|tsx|js|css|html|yaml|yml)$/i.test(file.name))return [];try{const bytes=Uint8Array.from(atob(file.data.split(',')[1]||''),ch=>ch.charCodeAt(0));return [{speaker:'Arquivo do projeto: '+file.name,text:new TextDecoder('utf-8',{fatal:true}).decode(bytes).slice(0,8000)}]}catch{return []}})]}
+ const openProject=(project:RecordEntry)=>{if(!records.some(r=>r.id===project.id))setRecords(rs=>[project,...rs]);setSelectedRecord(project.id);navigate('project')}
+ const updateProject=(project:RecordEntry)=>{setRecords(rs=>[project,...rs.filter(r=>r.id!==project.id)]);const members=readProject(project).members.map(id=>baseAgentById(id).id);setData(d=>({...d,chats:d.chats.map(c=>c.id===project.fields.chatId?{...c,title:project.title,members,archived:project.archived}:c.projectId===project.id?{...c,title:project.title+' · '+agentById(c.agent).name,archived:project.archived}:c)}))}
+ const createProject=({name,description,members,type='project'}:{name:string;description:string;members:string[];type?:'project'|'channel'})=>{const ids=[...new Set<MascotAgent>(['west',...members.map(id=>baseAgentById(id).id)])],chat:Chat={id:makeId(),title:name,agent:'west',members:ids,messages:[],private:!settings.privacy.saveHistory,updated:Date.now()};const project=writeProject({id:makeId(),kind:'projeto',title:name,fields:{chatId:chat.id,Tipo:type},updated:Date.now()},{version:1,description,notes:'',members:ids,tasks:[],attachments:[]});chat.projectId=project.id;setData(d=>({...d,chats:[chat,...d.chats],onboarded:true,sidebarAgents:[...new Set([...d.sidebarAgents,...ids])]}));setRecords(rs=>[project,...rs]);setSelectedRecord(project.id);setProjectCreator(false);setProjectOverview(false);setProjectAdvanced(false);navigate('project');notify(type==='channel'?'Canal criado.':'Projeto criado.')}
+ const startProjectChat=(project:RecordEntry)=>{const existing=data.chats.find(c=>c.id===project.fields.chatId&&!c.archived);if(existing&&!(settings.privacy.saveHistory===false&&!existing.private)){selectChat(existing);return}const chat:Chat={id:makeId(),title:project.title,agent:'west',members:readProject(project).members.map(id=>baseAgentById(id).id),messages:[],private:!settings.privacy.saveHistory,projectId:project.id,updated:Date.now()};setData(d=>({...d,chats:[chat,...d.chats],selected:chat.id}));updateProject({...project,fields:{...project.fields,chatId:chat.id}});selectChat(chat)}
+ const startProjectAgentChat=(project:RecordEntry,id:MascotAgent)=>{const existing=data.chats.filter(c=>c.projectId===project.id&&c.agent===id&&!c.members?.length&&!c.archived&&(settings.privacy.saveHistory||c.private)).sort((a,b)=>b.updated-a.updated)[0];if(existing){selectChat(existing);return}const chat:Chat={id:makeId(),title:project.title+' · '+agentById(id).name,agent:id,projectId:project.id,messages:[],private:!settings.privacy.saveHistory,updated:Date.now()};setData(d=>({...d,chats:[chat,...d.chats],selected:chat.id,sidebarAgents:[...new Set([...d.sidebarAgents,id])]}));selectChat(chat)}
+ const taskWidgetData=(snapshot:TasksData):TasksData=>{const project=records.find(r=>r.id===snapshot.projectId);return project?{...snapshot,projectTitle:project.title,tasks:readProject(project).tasks}:snapshot}
+ const toggleWidgetTask=(snapshot:TasksData,id:string)=>{const project=records.find(r=>r.id===snapshot.projectId);if(!project)return;const details=readProject(project),task=details.tasks.find(t=>t.id===id);if(task)updateProject(writeProject(project,updateProjectTask(details,id,{status:task.status==='done'?'todo':'done'})))}
+ const clearHistory=async()=>{if(Object.values(busy).some(Boolean)){notify('Aguarde as respostas terminarem antes de apagar.');return}if(!window.confirm('Apagar todas as conversas salvas deste espaço?'))return;try{await runtimeJson('history/clear',{});setData(d=>({...d,chats:[],selected:null,contextEpoch:makeId(),contextResetAt:Date.now()}));notify('Histórico apagado deste espaço.')}catch(error){notify(error instanceof Error?error.message:'Não foi possível apagar o histórico.')}}
+ const saveRecord=(code:string,fields:Record<string,string>)=>{if(inferKind(code)==='gasto'&&(!fields.Valor?.trim()||amount(fields.Valor)<=0)){notify('Informe um valor maior que zero.');return false}const filled=Object.entries(fields).filter(([,v])=>v.trim());if(!filled.length){notify('Preencha os campos antes de salvar.');return false}const kind=inferKind(code),title=fields.Nome||fields.Título||fields.Tarefa||fields['O que o agente deve fazer?']||filled[0][1];const entry:RecordEntry={id:selectedRecord??makeId(),kind,title,fields,updated:Date.now()};undoRecord.current=records.find(r=>r.id===entry.id)??null;setRecords(previous=>[entry,...previous.filter(r=>r.id!==entry.id)]);setSelectedRecord(entry.id);notify('Alterações salvas.');return true}
+ const sceneAction=async(action:SceneAction,sourceId=scene??'')=>{
+  const {name,fields}=action,label=action.label.replace(/[↗→+]/g,'').trim(),code=screenCode(sourceId)
+  if(label==='Nova conversa'){newChat(agent.id);return}
+  if(name==='project-agent'&&code==='02.02'){const a=agents.find(a=>a.name===label);if(a)setProjectMembers(ids=>ids.includes(a.id)?ids.filter(id=>id!==a.id):[...ids,a.id]);return}
+  if(label==='Escolher outros agentes'&&code==='02.02'){setDialog('agents');return}
+  if(label==='Vamos começar'){setData(d=>({...d,onboarded:true}));newChat();return}
+  if(/Voltar às conversas|^Conversas$|^Abrir nesta mensagem/.test(label)){navigate('chat');return}
+  if(label==='Cancelar'||label==='Voltar'||label==='Fechar'){if(returnScene.current){setScene(returnScene.current);returnScene.current=null}else navigate('chat');return}
+  if(name==='toggle'){setData(d=>({...d,pagePrefs:{...d.pagePrefs,[code]:{...d.pagePrefs?.[code],[label]:!d.pagePrefs?.[code]?.[label]}}}));return}
+  if(label==='Ver tarefas'){setTaskPanel(true);return}
+  if(label==='Ver detalhes'&&['10.02','10.03'].includes(code)){navigate('records');return}
+  if(label==='Projetos'){navigate('projects');return}
+  if(label==='Rotinas'){navigate('routines');return}
+  if(navCodes[label]){openScene(navCodes[label]);return}
+  if(label==='Alterar foto'||label==='Escolher imagem'){setPhotoTarget(code.startsWith('03.')?agent.id:'profile');profileInput.current?.click();return}
+  if((label==='Remover'||label==='Remover foto')&&code==='07.01'){setData(d=>({...d,profile:{...d.profile,avatar:''}}));notify('Foto removida.');return}
+  if(label==='Salvar alterações'&&code==='07.01'){if(!fields.Nome?.trim()){notify('Preencha seu nome.');return}setData(d=>({...d,profile:{...d.profile,name:fields.Nome.trim(),nickname:fields['Nome de usuário']??'',bio:fields['Sobre você']??''}}));openScene('16.01');return}
+  if(label==='Escuro'||label==='Claro'||label==='Sistema'){setData(d=>({...d,theme:label==='Escuro'?'dark':label==='Sistema'&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}));return}
+  if(/Testar conexão|^Conectar$/.test(label)){notify('Abra o painel local para selecionar o aplicativo e verificar a conexão.');setBackendTab('computer');return}
+  if(/Criar projeto|Criar canal/.test(label)&&code!=='02.02'){openScene('02.02');return}
+  if(/Criar projeto|Criar canal/.test(label)){
+   if(!fields.Nome?.trim()){notify('Dê um nome ao projeto.');return}
+   const chat:Chat={id:makeId(),title:fields.Nome.trim(),agent:'west',members:projectMembers.some(id=>id!=='west')?[...new Set<MascotAgent>(['west',...projectMembers])]:undefined,messages:[],updated:Date.now()}
+   setData(d=>({...d,chats:[chat,...d.chats],selected:chat.id,sidebarAgents:[...new Set([...d.sidebarAgents,...projectMembers])]}));setRecords(rs=>[{id:makeId(),kind:'projeto',title:chat.title,fields:{...fields,chatId:chat.id,Agentes:projectMembers.join(',')},updated:Date.now()},...rs]);selectChat(chat);notify('Projeto criado.');return
+  }
+  if(/Criar rotina|Salvar rotina/.test(label)){
+   if(!fields.Tarefa?.trim()||!fields.Horário){notify('Preencha a tarefa e o horário.');return}
+   const previous=routinesAPI.routines.find(r=>r.id===selectedRoutine),responsible=agentById(fields.Responsável||previous?.agent.id||agent.id),destination=data.chats.find(c=>c.id===fields['Entregar o resultado em'])??selected??newChat(responsible.id)
+   try{await routinesAPI.save({id:previous?.id??makeId(),chatId:destination.id,name:fields.Nome?.trim()||fields.Tarefa.slice(0,60),instruction:fields.Tarefa,agent:{...responsible,tone:String(data.prefs[responsible.id]?.tone??'Claro'),humor:String(data.prefs[responsible.id]?.humor??'Equilibrado')},frequency:fields.Frequência||'Todos os dias',time:fields.Horário,active:previous?.active??true,context:destination.messages.slice(-20).map(m=>({speaker:m.sender==='you'?'Você':agentById(m.sender).name,text:m.text.slice(0,8000)}))});notify(previous?'Rotina atualizada.':'Rotina criada.');navigate('routines')}catch(e){notify(e instanceof Error?e.message:'Não foi possível salvar a rotina.')}return
+  }
+  if(selectedRoutine&&((code==='04.04'&&/Pausar/.test(label))||(code==='04.06'&&/Excluir/.test(label)))){const routine=routinesAPI.routines.find(r=>r.id===selectedRoutine);if(!routine)return;try{if(code==='04.04')await routinesAPI.toggle(routine);else await routinesAPI.remove(routine.id);navigate('routines');notify(code==='04.04'?'Rotina pausada.':'Rotina excluída.')}catch(e){notify(e instanceof Error?e.message:'A operação falhou.')}return}
+  if(/Excluir conta/.test(label)&&code==='07.02'){openScene('07.06');return}
+  if(code==='07.06'&&/Excluir|Confirmar/.test(label)){notify('Não há uma conta Waddle remota para excluir. Seus dados locais continuam disponíveis.');return}
+  if(code==='07.07'&&/Limpar|Confirmar/.test(label)){if(Object.values(busy).some(Boolean)){notify('Aguarde as respostas terminarem antes de limpar o histórico.');return}setData(d=>({...d,chats:[],selected:null,contextEpoch:makeId(),contextResetAt:Date.now()}));notify('Histórico limpo.');navigate('chat');return}
+  const target=Object.entries(routeActions[code]??{}).find(([key])=>label.startsWith(key))?.[1]
+  if(target){returnScene.current=scene;openScene(target,preview);return}
+  if(/Salvar|Registrar|Confirmar registro|Confirmar gasto|Adicionar cartão|Adicionar chave|Adicionar investimento|Criar favorito/.test(label)){if(saveRecord(code,fields))openScene(code==='14.06'?'16.07':code==='14.11'?'16.16':'16.01');return}
+  if(/Arquivar|Excluir|Apagar/.test(label)&&selectedRecord){const old=records.find(r=>r.id===selectedRecord);if(old)undoRecord.current=old;setRecords(rs=>/Arquivar/.test(label)?rs.map(r=>r.id===selectedRecord?{...r,archived:true}:r):rs.filter(r=>r.id!==selectedRecord));openScene(/Arquivar/.test(label)?'16.04':'16.05');return}
+  if(label==='Desfazer'&&undoRecord.current){const previous=undoRecord.current;setRecords(rs=>[previous,...rs.filter(r=>r.id!==previous.id)]);undoRecord.current=null;openScene('16.06');return}
+  if(/Buscar|Tudo|Conversas|Recentes|Fixados|Histórico/.test(label)){setDialog(label==='Buscar'?'search':'history');return}
+  if(/^West|^Batman|^Songbird|^Pam|^Kyle|^Indiana/.test(label)){const a=agents.find(a=>label.startsWith(a.name));if(a){chooseAgent(a.id);return}}
+  if(label==='Nova rotina'){openScene('04.02');return}
+  if(/Nova|Novo|Adicionar/.test(label)){if(code.startsWith('02'))openScene('02.02');else if(code.startsWith('05'))openScene('05.03');else openScene('03.01');return}
+  if(label==='Restaurar mascote'){setData(d=>({...d,prefs:{...d.prefs,[agent.id]:{...d.prefs[agent.id],photo:''}}}));notify('Mascote restaurado.');return}
+  if(label==='Salvar alterações'&&code==='03.02'){notify('Preferências do agente salvas.');navigate('chat');return}
+  if(label==='Personalizar agente'){openScene('03.02');return}
+  notify('Esta ação depende de um registro ou serviço configurado.');
+ }
+ const workspaceProjects=[...records.filter(r=>r.kind==='projeto'),...data.chats.filter(c=>c.members?.length&&!records.some(r=>r.kind==='projeto'&&r.fields.chatId===c.id)).map(c=>({id:c.id,kind:'projeto',title:c.title,fields:{chatId:c.id,Agentes:c.members!.join(',')},updated:c.updated,archived:c.archived}))]
+ const filteredChats=data.chats.filter(c=>(archivedView?!!c.archived:!c.archived)&&normalize(c.title+' '+agentById(c.agent).name+' '+c.messages.map(m=>m.text).join(' ')).includes(normalize(query))).sort((a,b)=>Number(!!b.pinned)-Number(!!a.pinned)||b.updated-a.updated)
+ const currentRoutine=routinesAPI.routines.find(r=>r.id===selectedRoutine)
+ const activeCode=screenCode(scene??'')
+ const values=activeCode==='07.01'?{Nome:data.profile.name,'Nome de usuário':data.profile.nickname,'Sobre você':data.profile.bio??''}:activeCode.startsWith('04.')?{Tarefa:currentRoutine?.instruction??'',Frequência:currentRoutine?.frequency??'Todos os dias',Horário:currentRoutine?.time??'09:00',Responsável:currentRoutine?.agent.id??agent.id,'Entregar o resultado em':currentRoutine?.chatId??selected?.id??''}:records.find(r=>r.id===selectedRecord)?.fields??(activeCode==='15.01'?{Data:new Date().toLocaleDateString('en-CA')}:undefined)
+ const identityBindings={'Pedro — nome':{text:data.profile.name||'Seu perfil'},'Nome do usuário':{text:data.profile.name||'Seu perfil'},'Nome do perfil':{text:data.profile.name||'Seu perfil'},'Pedro — iniciais':{text:(data.profile.name||'P').slice(0,2)},'Iniciais de Pedro':{text:(data.profile.name||'P').slice(0,2)}}
+ const projectBindings=activeCode==='02.02'?Object.fromEntries([['Participantes — selecionados',{text:projectMembers.filter(id=>id!=='west').length+' selecionados'}],...['batman','kyle','songbird','sheldon'].flatMap(id=>{const name=agentById(id).name,checked=projectMembers.includes(id as MascotAgent);return [[name+' — cartão selecionado',{checked,style:{opacity:checked?'1':'.5'}}],[name+' — selecionado',{style:{visibility:checked?'visible':'hidden'}}]]})]):undefined
+ const fieldOptions=activeCode.startsWith('04.')?{Frequência:['Todos os dias','Dias úteis','Toda segunda-feira'].map(value=>({value,label:value})),Responsável:agents.map(a=>({value:a.id,label:a.name})),'Entregar o resultado em':data.chats.filter(c=>!c.archived).map(c=>({value:c.id,label:c.title+' · '+agentById(c.agent).name}))}:undefined
+ const upload=async(file:File,profile=false)=>{if(file.size>(profile?5_000_000:1_000_000)){notify('Escolha um arquivo menor que '+(profile?'5 MB.':'1 MB.'));return}if(profile&&!/^image\/(png|jpeg|webp)$/.test(file.type)){notify('Escolha uma imagem JPG, PNG ou WebP.');return}const reader=new FileReader();reader.onload=()=>{const content=String(reader.result);if(profile){if(photoTarget==='profile')setData(d=>({...d,profile:{...d.profile,avatar:content}}));else setData(d=>({...d,prefs:{...d.prefs,[photoTarget]:{...d.prefs[photoTarget],photo:content}}}));notify('Foto atualizada.')}else setAttachment({name:file.name,size:file.size,data:content})};reader.onerror=()=>notify('Não foi possível ler o arquivo.');reader.readAsDataURL(file)}
+
+ if(!data.onboarded&&!scene)return <div className="waddle-welcome"><CanvasScene id="bi8Au" crop={false} onAction={sceneAction}/></div>
+ const currentProject=records.find(r=>r.id===selectedRecord&&r.kind==='projeto')
+ const pencilSettings=page==='settings'
+ const fullScene=page==='favorites'||page==='memories'||page==='agent'||page==='scene'||page==='routines'||pencilSettings||page==='records'||page==='connections'||page==='projects'||(page==='project'&&!projectAdvanced)
+ return <CanvasIdentityProvider profile={data.profile}><PencilViewport><div className={'waddle-app'+(fullScene?' waddle-app--scene':'')+(page==='chat'&&agentPanel?' waddle-app--agent-panel':'')+(page==='chat'&&selected?.messages.some(m=>m.widget)?' waddle-app--widget-chat':'')+(page==='chat'&&!selected?.messages.length?' waddle-app--empty-chat':'')}>
+  {sidebar&&<button className="waddle-scrim" aria-label="Fechar navegação" onClick={()=>setSidebar(false)}/>}
+  <PencilSidebar variant={agentPanel?'chat':selected?.messages.some(m=>m.widget)?'widget':selected?.messages.length?'chat':'empty'} data={data} agents={agents} current={agent.id} busy={busy} menu={accountMenu} onMenu={()=>setAccountMenu(v=>!v)} onAgent={chooseAgent} onNew={()=>setCreateMenu(value=>!value)} onSearch={()=>{setQuery('');setDialog('search')}} onNavigate={label=>{setAccountMenu(false);if(label==='Seus agentes'){setQuery('');setDialog('agents')}else if(label==='Meus registros'){setSelectedRecord(null);navigate('records')}else if(label==='Histórico e itens fixados'){setQuery('');setArchivedView(false);setDialog('history')}else if(label==='Buscar no seu espaço'){setQuery('');setDialog('search')}else if(navCodes[label])openScene(navCodes[label])}}/>
+
+  <main className="waddle-main">
+   <header className="waddle-header"><div><button className="mobile-nav-button" aria-label="Abrir navegação" onClick={()=>setSidebar(true)}><Menu size={18}/></button>{page==='chat'?<>{!selected?.messages.length&&agent.id==='west'&&!data.prefs.west?.photo?<span className="pencil-empty-header-avatar"><CanvasScene id="s8DdPp" region="West — conjunto de formas" crop={false} autoActions={false} decorate={root=>paintCanvasMascotColor(root,data.prefs.west?.color as string|undefined)} decorationKey={String(data.prefs.west?.color)}/></span>:<CanvasMascot agent={agent.id} photo={data.prefs[agent.id]?.photo as string|undefined} color={data.prefs[agent.id]?.color as string|undefined} size={26}/>}<span>{agent.name}{selected&&selected.title!=='Nova conversa'&&selected.title!==agent.name?' · '+selected.title:''}</span></>:<span>{page==='scene'?catalog.find(s=>s.id===scene)?.name.replace(/^\d\d\.\d\d — /,''):page==='projects'||page==='project'?'Projetos':page==='settings'?({profile:'Perfil',account:'Conta',appearance:'Aparência',privacy:'Privacidade',notifications:'Notificações',permissions:'Permissões'}[settingsSection]):page==='routines'?'Rotinas':page==='connections'?'Conexões':page==='tasks'?'Tarefas':'Meus registros'}</span>}</div><div>{page==='chat'?<><button aria-label="Computador e serviços locais" aria-expanded={agentPanel} onClick={()=>setAgentPanel(v=>!v)}><Monitor size={15}/></button><button aria-label="Personalizar agente" onClick={()=>openScene('03.02')}><Settings size={15}/></button><button aria-label="Opções da conversa" onClick={()=>setMenu(v=>!v)}><MoreHorizontal size={18}/></button></>:<button onClick={()=>navigate('chat')} aria-label="Voltar às conversas"><ArrowLeft size={17}/></button>}</div>
+   {menu&&<div className="waddle-popover"><button onClick={()=>newChat(agent.id)}><Plus size={14}/> Nova conversa</button><button disabled={!selected} onClick={()=>{if(selected)setData(d=>({...d,chats:d.chats.map(c=>c.id===selected.id?{...c,pinned:!c.pinned}:c)}));setMenu(false)}}><Pin size={14}/>{selected?.pinned?'Desafixar':'Fixar conversa'}</button><button disabled={!selected||!!busy[selected.id]} onClick={()=>{if(selected)setData(d=>({...d,chats:d.chats.map(c=>c.id===selected.id?{...c,archived:true}:c),selected:null}));setMenu(false)}}><Trash2 size={14}/> Arquivar conversa</button><button disabled={!!busy[selected?.id||'']} onClick={()=>{setMenu(false);void send(undefined,'/clear')}}><Trash2 size={14}/> Limpar este chat</button><button onClick={toggleWorkMode}><Check size={14}/>{workMode?'Desativar modo de tarefa':'Ativar modo de tarefa'}</button><button onClick={()=>{setTaskPanel(true);setMenu(false)}}><Check size={14}/> Tarefas</button><button onClick={()=>{setBackendTab('files');setMenu(false)}}><FileText size={14}/> Arquivos</button><button onClick={()=>{setBackendTab('settings');setMenu(false)}}><Settings size={14}/> Motor de IA</button><button onClick={()=>openScene('06.01')}><Check size={14}/> Permissões</button></div>}
+   </header>
+   {page==='chat'&&selected?.private&&<div className="waddle-private-note">Conversa temporária · o histórico será descartado ao fechar ou recarregar.</div>}
+   {(storageError||recordError||taskError)&&<div className="waddle-error" role="alert">Não foi possível salvar agora. Sua alteração permanece nesta sessão.</div>}
+   {page==='chat'?<>
+    <div className="waddle-messages" ref={messageViewport}>
+     {!selected?.messages.length?<div className="waddle-empty-chat"><div className="waddle-empty-hero">{agent.id==='west'&&!data.prefs.west?.photo?<CanvasScene id="s8DdPp" region="West — destaque da conversa" crop={false} autoActions={false} decorate={root=>paintCanvasMascotColor(root,data.prefs.west?.color as string|undefined)} decorationKey={String(data.prefs.west?.color)}/>:<CanvasMascot agent={agent.id} photo={data.prefs[agent.id]?.photo as string|undefined} color={data.prefs[agent.id]?.color as string|undefined} size={88} animated/>}</div><h1>Mande sua primeira mensagem</h1><p>{baseAgentById(agent.id).personality}</p><div className="waddle-suggestions"><small>COMECE COM UMA IDEIA</small><button onClick={()=>setDraft(baseAgentById(agent.id).suggestion)}><CanvasMascot agent={agent.id} size={44}/><span><strong>{agent.role}</strong><small>{baseAgentById(agent.id).suggestion}</small></span></button></div></div>:<div className="waddle-message-column"><div className="waddle-date">{new Date(selected.updated).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</div>{selected.messages.filter(m=>!m.widget?.sample).map((m,index)=>{const isLast=index===selected.messages.filter(x=>!x.widget?.sample).length-1;return <article key={m.id} className={'waddle-message '+(selected.members?.length?'waddle-message--team ':'')+(m.sender==='you'?'waddle-message--user':'waddle-message--agent')} data-message-id={m.id}><div className={m.widget?'waddle-widget-message':'waddle-bubble'}>{m.text&&(m.sender==='you'||m.widget?<p>{m.text}</p>:<FormattedText text={m.text}/>)}{m.attachment&&<PencilAttachment file={m.attachment}/>}{m.widget?.type==='shopping'?<ShoppingComparison data={m.widget.data as ShoppingComparisonData}/>:m.widget?.type==='pix'?<PixWidget data={m.widget.data as PixData}/>:m.widget?.type==='canvas'?<OfficialWidget data={m.widget.data as OfficialWidgetData} agentId={m.sender} onRequest={prompt=>{void send(undefined,prompt)}}/>:m.widget?.type==='focus'?<FocusWidget data={m.widget.data as FocusData} agentId={m.sender}/>:m.widget?.type==='market'?<MarketWidget data={m.widget.data as MarketData} agentId={m.sender}/>:m.widget?.type==='tasks'?<TasksWidget data={taskWidgetData(m.widget.data as TasksData)} onToggle={id=>toggleWidgetTask(m.widget!.data as TasksData,id)} agentId={m.sender} onOpen={()=>{const project=records.find(r=>r.id===(m.widget?.data as TasksData)?.projectId);if(project)openProject(project);else setTaskPanel(true)}}/>:m.widget?.type==='weather'?<WeatherWidget data={m.widget.data as WeatherData}/>:m.widget?.type==='spending'?<SpendingWidget agentId={m.sender} agentName={agentById(m.sender).name} data={m.widget.data as SpendingData} onExpand={()=>navigate('records')}/>:m.widget?.screen?<CanvasScene id={m.widget.screen} fragment onAction={action=>void sceneAction(action,m.widget?.screen)}/>:null}</div>{(isLast||selected.members?.length)&&m.sender!=='you'&&<footer><CanvasMascot agent={m.sender} photo={data.prefs[m.sender]?.photo as string|undefined} color={data.prefs[m.sender]?.color as string|undefined} size={m.widget?20:26} animated/><span>{agentById(m.sender).name}</span></footer>}</article>})}{selected&&busy[selected.id]&&<article className="waddle-message waddle-message--agent"><div className="waddle-bubble" role="status">{live?.text||live?.activity||'Preparando resposta…'}</div>{live&&<RunProgress started={live.started} activity={live.activity}/>}<footer><CanvasMascot agent={respondingAgent.id} photo={data.prefs[respondingAgent.id]?.photo as string|undefined} color={data.prefs[respondingAgent.id]?.color as string|undefined} size={26} animated/><span>{respondingAgent.name}</span></footer>{live?.approval&&<div className="waddle-approval"><p>{live.approval.title}</p><ApprovalDetails details={live.approval.details}/><button onClick={()=>void runtime.approve(selected.id,'accept')}>Permitir</button><button onClick={()=>void runtime.approve(selected.id,'decline')}>Recusar</button></div>}</article>}{selected&&errors[selected.id]&&<div className="waddle-error" role="alert">{errors[selected.id]}<button onClick={()=>{const last=selected.messages.filter(m=>m.sender==='you').at(-1);if(last)setDraft(last.text)}}>Revisar mensagem</button></div>}<div ref={messageEnd}/></div>}
+    </div>
+    <form className="waddle-composer" onSubmit={e=>{if(settings.notifications.sound){audio.current??=new AudioContext();void audio.current.resume()}void send(e)}}>{attachment&&<div className="waddle-attachment"><Paperclip size={13}/>{attachment.name}<button type="button" aria-label="Remover anexo" onClick={()=>setAttachment(undefined)}><X size={13}/></button></div>}<div><button type="button" aria-label="Adicionar arquivo" onClick={()=>fileInput.current?.click()}><Plus size={17}/></button><button type="button" aria-label="Criar tarefa" aria-pressed={workMode} title={workMode?'Modo de tarefa ativo':'Ativar modo de tarefa'} onClick={()=>{if(!settings.permissions.files){openScene('06.01');notify('Ative o acesso a arquivos para criar tarefas de execução.');return}setWorkMode(v=>!v)}}><Check size={15}/></button><textarea aria-label={'Mensagem para '+agent.name} placeholder={'Mensagem para '+agent.name} value={draft} rows={1} maxLength={20000} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>{selected&&busy[selected.id]?<button type="button" aria-label="Interromper resposta" onClick={()=>{widgetJobs.current.get(selected.id)?.abort();void runtime.cancel(selected.id)}}><Square size={13}/></button>:<button className="waddle-send" type="submit" aria-label="Enviar mensagem" disabled={!draft.trim()&&!attachment}><ArrowUp size={16}/></button>}</div></form>
+   </>:page==='routines'?<RoutineList profileName={data.profile.name} onBack={()=>navigate('chat')} api={routinesAPI} onCreate={()=>openScene('04.02')} onEdit={r=>{setSelectedRoutine(r.id);openScene('04.03')}} onNotice={notify} onChat={id=>{const chat=data.chats.find(c=>c.id===id);if(chat)selectChat(chat);else notify('A conversa de origem não está no histórico atual.')}}/>:page==='favorites'?<PencilFavorites records={records} onSave={entry=>setRecords(previous=>[entry,...previous.filter(record=>record.id!==entry.id)])} onReminders={()=>navigate('routines')} onBack={()=>navigate('chat')}/>:page==='memories'?<PencilMemories data={data} records={records} agents={agents} onUpdate={setData} onSave={entry=>setRecords(previous=>[entry,...previous.filter(record=>record.id!==entry.id)])} onBack={()=>navigate('chat')}/>:page==='agent'?<PencilAgent initialAgent={agent.id} agents={agents} data={data} onBack={()=>navigate('chat')} onSave={(id,patch)=>setData(previous=>({...previous,prefs:{...previous.prefs,[id]:{...previous.prefs[id],...patch}}}))}/>:pencilSettings?<PencilSettings section={settingsSection} data={data} onUpdate={setData} onBack={()=>navigate('chat')} onNavigate={setSettingsSection} onRoute={label=>{if(label==='Conversas')navigate('chat');else if(navCodes[label])openScene(navCodes[label])}} onConnections={()=>navigate('connections')} onClearHistory={clearHistory} onBackup={()=>setBackendTab('backup')} runtimeStatus={runtime.status}/>:page==='connections'?<ConnectionsPage profileName={data.profile.name} onNavigate={label=>{if(label==='Voltar às conversas'||label==='Conversas')navigate('chat');else if(navCodes[label])openScene(navCodes[label])}}/>:page==='project'&&currentProject&&projectOverview?<PencilProjectOverview project={currentProject} chats={data.chats} agents={agents} onChange={updateProject} onBoard={()=>setProjectOverview(false)} onTeamChat={()=>startProjectChat(currentProject)} onChat={id=>{const chat=data.chats.find(c=>c.id===id);if(chat)selectChat(chat)}} onAgent={id=>startProjectAgentChat(currentProject,id)} onBack={()=>navigate('projects')} onArchive={()=>{updateProject({...currentProject,archived:!currentProject.archived});navigate('projects')}}/>:page==='project'&&currentProject&&!projectAdvanced?<PencilProjectBoard project={currentProject} chats={data.chats} agents={agents} profileName={data.profile.name} onNavigate={label=>{if(label==='Conversas'||/Voltar/.test(label))navigate('chat');else if(navCodes[label])openScene(navCodes[label])}} onFiles={()=>{setProjectAdvancedTab('files');setProjectAdvanced(true)}} onAdvanced={()=>{setProjectAdvancedTab('tasks');setProjectAdvanced(true)}} onChange={updateProject} onTeamChat={()=>startProjectChat(currentProject)} onChat={id=>{const chat=data.chats.find(c=>c.id===id);if(chat)selectChat(chat)}} onAgent={id=>startProjectAgentChat(currentProject,id)} onBack={()=>navigate('projects')} onArchive={()=>{updateProject({...currentProject,archived:!currentProject.archived});navigate('projects')}}/>:page==='project'&&currentProject?<ProjectWorkspace initialTab={projectAdvancedTab} project={currentProject} chats={data.chats} agents={agents} onChange={updateProject} onTeamChat={()=>startProjectChat(currentProject)} onChat={id=>{const chat=data.chats.find(c=>c.id===id);if(chat)selectChat(chat)}} onAgent={id=>startProjectAgentChat(currentProject,id)} onBack={()=>navigate('projects')} onArchive={()=>{updateProject({...currentProject,archived:!currentProject.archived});navigate('projects')}}/>:page==='tasks'?<TasksPage tasks={tasks} onChat={id=>{const chat=data.chats.find(c=>c.id===id);if(chat)selectChat(chat);else notify('A conversa foi arquivada ou removida.')}} onRetry={task=>{const chat=data.chats.find(c=>c.id===task.chatId);if(chat){selectChat(chat);setWorkMode(true);setDraft(task.instruction)}}}/>:page==='records'?<RecordsPage agents={agents} initialRecord={selectedRecord} records={records.filter(r=>r.kind!=='projeto'&&r.kind!=='rotina')} onChange={entry=>setRecords(rs=>[entry,...rs.filter(r=>r.id!==entry.id)])} onRemove={id=>setRecords(rs=>rs.filter(r=>r.id!==id))} onBack={()=>navigate('chat')}/>:page==='scene'&&scene?<div className="waddle-scene-page"><CanvasScene id={scene} crop={false} bindings={{...identityBindings,...projectBindings}} values={values} fieldOptions={fieldOptions} onAction={a=>void sceneAction(a)}/></div>:<PencilProjects projects={workspaceProjects.filter(r=>!r.archived)} profileName={data.profile.name} onCreate={()=>{setProjectCreatorType('project');setProjectCreator(true)}} onOpen={project=>{setProjectOverview(true);setProjectAdvanced(false);openProject(project)}} onNavigate={label=>{if(label==='Conversas'||/Voltar/.test(label))navigate('chat');else if(navCodes[label])openScene(navCodes[label])}}/>}
+  </main>
+  {page==='chat'&&agentPanel&&<PencilAgentPanel name={agent.name} agentId={agent.id} routines={routinesAPI.routines} onClose={()=>setAgentPanel(false)} onSettings={()=>openScene('03.02')} onBrowser={()=>setBackendTab('browser')} onRoutine={routine=>{setSelectedRoutine(routine.id);openScene('04.03')}}/>}
+  {page==='chat'&&taskPanel&&<PencilTasksPanel tasks={tasks} agents={agents} current={agent.id} chatId={selected?.id} onClose={()=>setTaskPanel(false)} onChat={id=>{const chat=data.chats.find(c=>c.id===id);if(chat){selectChat(chat);setTaskPanel(false)}}} onRetry={task=>{const chat=data.chats.find(c=>c.id===task.chatId);if(chat){selectChat(chat);setTaskPanel(false);setWorkMode(true);setDraft(task.instruction)}}} onBoard={()=>{setTaskPanel(false);navigate('projects')}}/>}
+  {createMenu&&<><button className="pencil-create-scrim" aria-label="Fechar menu de criação" onClick={()=>setCreateMenu(false)}/><div className="pencil-create-menu" role="menu" aria-label="Criar agente ou canal"><CanvasScene id="eGwLf" region="Menu — criar agente ou canal" crop={false} bindings={{'Novo agente':{action:'Novo agente'},'Novo canal':{action:'Novo canal'}}} onAction={event=>{setCreateMenu(false);if(event.label==='Novo agente'){setQuery('');setDialog('agents')}else if(event.label==='Novo canal'){setProjectCreatorType('channel');setProjectCreator(true)}}}/></div></>}
+  {pluginsOpen&&<div className="waddle-plugin-backdrop" role="dialog" aria-modal="true" aria-label="Plugins"><section className="waddle-plugin-catalog"><PluginCatalog onAction={event=>{if(event.label==='Fechar'){setPluginsOpen(false);return}if(event.label==='Plugin: Pesquisa de IA'){setPluginsOpen(false);chooseAgent('indy');return}if(event.label==='Plugin: Direção visual'){setPluginsOpen(false);chooseAgent('kyle');return}setPluginsOpen(false);navigate('connections')}}/></section></div>}
+  {projectCreator&&<PencilProjectCreator initialType={projectCreatorType} profileName={data.profile.name} agents={agents} onCreate={createProject} onClose={()=>setProjectCreator(false)}/>}
+  {dialog&&(['search','history'].includes(dialog)?<SearchPanel history={dialog==='history'} chats={data.chats} records={records} archived={archivedView} initialQuery={query} onArchive={()=>setArchivedView(v=>!v)} onClose={()=>setDialog(null)} onChat={chat=>{if(chat.archived)setData(d=>({...d,chats:d.chats.map(c=>c.id===chat.id?{...c,archived:false}:c)}));selectChat({...chat,archived:false})}} onRecord={record=>{if(record.kind==='projeto'){openProject(record);setDialog(null);return}setSelectedRecord(record.id);openScene(record.kind==='cartao'?'15.08':record.kind==='investimento'?'15.09':'15.01')}}/>:<div className="waddle-dialog-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setDialog(null)}}><section className="waddle-dialog" role="dialog" aria-modal="true" aria-label="Seus agentes"><header><div><h2>Seus agentes</h2><p>Escolha com quem você quer conversar.</p></div><button aria-label="Fechar" onClick={()=>setDialog(null)}><X size={18}/></button></header><label className="waddle-dialog-search"><Search size={16}/><input autoFocus placeholder="Buscar agente" value={query} onChange={e=>setQuery(e.target.value)}/></label>{dialog==='agents'?<div className="waddle-dialog-results">{agents.filter(a=>normalize(a.name+' '+a.role).includes(normalize(query))).map(a=><button key={a.id} onClick={()=>{if(activeCode==='02.02'&&page==='scene')setProjectMembers(ids=>ids.includes(a.id)?ids.filter(id=>id!==a.id):[...ids,a.id]);else chooseAgent(a.id)}}><CanvasMascot agent={a.id} size={30}/><span><strong>{a.name}</strong><small>{a.role}</small></span><Plus size={14}/></button>)}</div>:<><div className="waddle-record-tabs"><button aria-pressed={archivedView} onClick={()=>setArchivedView(v=>!v)}>{archivedView?'Conversas ativas':'Conversas arquivadas'}</button></div><div className="waddle-dialog-results">{filteredChats.map(c=><button key={c.id} onClick={()=>{if(c.archived)setData(d=>({...d,chats:d.chats.map(x=>x.id===c.id?{...x,archived:false}:x)}));selectChat({...c,archived:false})}}><CanvasMascot agent={c.agent} size={28}/><span><strong>{agentById(c.agent).name} · {c.title}</strong><small>{c.messages.find(m=>normalize(m.text).includes(normalize(query)))?.text.slice(0,100)||'Conversa salva'} · {new Date(c.updated).toLocaleDateString('pt-BR')}</small></span>{c.pinned?<Pin size={13}/>:<ChevronRight size={13}/>}</button>)}{!filteredChats.length&&<div className="waddle-search-empty"><Search size={25}/><h3>Nenhum resultado encontrado</h3><p>Tente outro termo ou comece uma nova conversa.</p></div>}<div className="waddle-search-links"><button onClick={()=>openScene('14.05',true)}><Star size={14}/> Meus favoritos</button><button onClick={()=>openScene('14.09',true)}><History size={14}/> Memória dos agentes</button></div></div></>}</section></div>)}
+  {backendTab&&<BackendPanel computerEnabled={settings.permissions.computer} onPermissions={()=>{setBackendTab(null);openScene('06.01')}} tab={backendTab} onTab={setBackendTab} onClose={()=>setBackendTab(null)} status={runtime.status} refresh={runtime.refresh} agents={agents.map(a=>a.id)} agent={agent} prefs={data.prefs[agent.id]??{}} onPrefs={patch=>setData(d=>({...d,prefs:{...d.prefs,[agent.id]:{...d.prefs[agent.id],...patch}}}))}/> }
+  {toast&&<div className="waddle-toast" role="status"><Check size={15}/>{toast}<button onClick={()=>setToast('')} aria-label="Dispensar"><X size={13}/></button></div>}
+  <input ref={fileInput} type="file" hidden onChange={e=>{const file=e.target.files?.[0];if(file){void upload(file);setDialog(null)}e.target.value=''}}/><input ref={profileInput} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={e=>{const file=e.target.files?.[0];if(file)void upload(file,true);e.target.value=''}}/>
+ </div></PencilViewport></CanvasIdentityProvider>
 }
-
-function Avatar({ profile, size = 34 }: { profile: Profile; size?: number }) {
-  return profile.avatar
-    ? <img className="user-avatar" src={profile.avatar} alt="Seu avatar" style={{ width: size, height: size }} />
-    : <span className="user-avatar user-avatar-fallback" style={{ width: size, height: size }}>{(profile.nickname || profile.name || 'V').charAt(0).toUpperCase()}</span>
-}
-
-function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
-  const label = theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'
-  return <button className="theme-toggle" onClick={onToggle} aria-label={label} title={label}>{theme === 'dark' ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}</button>
-}
-
-function DemoMark() { return <span className="demo-mark"><span className="demo-dot" /> Demonstração local</span> }
-
-function Onboarding({ profile, onDone, theme, onToggleTheme }: { profile: Profile; onDone: (next: Profile) => void; theme: Theme; onToggleTheme: () => void }) {
-  return <div className="welcome-simple"><div className="welcome-theme"><ThemeToggle theme={theme} onToggle={onToggleTheme} /></div><div className="welcome-center"><div className="welcome-identity"><Mascot agent="west" state="idle" size={120} /><h1>Wendler</h1></div><p>Sua equipe de ideias, em um só lugar.<br />Um espaço para criar, explorar e continuar.</p><button className="primary-button" onClick={() => onDone({ ...profile, name: profile.name || 'Visitante' })}>Vamos começar <ArrowRight size={17} /></button><small>Seu espaço pessoal, salvo neste navegador.</small></div></div>
-}
-
-export default function App() {
-  const [data, setData, storageError] = useLocalStore<Stored>(key, load)
-  const [showSearch, setShowSearch] = useState(false)
-  const [teamEditor, setTeamEditor] = useState<string | null | false>(false)
-  const [highlightMessage, setHighlightMessage] = useState<string | null>(null)
-  const [contextLinks, setContextLinks, contextStorageError] = useLocalStore<Record<string, Partial<Record<AgentId, boolean>>>>('wendler:context-links:v1', () => { try { return JSON.parse(localStorage.getItem('wendler:context-links:v1') || '{}') } catch { return {} } })
-  const [view, setView] = useState<View>('chat')
-  const [welcomeFinished, setWelcomeFinished] = useState(false)
-  const [activeAgent, setActiveAgent] = useState<AgentId>('west')
-  const [editorAgent, setEditorAgent] = useState<AgentId>('west')
-  const [draft, setDraft] = useState('')
-  const [taskMode, setTaskMode] = useState(false)
-  const [tasks, setTasks, taskStorageError] = useLocalStore(taskStorageKey, () => loadTasks(agents.map(agent => agent.id)))
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
-  const [taskPanelRequest, setTaskPanelRequest] = useState(0)
-  const [attachment, setAttachment] = useState<Message['attachment']>()
-  const [attachmentError, setAttachmentError] = useState('')
-  const [showAgentPicker, setShowAgentPicker] = useState(false)
-  const [showPlugins, setShowPlugins] = useState(false)
-  const [showWorkPanel, setShowWorkPanel] = useState(() => window.innerWidth > 1100)
-  const [teamExpanded, setTeamExpanded] = useState(true)
-  const [individualsExpanded, setIndividualsExpanded] = useState(true)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => { try { return localStorage.getItem('wendler:sidebar-collapsed') === 'true' } catch { return false } })
-  useEffect(() => { try { localStorage.setItem('wendler:sidebar-collapsed', String(sidebarCollapsed)) } catch { /* Remains usable for this session. */ } }, [sidebarCollapsed])
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [showMenu, setShowMenu] = useState(false)
-  const [linkedThreads, setLinkedThreads, linkedStorageError] = useLocalStore(linkedStorageKey, () => migrateLinkedThreads(loadLinkedThreads(), migratedChatIds))
-  const [draftConversationId] = useState(id)
-  const [miniAgent, setMiniAgent] = useState<MascotAgent | null>(null)
-  const [miniMinimized, setMiniMinimized] = useState(false)
-  const [expressionAgent, setExpressionAgent] = useState<MascotAgent>('west')
-  const [profileDraft, setProfileDraft] = useState<Profile>(data.profile)
-  const [profileSaved, setProfileSaved] = useState(false)
-  const [profileError, setProfileError] = useState('')
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const current = data.chats.find(chat => chat.id === data.selected) ?? data.chats.find(chat => !chat.members && chat.agent === activeAgent)
-  const currentAgent = agentById(current?.agent ?? activeAgent)
-  const teams = data.chats.filter(chat => chat.members && !chat.archived)
-  const individualAgents = data.sidebarAgents.map(agentById)
-  const chatName = current?.members ? current.title : currentAgent.name
-  const contextId = current?.id ?? draftConversationId
-  const attachmentContext = useRef(contextId)
-  useEffect(() => { attachmentContext.current = contextId; setAttachment(undefined); setAttachmentError('') }, [contextId])
-  const chatTasks = tasks.filter(task => task.chatId === contextId)
-  const selectedTask = chatTasks.find(task => task.id === selectedTaskId) ?? chatTasks[0]
-  const openTask = (task: ChatTask) => { setSelectedTaskId(task.id); setTaskPanelRequest(value => value + 1); setShowWorkPanel(true); setMiniAgent(null) }
-  const changeTaskStatus = (taskId: string, status: TaskStatus) => {
-    const task = tasks.find(task => task.id === taskId); if (!task || task.status === status) return
-    const next = transitionTask(task, status); setTasks(previous => previous.map(item => item.id === taskId ? transitionTask(item, status, next.updated) : item))
-    const notice: Message = { id: id(), sender: task.agent, text: `Demonstração: “${task.title}” — ${taskLabels[status]}.${status === 'done' ? ` Um rascunho local foi preparado em Arquivos.\n\n${next.result}` : status === 'blocked' ? ' Veja o motivo e o próximo passo no painel.' : ''}`, at: Date.now(), taskId }
-    setData(previous => ({ ...previous, chats: previous.chats.map(chat => chat.id === task.chatId ? { ...chat, messages: [...chat.messages, notice], updated: notice.at } : chat) }))
-  }
-  const sharing = miniAgent ? contextLinks[contextId]?.[miniAgent] !== false : false
-  const toggleSharing = () => { if (miniAgent) setContextLinks(previous => ({ ...previous, [contextId]: { ...previous[contextId], [miniAgent]: !(previous[contextId]?.[miniAgent] !== false) } })) }
-  const miniThread = miniAgent ? linkedThreads[contextId]?.[miniAgent] ?? emptyMiniThread : emptyMiniThread
-  const miniName = agents.find(agent => agent.id === miniAgent)?.name ?? ''
-  const mainContext = (current?.messages ?? []).filter(message => message.kind !== 'context').map(message => ({ speaker: message.sender === 'you' ? 'Você' : agentById(message.sender).name, text: message.text || (message.attachment ? `Anexo local: ${message.attachment.name}` : '') }))
-  const miniContext = miniThread.messages.map(message => ({ speaker: message.sender === 'you' ? 'Você' : miniName, text: message.text }))
-  const updateMiniDraft = (draft: string) => {
-    if (!miniAgent) return
-    setLinkedThreads(previous => ({ ...previous, [contextId]: { ...previous[contextId], [miniAgent]: { ...(previous[contextId]?.[miniAgent] ?? emptyMiniThread), draft } } }))
-  }
-  const sendMini = () => {
-    if (!miniAgent || !miniThread.draft.trim()) return
-    const lastUser = [...(current?.messages ?? [])].reverse().find(message => message.sender === 'you')
-    const receipt = !sharing ? 'Compartilhamento pausado: nenhum contexto do chat principal foi usado neste pedido.' : mainContext.length ? `Contexto recebido: ${mainContext.length} mensagens da conversa com ${currentAgent.name}.${lastUser ? ` Última mensagem sua: “${lastUser.text.slice(0, 180)}”.` : ''}` : `O vínculo com ${currentAgent.name} está ativo. Ainda não há mensagens enviadas no chat principal.`
-    setLinkedThreads(previous => ({ ...previous, [contextId]: { ...previous[contextId], [miniAgent]: {
-      draft: '', messages: [...(previous[contextId]?.[miniAgent]?.messages ?? []), { sender: 'you', text: miniThread.draft.trim() }, { sender: 'agent', text: `${receipt} Esta é uma confirmação demonstrativa; a IA ainda não está conectada.` }],
-    } } }))
-  }
-  const displayName = data.profile.nickname || data.profile.name
-
-  useEffect(() => { document.documentElement.dataset.theme = data.theme }, [data.theme])
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [current?.messages.length])
-  useEffect(() => { const onKey = (event: globalThis.KeyboardEvent) => { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); setShowAgentPicker(true); setSidebarOpen(false) } }; window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey) }, [])
-
-  const startChat = (agent: AgentId = 'west') => {
-    const chat = data.chats.find(chat => !chat.members && chat.agent === agent)
-    if (!chat) return
-    if (miniAgent === agent) setMiniAgent(null)
-    setActiveAgent(agent); setData(previous => ({ ...previous, selected: chat.id })); setView('chat'); setSidebarOpen(false); setShowMenu(false); setShowAgentPicker(false)
-    if (current?.id !== chat.id) { setDraft(''); setAttachment(undefined); setAttachmentError('') }
-  }
-  const openAgent = startChat
-  const selectChat = (chat: Conversation) => { if (miniAgent === chat.agent) setMiniAgent(null); setData(prev => ({ ...prev, selected: chat.id })); setActiveAgent(chat.agent); setView('chat'); setSidebarOpen(false) }
-  const send = (value = draft) => {
-    const text = value.trim()
-    if (!text && !attachment) return
-    const mentions = mentionedAgents(text, agents)
-    const source = current?.agent ?? activeAgent
-    const target = mentions[0]?.id ?? source
-    const snapshot = [...mainContext, ...(sharing ? miniContext : []), { speaker: displayName || 'Você', text }]
-    const destinations = mentions.filter(agent => agent.id !== source)
-    const now = Date.now()
-    let routineConfirmation = ''
-    try { const routine = createRoutineFromMessage(text, contextId); if (routine) { setShowWorkPanel(true); setMiniAgent(null); routineConfirmation = `Rotina “${routine.name}” criada: ${routine.frequency.toLowerCase()}, às ${routine.time}. Você pode ajustar no painel de trabalho. Configuração demonstrativa; execução automática ainda não conectada.` } } catch { routineConfirmation = 'Não foi possível salvar a rotina neste navegador. Tente novamente pelo painel de trabalho.' }
-    const userMessage: Message = { id: id(), sender: 'you', text, at: now, attachment }
-    const response: Message = { id: id(), sender: target, text: target === 'west'
-      ? 'A ideia está viva, mas ainda não tem forma. Vamos começar com duas versões simples e ver qual merece continuar.'
-      : target === 'ted' ? 'Vamos começar pelo que você quer guardar: a obra, a data e a sua impressão. Depois podemos dar forma à resenha.'
-      : target === 'indy' ? 'Vejo uma pista interessante. Eu começaria pelas perguntas essenciais e separaria o que sabemos do que ainda precisamos descobrir.'
-      : target === 'livro' ? 'Vamos olhar o contexto antes do placar. O que mais chamou sua atenção nessa partida?'
-      : target === 'figma' ? 'Podemos testar duas direções visuais. Uma mais contida e outra mais expressiva; a comparação ajuda a escolher.'
-      : `Recebi sua mensagem no espaço de ${agentById(target).name}. Esta resposta é demonstrativa; a IA ainda não está conectada.`, at: now + 1 }
-    let task: ChatTask | undefined
-    const transfer: Message | undefined = destinations.length ? { id: id(), sender: source, text: '', at: now + 1, kind: 'context', transfer: { from: currentAgent.name, to: destinations.map(agent => agent.name), entries: snapshot } } : undefined
-    if (!routineConfirmation && (taskMode || mentions.length)) {
-      task = { id: crypto.randomUUID(), chatId: contextId, agent: target, title: taskTitle(text), instruction: text || attachment?.name || '', status: 'thinking', created: now, updated: now, history: [{ status: 'thinking', at: now }], context: snapshot }
-      setTasks(previous => [task!, ...previous]); setSelectedTaskId(task.id); setShowWorkPanel(true); setMiniAgent(null); response.taskId = task.id; response.text = `Pedido recebido por ${agentById(target).name}, com ${snapshot.length} mensagens de contexto disponíveis. A tarefa está pronta para explorar no painel. Esta é uma demonstração local, sem IA conectada.`
-    }
-    if (!task && current?.members) response.text = `Mensagem recebida no grupo ${current.title}. Os participantes compartilham este histórico do projeto. Resposta demonstrativa, sem IA conectada.`
-    if (routineConfirmation) response.text = routineConfirmation
-    if (miniAgent && sharing && miniContext.length) response.text += ` Contexto compartilhado: ${miniContext.length} mensagens de ${miniName} disponíveis nesta conversa (demonstração).`
-    setData(prev => {
-      const selected = prev.chats.find(chat => chat.id === current?.id)
-      const newId = selected?.id ?? draftConversationId
-      const messages = [...(selected?.messages ?? []), userMessage, ...(transfer ? [transfer] : []), response]
-      const updated: Conversation = { id: newId, title: selected?.title ?? (text.length > 38 ? `${text.slice(0, 38)}…` : text), agent: source, members: selected?.members, archived: selected?.archived, messages, updated: now }
-      return { ...prev, selected: newId, sidebarAgents: rememberContact(prev.sidebarAgents, source, Boolean(selected?.members)), chats: [updated, ...prev.chats.filter(chat => chat.id !== newId)] }
-    })
-    setDraft(''); setAttachment(undefined); setTaskMode(false)
-  }
-  const attachFile = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]; event.target.value = ''; if (!file) return
-    if (file.size > 2_000_000) { setAttachmentError('Escolha um arquivo de até 2 MB.'); return }
-    const chatId = contextId
-    const reader = new FileReader(); reader.onload = () => { if (chatId !== attachmentContext.current) return; setAttachment({ name: file.name, size: file.size, data: String(reader.result) }); setAttachmentError('') }; reader.onerror = () => setAttachmentError('Não foi possível ler o arquivo.'); reader.readAsDataURL(file)
-  }
-  const addWorkNotice = (text: string) => {
-    if (!current) return
-    const notice: Message = { id: id(), sender: current.agent, text, at: Date.now(), kind: 'routine' }
-    setData(previous => ({ ...previous, chats: previous.chats.map(chat => chat.id === current.id ? { ...chat, messages: [...chat.messages, notice], updated: notice.at } : chat) }))
-  }
-  const startTeamChat = () => setTeamEditor(null)
-  const createTeam = (title: string, members: AgentId[]) => {
-    const chat: Conversation = { id: crypto.randomUUID(), title, agent: members.includes('west') ? 'west' : members[0], members, messages: [], updated: Date.now() }
-    setData(previous => ({ ...previous, selected: chat.id, chats: [chat, ...previous.chats] }))
-    setActiveAgent(chat.agent); setView('chat'); setTeamExpanded(true); setDraft(''); setMiniAgent(null); setTeamEditor(false)
-  }
-  const archiveTeam = (teamId: string, archived: boolean) => {
-    setData(previous => ({ ...previous, selected: archived && previous.selected === teamId ? previous.chats.find(chat => !chat.members && chat.agent === 'west')?.id ?? null : previous.selected, chats: previous.chats.map(chat => chat.id === teamId ? { ...chat, archived, updated: Date.now() } : chat) }))
-    setShowMenu(false)
-  }
-  const searchSelect = (result: ConversationSearchResult) => {
-    setShowSearch(false)
-    if (result.taskId) { const task = chatTasks.find(task => task.id === result.taskId); if (task) openTask(task) }
-    if (result.messageId) setHighlightMessage(result.messageId)
-  }
-  useEffect(() => {
-    if (!highlightMessage) return
-    const element = document.getElementById('message-' + highlightMessage)
-    element?.scrollIntoView({ block: 'center', behavior: 'smooth' })
-    const timeout = setTimeout(() => setHighlightMessage(null), 4000)
-    return () => clearTimeout(timeout)
-  }, [highlightMessage])
-  const updatePref = (agent: AgentId, patch: Partial<AgentPrefs[AgentId]>) => setData(prev => ({ ...prev, prefs: { ...prev.prefs, [agent]: { ...prev.prefs[agent], ...patch } } }))
-  const handleAvatar = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-    if (!file.type.startsWith('image/') || file.size > 2_000_000) { setProfileError('Escolha uma imagem de até 2 MB.'); return }
-    const reader = new FileReader()
-    reader.onload = () => { setProfileDraft(prev => ({ ...prev, avatar: String(reader.result) })); setProfileError(''); setProfileSaved(false) }
-    reader.readAsDataURL(file)
-  }
-  const saveProfile = (event: FormEvent) => { event.preventDefault(); if (!profileDraft.name.trim()) { setProfileError('Seu nome é obrigatório.'); return }; setData(prev => ({ ...prev, profile: { ...profileDraft, name: profileDraft.name.trim(), nickname: profileDraft.nickname.trim() } })); setProfileError(''); setProfileSaved(true) }
-
-  if (!data.onboarded) return <Onboarding theme={data.theme} onToggleTheme={() => setData(prev => ({ ...prev, theme: prev.theme === 'dark' ? 'light' : 'dark' }))} profile={data.profile} onDone={profile => { setWelcomeFinished(true); setView('chat'); setData(prev => ({ ...prev, profile, onboarded: true })); setProfileDraft(profile) }} />
-
-  return <div className={`app-shell chrome-layout${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
-    <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`} aria-label="Navegação principal">
-      <div className="sidebar-top"><button className="brand" onClick={() => startChat()} aria-label="Wendler, voltar ao início"><span className="wordmark-symbol">w.</span><span>wendler</span></button><button className="sidebar-collapse" onClick={() => setSidebarCollapsed(value => !value)} aria-label={sidebarCollapsed ? 'Expandir barra lateral' : 'Recolher barra lateral'} title={sidebarCollapsed ? 'Expandir barra lateral' : 'Recolher barra lateral'} aria-expanded={!sidebarCollapsed}><PanelLeft size={18} /></button><button className="mobile-close icon-button" onClick={() => setSidebarOpen(false)} aria-label="Fechar menu"><X size={18} /></button></div>
-      <button aria-label="Escolher agente" title="Escolher agente" className="new-chat" onClick={() => { setShowAgentPicker(true); setSidebarOpen(false) }}><MessageCircle size={18} /> Conversar <span className="new-chat-key">Ctrl K</span></button>
-      <div className="sidebar-content">
-      <nav className="main-nav" aria-label="Seções"><button aria-label="Conversas" title="Conversas" className={view === 'chat' ? 'nav-item selected' : 'nav-item'} onClick={() => { setView('chat'); setSidebarOpen(false) }}><MessageCircle size={18} /> Conversas</button><button aria-label="Equipe" title="Equipe" className={view === 'team' ? 'nav-item selected' : 'nav-item'} onClick={() => { setView('team'); setSidebarOpen(false) }}><Users size={18} /> Equipe</button><button aria-label="Expressões" title="Expressões" className={view === 'expressions' ? 'nav-item selected' : 'nav-item'} onClick={() => { setView('expressions'); setSidebarOpen(false) }}><Sparkles size={18} /> Expressões</button></nav>
-      <button className="team-group-toggle" aria-label="Individuais" title="Individuais" aria-expanded={individualsExpanded} aria-controls="sidebar-individuals" onClick={() => { if (sidebarCollapsed) { setSidebarCollapsed(false); setIndividualsExpanded(true) } else setIndividualsExpanded(value => !value) }}><MessageCircle size={17} /><span>Individuais</span><small>{individualAgents.length}</small><ChevronDown size={15} /></button>
-      {individualsExpanded && <div id="sidebar-individuals" className="roster individual-roster">{individualAgents.map(agent => <button title={agent.name} aria-label={`Conversar com ${agent.name}`} className={`roster-row ${view === 'chat' && !current?.members && currentAgent.id === agent.id ? 'active' : ''}`} key={agent.id} onClick={() => openAgent(agent.id)}><span className="roster-mascot"><Mascot agent={agent.id} animated size={35} accessory={data.prefs[agent.id].accessory} /></span><span className="roster-copy"><strong>{agent.name}</strong><small>{agent.role}</small></span></button>)}</div>}
-      <button className="team-group-toggle" aria-label="Minha equipe" title="Minha equipe" aria-expanded={teamExpanded} aria-controls="sidebar-teams" onClick={() => { if (sidebarCollapsed) { setSidebarCollapsed(false); setTeamExpanded(true) } else setTeamExpanded(value => !value) }}><Users size={17} /><span>Minha equipe</span><small>{teams.length}</small><ChevronDown size={15} /></button>
-      {teamExpanded && <div id="sidebar-teams" className="project-teams">{teams.map(team => <div className="project-team" key={team.id}><button className={`project-team__title ${current?.id === team.id ? 'active' : ''}`} onClick={() => selectChat(team)} title={team.title}><Users size={15} /><span>{team.title}</span></button><details><summary>Participantes · {team.members!.length}</summary><div className="project-team__members">{team.members!.map(member => <button key={member} onClick={() => openAgent(member)} title={`Conversa individual com ${agentById(member).name}`}><Mascot agent={member} animated size={25} /><span>{agentById(member).name}</span></button>)}</div></details></div>)}<button className="manage-teams text-action" onClick={() => setTeamEditor(null)}><Users size={14} /> Gerenciar equipes</button>{!teams.length && <p className="sidebar-empty">Seus grupos de trabalho aparecerão aqui.</p>}</div>}
-      </div>
-      <div className="sidebar-bottom"><button className="settings-link" aria-label="Plugins" title="Plugins" onClick={() => { setShowPlugins(true); setSidebarOpen(false) }}><Plug size={18} /> Plugins</button><button aria-label="Ajustes" title="Ajustes" className="settings-link" onClick={() => { setView('settings'); setSidebarOpen(false); setProfileDraft(data.profile) }}><Settings2 size={18} /> Ajustes</button><button aria-label="Seu perfil" title="Seu perfil" className="account" onClick={() => { setView('settings'); setSidebarOpen(false); setProfileDraft(data.profile) }}><Avatar profile={data.profile} /><span><strong>{displayName}</strong><small>Seu espaço pessoal</small></span><ChevronRight size={16} /></button></div>
-    </aside>
-    {showPlugins && <PluginsDialog onClose={() => setShowPlugins(false)} />}
-    {showSearch && <SearchConversation title={chatName} messages={current?.messages ?? []} tasks={chatTasks} onClose={() => setShowSearch(false)} onSelect={searchSelect} />}
-    {teamEditor !== false && <ProjectTeams key={teamEditor ?? 'new'} initialTeamId={teamEditor ?? undefined} teams={data.chats.filter(chat => chat.members).map(chat => ({ id: chat.id, title: chat.title, members: chat.members!, archived: chat.archived }))} agents={agents} onClose={() => setTeamEditor(false)} onCreate={createTeam} onUpdate={(teamId, patch) => setData(previous => ({ ...previous, chats: previous.chats.map(chat => chat.id === teamId ? { ...chat, ...patch, agent: patch.members.includes(chat.agent) ? chat.agent : patch.members[0], updated: Date.now() } : chat) }))} onArchive={archiveTeam} onOpen={teamId => { const chat = data.chats.find(chat => chat.id === teamId); if (chat) selectChat(chat); setTeamEditor(false) }} />}
-    {showAgentPicker && <AgentPicker agents={agents} onChoose={startChat} onClose={() => setShowAgentPicker(false)} />}
-    {sidebarOpen && <button className="sidebar-scrim" aria-label="Fechar menu" onClick={() => setSidebarOpen(false)} />}
-    <main className={`workspace${miniAgent && !miniMinimized && view === 'chat' ? ' workspace--parallel' : ''}`}>{(storageError || taskStorageError || contextStorageError) && <div className="storage-alert" role="alert">Não foi possível salvar neste navegador. Suas alterações continuam disponíveis nesta sessão.</div>}
-      <WorkspaceTabs view={view} forceInitialView={welcomeFinished} onViewChange={next => { setView(next); setSidebarOpen(false) }} />
-      <div id="workspace-tab-panel" role="tabpanel" aria-label="Página ativa" className="workspace-panel">
-      <header className="topbar"><button className="mobile-menu icon-button" onClick={() => setSidebarOpen(true)} aria-label="Abrir menu"><Menu size={20} /></button><div className="breadcrumb"><span>Workspace</span><ChevronRight size={15} /><strong>{view === 'chat' ? current ? current.title : 'Nova conversa' : view === 'team' ? 'Equipe' : view === 'expressions' ? 'Expressões' : 'Ajustes'}</strong></div><div className="topbar-actions"><TeamQuickMenu agents={agents} currentAgent={view === 'chat' ? currentAgent.id : undefined} onChoose={agent => { setMiniAgent(agent); setMiniMinimized(false) }} /><DemoMark /><ThemeToggle theme={data.theme} onToggle={() => setData(prev => ({ ...prev, theme: prev.theme === 'dark' ? 'light' : 'dark' }))} /><button className="help-button" title="Sobre esta versão" onClick={() => setView('settings')} aria-label="Sobre esta versão"><CircleHelp size={18} /></button><Avatar profile={data.profile} size={31} /></div></header>
-      {view === 'chat' && <div className="chat-layout"><div className="chat-page">
-        <div className="chat-heading"><div className="chat-heading-agent"><div className="heading-avatar"><Mascot agent={currentAgent.id} size={43} accessory={data.prefs[currentAgent.id].accessory} /></div><div><h2>{current ? chatName : activeAgent === 'west' ? 'Converse com Ash' : `Converse com ${currentAgent.name}`}</h2><span>{current?.members ? 'Grupo de projeto' : currentAgent.role} <span className="heading-divider">·</span> {current?.members ? `${current.members.length} participantes` : 'Disponível'}</span></div></div><div className="chat-heading-actions"><button className="icon-button" aria-label="Buscar nesta conversa" title="Buscar nesta conversa" onClick={() => setShowSearch(true)}><Search size={18} /></button><button className="icon-button work-toggle" aria-label="Alternar painel de trabalho" title="Painel de trabalho" aria-expanded={showWorkPanel && !miniAgent} onClick={() => { setShowWorkPanel(value => !value); setMiniAgent(null) }}><Monitor size={18} /></button><button className="agent-picker" onClick={() => setShowAgentPicker(true)} title="Escolher agente"><Users size={16} /><span>Escolher agente</span></button>{current?.members && <div className="menu-wrap"><button className="icon-button" onClick={() => setShowMenu(!showMenu)} aria-label="Mais opções" aria-expanded={showMenu}><MoreHorizontal size={21} /></button>{showMenu && <div className="popover"><button onClick={() => { setTeamEditor(current.id); setShowMenu(false) }}><Settings2 size={15} /> Editar equipe</button><button onClick={() => archiveTeam(current.id, true)}><Trash2 size={15} /> Arquivar equipe</button></div>}</div>}</div></div>
-        {current?.members && <div className="chat-team-members">{current.members.map(member => <span key={member}><Mascot agent={member} size={25} />{agentById(member).name}</span>)}</div>}
-        {miniAgent && <SharedContext name={miniName} messages={miniContext} enabled={sharing} onToggle={toggleSharing} />}
-        <div className={`chat-body ${current ? 'has-messages' : ''}`}>
-          {!current?.messages.length ? <div className="empty-chat"><div className="empty-visual"><div className="empty-halo" /><Mascot agent={activeAgent} state="idle" size={174} accessory={data.prefs[activeAgent].accessory} /></div><span className="eyebrow">SEU ESPAÇO DE IDEIAS</span><h1>{activeAgent === 'west' ? 'Grandes ideias começam\ncom uma conversa.' : `Uma conversa com ${currentAgent.name}\npode abrir caminhos.`}</h1><p>{activeAgent === 'west' ? 'Conte o que está na sua cabeça. Ash ajuda a encontrar o caminho e reúne a equipe quando fizer sentido.' : currentAgent.tagline}</p><div className="prompt-grid"><button onClick={() => send('Quero começar um projeto novo. Pode me ajudar a organizar as ideias?')}><Feather size={17} /> Organizar uma ideia <ArrowUp size={15} /></button><button onClick={() => send('Quero explorar um assunto e entender por onde começar.')}><Search size={17} /> Explorar um assunto <ArrowUp size={15} /></button><button onClick={() => send('Me apresente o que cada pessoa da equipe pode fazer.')}><Users size={17} /> Conhecer a equipe <ArrowUp size={15} /></button></div>{activeAgent === 'west' && !current?.members && <button className="team-demo-button" onClick={startTeamChat}><Users size={16} /> Ver uma conversa em equipe <ArrowRight size={16} /></button>}</div> : <div className="message-list" aria-live="polite"><ChatMessages highlightId={highlightMessage} messages={current.messages} agents={agents} tasks={chatTasks} onTask={openTask} accessory={agent => data.prefs[agent].accessory} /><div ref={bottomRef} /></div>}
-        </div>
-        <div className="composer-area">{attachmentError && <p className="field-error" role="alert">{attachmentError}</p>}<div className="composer">{attachment && <div className="attachment-draft"><FileText size={15} /><span>{attachment.name}</span><button className="icon-button" aria-label="Remover anexo" onClick={() => setAttachment(undefined)}><X size={14} /></button></div>}<MentionComposer agents={agents} value={draft} onChange={setDraft} onSend={() => send()} placeholder={`Escreva para ${chatName}... (@ para mencionar)`} /><div className="composer-footer"><label className="attach-button" title="Anexar arquivo local"><Paperclip size={17} /><input type="file" aria-label="Anexar arquivo local" onChange={attachFile} /></label><button className="task-mode-button" aria-pressed={taskMode} onClick={() => setTaskMode(value => !value)}><Check size={13} /> Criar tarefa</button><div className="composer-note">Demonstração local</div><button className="send-button" onClick={() => send()} disabled={!draft.trim() && !attachment} aria-label="Enviar mensagem"><ArrowUp size={19} /></button></div></div><div className="composer-under">Enter para enviar <span>·</span> Shift + Enter para pular linha</div></div>
-      </div>{showWorkPanel && !miniAgent && <WorkPanel chatId={contextId} agent={selectedTask?.agent ?? currentAgent.id} name={selectedTask ? agentById(selectedTask.agent).name : currentAgent.name} onClose={() => setShowWorkPanel(false)} onNotice={addWorkNotice} tasks={chatTasks} openRequest={taskPanelRequest} selectedTask={selectedTask} onSelectTask={openTask} onTaskStatus={changeTaskStatus} agentName={agent => agentById(agent).name} files={(current?.messages ?? []).flatMap(message => message.attachment ? [message.attachment] : [])} />}</div>}
-      {view === 'team' && <section className="content-page team-page"><div className="page-intro"><span className="eyebrow">AS PESSOAS CERTAS PARA CADA IDEIA</span><h1>Conheça a equipe.</h1><p>Cada personagem tem uma área de atuação. A personalidade e as capacidades serão construídas com cuidado, um passo de cada vez.</p></div><button className="outline-button" onClick={() => setTeamEditor(null)}><Users size={16} /> Equipes de projeto</button><div className="team-list">{agents.map((agent, index) => <article className="team-row" key={agent.id}><span className="team-index">0{index + 1}</span><div className="team-mascot"><Mascot agent={agent.id} state="idle" size={92} accessory={data.prefs[agent.id].accessory} /></div><div className="team-info"><span className="eyebrow">{agent.role}</span><h2>{agent.name}</h2><p>{agent.tagline}</p></div><div className="team-buttons"><button className="text-action" onClick={() => { setEditorAgent(agent.id); setView('settings') }}>Personalizar <Settings2 size={16} /></button><button className="round-action" onClick={() => openAgent(agent.id)} aria-label={`Conversar com ${agent.name}`}><ArrowRight size={19} /></button></div></article>)}</div><div className="team-callout"><div><strong>Veja a equipe em ação</strong><span>Uma conversa ilustrativa com Ash, Indiana e Figma.</span></div><button className="primary-button" onClick={startTeamChat}>Reunir equipe <ArrowRight size={16} /></button></div><div className="team-note"><Sparkles size={18} /><span>Estes são personagens de interface. A conexão com o motor de IA e as ferramentas virá em uma etapa futura.</span></div></section>}
-      {view === 'expressions' && <section className="content-page expressions-page"><div className="page-intro"><span className="eyebrow">PEQUENOS SINAIS, GRANDES CONVERSAS</span><h1>Um rosto para cada momento.</h1><p>As expressões ajudam a entender o que a equipe está fazendo. Explore os estados de cada mascote.</p></div><div className="expression-controls"><span>Personagem</span><div className="agent-tabs">{agents.map(agent => <button key={agent.id} className={expressionAgent === agent.id ? 'active' : ''} onClick={() => setExpressionAgent(agent.id)}>{agent.name}</button>)}</div></div><div className="sketch-studies"><div><span className="eyebrow">ELENCO EM CONSTRUÇÃO</span><p>Os 18 personagens do documento estão reunidos aqui. Livro e Figma também estão disponíveis nas abas acima. Estudos visuais: selecione um e mova o cursor. Após oito segundos sem movimento, eles procuram por você.</p></div><div className="sketch-roster">{sketchAgents.map(agent => <button key={agent.id} className={expressionAgent === agent.id ? 'active' : ''} onClick={() => setExpressionAgent(agent.id)} aria-pressed={expressionAgent === agent.id}><Mascot agent={agent.id} size={72} /><span>{agent.name}</span></button>)}</div></div><div className="expression-grid">{mascotStates.map((state, index) => <div className="expression-tile" key={state.id}><span className="tile-number">{String(index + 1).padStart(2, '0')}</span><Mascot agent={expressionAgent} state={state.id as MascotState} size={100} accessory={data.prefs[expressionAgent as AgentId]?.accessory ?? true} /><strong>{state.label}</strong></div>)}</div></section>}
-      {view === 'settings' && <section className="content-page settings-page"><div className="page-intro"><span className="eyebrow">DO SEU JEITO</span><h1>Ajustes.</h1><p>Personalize seu espaço e o jeito como a equipe aparece por aqui.</p></div><div className="settings-layout"><nav className="settings-subnav" aria-label="Categorias de ajustes"><a href="#perfil"><Users size={17} /> Seu perfil</a><a href="#aparencia"><Sun size={17} /> Aparência</a><a href="#personagens"><Sparkles size={17} /> Personagens</a><a href="#backup"><FileText size={17} /> Backup</a><a href="#sobre"><CircleHelp size={17} /> Sobre</a></nav><div className="settings-content"><section id="perfil" className="settings-section"><div className="section-head"><div><h2>Seu perfil</h2><p>Como a equipe vê você neste navegador.</p></div></div><form onSubmit={saveProfile}><div className="profile-photo-row"><Avatar profile={profileDraft} size={62} /><div><button type="button" className="outline-button" onClick={() => document.getElementById('profile-upload')?.click()}><ImagePlus size={16} /> Trocar foto</button><input id="profile-upload" type="file" accept="image/*" hidden onChange={handleAvatar} />{profileDraft.avatar && <button type="button" className="bare-button" onClick={() => { setProfileDraft(prev => ({ ...prev, avatar: '' })); setProfileSaved(false) }}>Remover</button>}</div></div><div className="profile-fields"><label>Nome<input className="text-input" value={profileDraft.name} onChange={event => { setProfileDraft(prev => ({ ...prev, name: event.target.value })); setProfileSaved(false) }} /></label><label>Apelido<input className="text-input" value={profileDraft.nickname} onChange={event => { setProfileDraft(prev => ({ ...prev, nickname: event.target.value })); setProfileSaved(false) }} placeholder="Como prefere ser chamado" /></label></div>{profileError && <p className="field-error" role="alert">{profileError}</p>}<button className="primary-button" type="submit">{profileSaved ? <Check size={17} /> : null}{profileSaved ? 'Salvo' : 'Salvar perfil'}</button></form></section><section id="aparencia" className="settings-section"><div className="section-head"><div><h2>Aparência</h2><p>Escolha o clima do seu espaço.</p></div></div><div className="theme-options"><button className={data.theme === 'light' ? 'theme-option active' : 'theme-option'} onClick={() => setData(prev => ({ ...prev, theme: 'light' }))}><div className="theme-preview theme-light"><span /><span /><span /></div><span><Sun size={17} /> Claro e acolhedor</span>{data.theme === 'light' && <Check size={17} />}</button><button className={data.theme === 'dark' ? 'theme-option active' : 'theme-option'} onClick={() => setData(prev => ({ ...prev, theme: 'dark' }))}><div className="theme-preview theme-dark"><span /><span /><span /></div><span><Moon size={17} /> Escuro e tranquilo</span>{data.theme === 'dark' && <Check size={17} />}</button></div></section><section id="personagens" className="settings-section"><div className="section-head"><div><h2>Personagens</h2><p>Pequenos ajustes de apresentação. A identidade de cada um permanece a mesma.</p></div></div><div className="settings-agent-tabs">{agents.map(agent => <button key={agent.id} className={editorAgent === agent.id ? 'active' : ''} onClick={() => setEditorAgent(agent.id)}>{agent.name}</button>)}</div><div className="agent-config"><div className="config-preview"><Mascot agent={editorAgent} state="idle" size={138} accessory={data.prefs[editorAgent].accessory} /><strong>{agentById(editorAgent).name}</strong><span>{agentById(editorAgent).role}</span></div><div className="config-fields"><label className="select-label">Tom de conversa <span className="select-wrap"><select value={data.prefs[editorAgent].tone} onChange={event => updatePref(editorAgent, { tone: event.target.value })}><option>Criativo</option><option>Acolhedor</option><option>Curioso</option><option>Direto</option><option>Claro</option><option>Calmo</option></select><ChevronDown size={16} /></span></label><label className="select-label">Humor <span className="select-wrap"><select value={data.prefs[editorAgent].humor} onChange={event => updatePref(editorAgent, { humor: event.target.value })}><option>Sutil</option><option>Equilibrado</option><option>Divertido</option></select><ChevronDown size={16} /></span></label><label className="toggle-row"><span><strong>Mostrar acessório</strong><small>Uma pequena marca visual do personagem.</small></span><input type="checkbox" checked={data.prefs[editorAgent].accessory} onChange={event => updatePref(editorAgent, { accessory: event.target.checked })} /><span className="switch" /></label><p className="config-disclaimer">Essas preferências são visuais nesta demonstração. Elas não alteram respostas de IA.</p></div></div></section><BackupSettings agents={agents.map(agent => agent.id)} /><section id="sobre" className="settings-section about-section"><div className="section-head"><div><h2>Sobre esta versão</h2><p>Uma primeira cena para sentir o Wendler em movimento.</p></div></div><div className="about-line"><span>Wendler · Interface demonstrativa</span><span>v0.1</span></div><p>Conversas, perfil e ajustes são guardados localmente neste navegador. Não há IA, login ou serviços externos conectados nesta versão.</p><button className="text-action" onClick={() => { setData(prev => ({ ...prev, onboarded: false })); setView('chat') }}>Rever boas-vindas <ArrowRight size={16} /></button></section></div></div></section>}
-      <MiniAgentChat sharing={sharing} onToggleSharing={toggleSharing} agent={miniAgent ? agents.find(agent => agent.id === miniAgent) ?? null : null} mainName={chatName} thread={miniThread} mainMessages={mainContext} onDraft={updateMiniDraft} onSend={sendMini} storageError={linkedStorageError} minimized={miniMinimized} onMinimize={() => setMiniMinimized(value => !value)} onClose={() => setMiniAgent(null)} />
-      </div>
-    </main>
-  </div>
-}
-
-

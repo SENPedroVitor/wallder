@@ -25,3 +25,17 @@
 @media (max-width: 1100px) { .workspace--parallel .chat-page { margin-right: 0; } .mini-chat { top: auto; height: min(490px, calc(100dvh - 90px)); } .mini-chat--minimized { height: auto; } }
 @media (max-width: 640px) { .mini-chat { right: 10px; bottom: 10px; width: calc(100vw - 20px); height: 55dvh; } .mini-chat--minimized { height: auto; } }
 @media (prefers-reduced-motion: reduce) { .mini-chat { animation: none; } }
+
+.mini-chat__messages{overscroll-behavior:contain;scrollbar-width:thin}
+.mini-chat form{flex:none}
+.mini-chat header{flex:none}
+.mini-chat textarea{outline:none}
+.mini-chat form:focus-within{border-color:var(--accent)}
+@media(max-width:640px){
+  .mini-chat{inset:64px 8px calc(8px + env(safe-area-inset-bottom));width:auto;height:auto;max-height:calc(var(--app-height,100dvh) - 72px - env(safe-area-inset-bottom));z-index:40;border-radius:20px}
+  :root[data-keyboard='open'] .mini-chat{bottom:8px;max-height:calc(var(--app-height,100dvh) - 72px)}
+  .mini-chat--minimized{top:auto;height:auto}
+  .mini-chat form{margin:10px}
+  .mini-chat textarea{font-size:16px}
+  .mini-chat header button{width:32px;height:32px;flex:none}
+}
