@@ -6,9 +6,11 @@ O projeto reúne a interface web, o backend e um aplicativo nativo exclusivo par
 
 ## Aplicativo Android
 
-O Android funciona como a tela dedicada do mascote: fundo preto, personagem centralizado, seletor de mascotes e controles para falar ou silenciar o microfone. As formas vetoriais foram extraídas dos desenhos originais do Pencil. O mascote respira suavemente e pisca; a seleção e o estado de silêncio são salvos no aparelho.
+O Android funciona como a tela dedicada do mascote: fundo preto, personagem centralizado, seletor de mascotes e acesso à conversa. As formas vetoriais foram extraídas dos desenhos originais do Pencil. O mascote respira suavemente e pisca; a seleção é salva no aparelho. Os controles de voz ficam para uma etapa posterior.
 
-A tela dedicada é a entrada do APK. O botão de falar usa o reconhecimento de voz do Android, quando disponível e autorizado pelo usuário; silenciar ou sair do aplicativo interrompe a escuta. A conexão dessa voz ao backend e as respostas faladas do agente ainda não estão implementadas. As telas antigas de lista, chat e rotinas permanecem no código legado, mas não fazem parte da entrada atual. Nenhuma resposta simulada é emitida pela tela do mascote.
+A tela dedicada é a entrada do APK e se conecta ao mesmo servidor da interface web. Nesta etapa, o botão central abre uma conversa por texto; voz e respostas faladas ficam para depois. O Android retoma a conversa individual mais recente do agente, compartilha o histórico com a web e usa as personalidades, memórias autorizadas e permissões salvas no servidor. Conversas privadas, arquivadas e projetos não são escolhidos automaticamente. As telas antigas de lista, chat e rotinas permanecem no código legado, mas não fazem parte da entrada atual. Nenhuma resposta simulada é emitida pela tela do mascote.
+
+O celular precisa estar na mesma rede Tailscale do servidor. Nenhuma chave de modelo é armazenada no APK. Cards e widgets ficam registrados na conversa web e podem ser vistos pela ação **Abrir no painel**. O app não reenvia automaticamente mensagens após falha de rede; uma tarefa já iniciada pode continuar no servidor e sua resposta aparecerá ao atualizar a conversa. Ações que exigirem autorização continuam mostrando a confirmação do servidor.
 
 ## Telas reais
 

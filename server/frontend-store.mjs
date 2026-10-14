@@ -8,10 +8,17 @@ let queue = Promise.resolve()
 // Agent writes share the browser-save queue and advance its revision.
 export function mutateLocalStore(dataDir, key, apply) {
   if (!localKeys.has(key)) throw new Error('Registro local inválido.')
+  return mutateStore(dataDir, key, apply)
+}
+export function mutateWorkspaceStore(dataDir, apply) {
+  if (process.env.WENDLER_SITE_BRIDGE === '1') throw Object.assign(new Error('O Android requer o armazenamento do servidor local.'), { status: 503 })
+  return mutateStore(dataDir, 'wendler:frontend:v1', apply)
+}
+function mutateStore(dataDir, key, apply) {
   const operation = queue.catch(() => {}).then(async () => {
     const file = path.join(dataDir, 'frontend.json')
     const records = await readFile(file, 'utf8').then(JSON.parse).catch(error => { if (error.code === 'ENOENT') return {}; throw error })
-    const result = apply(structuredClone(records[key]?.value ?? []), records)
+    const result = apply(structuredClone(records[key]?.value ?? (key === 'wendler:frontend:v1' ? {} : [])), records)
     records[key] = { revision: (records[key]?.revision || 0) + 1, value: result.value }
     await mkdir(dataDir, { recursive: true })
     const temporary = `${file}.${randomUUID()}.tmp`

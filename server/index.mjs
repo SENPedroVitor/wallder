@@ -9,6 +9,7 @@ import { ComputerBridge, computerTools } from './computer.mjs'
 import { BrowserBridge, browserTools } from './browser.mjs'
 import { createRoutineEngine } from './routines.mjs'
 import { frontendStore } from './frontend-store.mjs'
+import { createMobileService } from './mobile.mjs'
 import { makePrompt } from './chat-context.mjs'
 import { personalityInstructions,agentPersonalities } from './personas.mjs'
 import {TeamService,teamTools,delegationResponse} from './team.mjs'
@@ -396,6 +397,7 @@ async function fileContent(req, res, url) {
   res.end(await readFile(actual))
 }
 
+const mobile = createMobileService({ dataDir, agents: agentPersonalities, startRun, status: () => ({ ready: client.ready && authenticated && !!models.length }) })
 export const server = http.createServer(async (req, res) => {
   try {
     const host = String(req.headers.host || '')
@@ -410,6 +412,9 @@ export const server = http.createServer(async (req, res) => {
     }
     if (origin && !isAuthorizedOrigin(origin, { port, uiPort, remoteOrigin: environment.WENDLER_REMOTE_ORIGIN })) return fail(res, 403, 'Origem não autorizada.')
     const url = new URL(req.url, `http://${host}`)
+    if (url.pathname === '/api/mobile/agents' && req.method === 'GET') return json(res, 200, { agents: mobile.agents() })
+    if (url.pathname === '/api/mobile/conversation' && req.method === 'GET') return json(res, 200, await mobile.conversation(url.searchParams.get('agent')))
+    if (url.pathname === '/api/mobile/chat' && req.method === 'POST') return await mobile.chat(res, await body(req))
     if(url.pathname==='/api/health'&&req.method==='GET')return json(res,200,await maintenance.health())
     if(url.pathname==='/api/maintenance/backup'&&req.method==='POST')return json(res,200,await maintenance.backup())
     if(url.pathname==='/api/shopping'&&req.method==='GET')return json(res,200,await shopping.read())

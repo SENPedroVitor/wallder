@@ -162,7 +162,7 @@ try {
   assert.equal(starts.at(-1).config.features.shell_tool, false)
   assert.equal(starts.at(-1).config.features.unified_exec, false)
   assert.equal(starts.at(-1).config.features.view_image, false)
-  assert.deepEqual(starts.at(-1).dynamicTools.map(tool=>tool.name), ['wendler_team', 'wendler_widget', 'wendler_project', 'wendler_browser'])
+  assert.deepEqual(starts.at(-1).dynamicTools.map(tool=>tool.name), ['wendler_team', 'wendler_widget', 'wendler_project', 'wendler_browser', 'wendler_shopping', 'wendler_research'])
   await delay(50)
   const storedState = JSON.parse(await readFile(join(dataDir, 'state.json'), 'utf8'))
   assert.ok(!storedState.history.some(entry => /^private-/.test(entry.requestId)), 'Private responses must not enter persisted history')

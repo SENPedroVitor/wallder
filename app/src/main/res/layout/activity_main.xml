@@ -3,13 +3,25 @@
     <TextView android:id="@+id/choose_agent" android:layout_width="wrap_content" android:layout_height="48dp" android:paddingHorizontal="16dp" android:gravity="center" android:text="West" android:textColor="#9A9A9F" android:textSize="14sp" android:fontFamily="sans-serif" android:background="@drawable/bg_agent_selector" android:drawableEnd="@drawable/ic_agent_chevron" android:drawablePadding="10dp" android:contentDescription="Trocar mascote" android:focusable="true" android:clickable="true" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" />
     <FrameLayout android:id="@+id/mascot_stage" android:layout_width="240dp" android:layout_height="240dp" android:contentDescription="Mascote West" android:importantForAccessibility="yes" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.5">
         <ImageView android:id="@+id/mascot_body" android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/mascot_west_body" android:importantForAccessibility="no" />
-        <ImageView android:id="@+id/mascot_eyes" android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/mascot_west_eyes" android:importantForAccessibility="no" />
+
+        <ImageView
+            android:id="@+id/mascot_eyes"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:src="@drawable/mascot_west_eyes" />
     </FrameLayout>
-    <androidx.constraintlayout.widget.Guideline android:id="@+id/voice_line" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" app:layout_constraintGuide_percent="0.76" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/voice_line"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.69" />
     <FrameLayout android:id="@+id/mic_ring" android:layout_width="96dp" android:layout_height="96dp" android:background="@drawable/bg_voice_ring" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="@id/voice_line" app:layout_constraintBottom_toTopOf="@id/voice_line">
-        <ImageButton android:id="@+id/talk_button" android:layout_width="72dp" android:layout_height="72dp" android:layout_gravity="center" android:background="@drawable/bg_voice_button" android:src="@drawable/ic_voice_mic" android:padding="21dp" android:contentDescription="Toque para falar" />
+        <ImageButton android:id="@+id/talk_button" android:layout_width="72dp" android:layout_height="72dp" android:layout_gravity="center" android:background="@drawable/bg_voice_button" android:src="@drawable/ic_agent_keyboard" android:padding="21dp" android:contentDescription="Conversar por texto" />
     </FrameLayout>
-    <ImageButton android:id="@+id/mute_button" android:layout_width="48dp" android:layout_height="48dp" android:layout_marginStart="16dp" android:background="@drawable/bg_agent_selector" android:src="@drawable/ic_voice_mic" android:padding="14dp" android:alpha="0.6" android:contentDescription="Silenciar microfone" app:layout_constraintStart_toEndOf="@id/mic_ring" app:layout_constraintTop_toTopOf="@id/mic_ring" app:layout_constraintBottom_toBottomOf="@id/mic_ring" />
-    <TextView android:id="@+id/voice_status" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="Toque para falar" android:textColor="#8A8F9A" android:textSize="15sp" android:fontFamily="sans-serif" android:gravity="center" android:accessibilityLiveRegion="polite" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@id/mic_ring" />
+    <ImageButton android:id="@+id/mute_button" android:layout_width="48dp" android:layout_height="48dp" android:layout_marginStart="16dp" android:background="@drawable/bg_agent_selector" android:src="@drawable/ic_voice_muted" android:padding="14dp" android:alpha="0.3" android:contentDescription="Voz ainda não disponível" app:layout_constraintStart_toEndOf="@id/mic_ring" app:layout_constraintTop_toTopOf="@id/mic_ring" app:layout_constraintBottom_toBottomOf="@id/mic_ring" />
+    <TextView android:id="@+id/voice_status" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="Toque para conversar por texto" android:textColor="#8A8F9A" android:textSize="15sp" android:fontFamily="sans-serif" android:gravity="center" android:accessibilityLiveRegion="polite" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@id/mic_ring" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
