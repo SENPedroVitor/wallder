@@ -11,6 +11,7 @@ import { createRoutineEngine } from './routines.mjs'
 import { frontendStore } from './frontend-store.mjs'
 import { createMobileService } from './mobile.mjs'
 import { createIslandActivity } from './island.mjs'
+import { createAudioProxy } from './audio-proxy.mjs'
 import { SportsService, sportsTools } from './sports.mjs'
 import { travelTools, travelContext, travelCard } from './travel.mjs'
 import { readTravelSource, travelAddress } from './travel-source.mjs'
@@ -60,6 +61,7 @@ if(environment.WENDLER_VAULT_KEY_FILE)maintenance.start()
 const normalThreadConfig = { features: { apps: true }, ...(process.platform==='win32'?{'mcp_servers.node_repl':{enabled:false}}:{}), plugins: { 'computer-use@openai-bundled': { enabled: false }, 'unified-computer-use@openai-bundled': { enabled: false } } }
 const widgets = createWidgetService({dataDir})
 const sports = new SportsService({dataDir})
+const audioProxy = createAudioProxy()
 const browser = new BrowserBridge(dataDir)
 const pamAgentMail=new AgentMailService({dataDir})
 const pamMail=new PamEmailRouter(pamAgentMail,new PamMailService({vault:createPamMailVault(dataDir),browser}))
@@ -455,6 +457,8 @@ export const server = http.createServer(async (req, res) => {
     }
     if (origin && !isAuthorizedOrigin(origin, { port, uiPort, remoteOrigin: environment.WENDLER_REMOTE_ORIGIN })) return fail(res, 403, 'Origem não autorizada.')
     const url = new URL(req.url, `http://${host}`)
+    if (url.pathname === '/api/audio/status' && req.method === 'GET') return json(res,200,await audioProxy.status())
+    if (url.pathname === '/api/audio/transcribe' && req.method === 'POST') return await audioProxy.transcribe(req,res)
     if (url.pathname === '/api/island/status' && req.method === 'GET') return json(res, 200, { ...islandActivity.snapshot({ agents: agentPersonalities, ready: client.ready && authenticated && !!models.length, approvals }), sports: await sports.snapshot() })
     if (url.pathname === '/api/sports/score' && req.method === 'GET') { const result=await sports.scores({league:url.searchParams.get('league')||'soccer/all',date:url.searchParams.get('date')||undefined});const game=result.games.find(game=>game.id===url.searchParams.get('event'));return game?json(res,200,game):fail(res,404,'Partida não encontrada nesta data.') }
     if (url.pathname === '/api/sports/follow' && req.method === 'POST') { const input=await body(req); if(input.action!=='unfollow')return fail(res,400,'Ação inválida.');return json(res,200,await sports.execute(input)) }

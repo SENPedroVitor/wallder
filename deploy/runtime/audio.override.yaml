@@ -1,0 +1,18 @@
+services:
+  transcription:
+    build:
+      context: ./app
+      dockerfile: deploy/audio/Dockerfile
+    container_name: wendler-audio
+    network_mode: host
+    mem_limit: 1500m
+    memswap_limit: 1500m
+    cpus: 1.5
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true

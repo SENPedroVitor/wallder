@@ -1,0 +1,5 @@
+<!doctype html><html lang="pt-BR"><meta charset="UTF-8"><title>Teste de áudio</title><div id="root"></div><script type="module">
+import React,{useState} from 'react';import{createRoot}from'react-dom/client';import{VoiceInput}from'/src/design/VoiceInput.tsx';import'/src/design/waddle.css';
+function Test(){const[draft,setDraft]=useState('Texto inicial'),[key,setKey]=useState(0);return React.createElement('main',{style:{padding:'240px 80px',maxWidth:'600px'}},React.createElement('button',{type:'button',onClick:()=>{setKey(value=>value+1);setDraft('Outra conversa')}},'Trocar conversa de teste'),React.createElement('form',{className:'waddle-composer',onSubmit:event=>{event.preventDefault();window.submissions=(window.submissions||0)+1}},React.createElement('div',null,React.createElement(VoiceInput,{key,remaining:19999-draft.length,onText:text=>setDraft(previous=>previous+'\n'+text)}),React.createElement('textarea',{'aria-label':'Mensagem de teste',value:draft,onChange:event=>setDraft(event.target.value)}))))}
+createRoot(document.getElementById('root')).render(React.createElement(Test));
+</script></html>
