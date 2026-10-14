@@ -1,0 +1,19 @@
+{
+  "name": "Wendler Local",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": [
+    "figma"
+  ],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": [
+      "none"
+    ],
+    "reasoning": "Conecta exclusivamente ao serviço local do Wendler no computador para receber pedidos do seu agente. Não chama a API REST nem o MCP oficial do Figma.",
+    "devAllowedDomains": [
+      "http://localhost:5174"
+    ]
+  }
+}

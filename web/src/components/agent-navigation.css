@@ -1,0 +1,75 @@
+.team-group-toggle { display:flex; align-items:center; gap:10px; border:0; background:transparent; color:var(--muted); width:100%; padding:10px 9px; margin-bottom:5px; font-size:12px; text-align:left; border-radius:8px; }
+.team-group-toggle:hover { background:var(--hover); }
+.team-group-toggle small { margin-left:auto; color:var(--soft); }
+.team-group-toggle > svg:last-child { transition:transform .2s; }
+.team-group-toggle[aria-expanded='false'] > svg:last-child { transform:rotate(-90deg); }
+.sidebar-collapsed .team-group-toggle { justify-content:center; padding:10px 0; }
+.sidebar-collapsed .team-group-toggle span,.sidebar-collapsed .team-group-toggle small,.sidebar-collapsed .team-group-toggle > svg:last-child { display:none; }
+.agent-dialog { width:min(660px,calc(100vw - 32px)); max-height:85dvh; border:1px solid var(--line); border-radius:20px; background:var(--surface); color:var(--text); padding:24px; box-shadow:var(--shadow); }
+.agent-dialog::backdrop { background:#11101685; backdrop-filter:blur(6px); }
+.agent-dialog__header { display:flex; gap:20px; align-items:flex-start; justify-content:space-between; }
+.agent-dialog__header h2 { font-size:25px; margin-bottom:8px; }
+.agent-dialog__header p { font-size:12px; color:var(--muted); margin-bottom:20px; }
+.agent-dialog__header button { min-width:32px; height:32px; }
+.agent-dialog__search { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; margin-bottom:16px; color:var(--muted); }
+.agent-dialog__search input { min-width:0; flex:1; background:none; border:0; color:var(--text); font-size:13px; outline:none; }
+.agent-dialog__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.agent-dialog__grid button { display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--line); border-radius:11px; background:var(--bg); text-align:left; }
+.agent-dialog__grid button:hover { background:var(--hover); border-color:var(--accent); }
+.agent-dialog__grid button > svg { flex:none; }
+.agent-dialog__grid button span { display:grid; gap:4px; }
+.agent-dialog__grid strong { font-size:12px; }
+.agent-dialog__grid small,.agent-dialog__note,.agent-dialog__empty { font-size:11px; color:var(--muted); }
+.agent-dialog__note { margin:18px 0 0; }
+.agent-history { flex:none; margin:0 24px 8px; border:1px solid var(--line); border-radius:10px; background:var(--surface-alt); }
+.agent-history summary { display:flex; align-items:center; gap:8px; cursor:pointer; list-style:none; padding:10px 12px; font-size:11px; color:var(--muted); }
+.agent-history summary::-webkit-details-marker { display:none; }
+.agent-history summary small { margin-left:auto; color:var(--soft); }
+.agent-history[open] summary > svg:last-child { transform:rotate(180deg); }
+.agent-history__list { max-height:170px; overflow:auto; padding:0 7px; }
+.agent-history__list button { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; border:0; border-radius:7px; background:none; padding:9px; text-align:left; font-size:12px; }
+.agent-history__list button:hover,.agent-history__list button.active { background:var(--hover); }
+.agent-history__list button span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.agent-history__list small { flex:none; color:var(--soft); font-size:10px; }
+.agent-history__list p { margin:5px 8px 12px; font-size:11px; color:var(--muted); }
+.agent-history__new { display:flex; align-items:center; gap:8px; margin:5px 7px 7px; padding:9px; border:0; background:none; color:var(--accent); font-size:11px; border-radius:7px; }
+.agent-history__new:hover { background:var(--hover); }
+.individual-roster { margin-bottom:18px; }
+.individual-entry__row { display:flex; align-items:center; position:relative; }
+.individual-entry__row .roster-row { padding-right:26px; }
+.individual-entry__new { position:absolute; right:4px; width:24px; height:24px; display:grid; place-items:center; border:0; border-radius:6px; background:transparent; color:var(--muted); }
+.individual-entry__new:hover { background:var(--selected); color:var(--text); }
+.sidebar-agent-history { margin:0 0 6px 12px; }
+.sidebar-agent-history summary { display:flex; gap:6px; align-items:center; cursor:pointer; list-style:none; font-size:10px; color:var(--soft); padding:6px; }
+.sidebar-agent-history summary::-webkit-details-marker { display:none; }
+.sidebar-agent-history summary small { margin-left:auto; }
+.sidebar-agent-history[open] summary > svg { transform:rotate(90deg); }
+.sidebar-thread { display:block; width:100%; padding:8px 10px; border:0; border-radius:6px; font-size:11px; text-align:left; background:none; color:var(--muted); white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+.sidebar-thread.active,.sidebar-thread:hover { background:var(--hover); color:var(--text); }
+.sidebar-collapsed .sidebar-agent-history,.sidebar-collapsed .individual-entry__new { display:none; }
+.sidebar-collapsed .individual-entry__row .roster-row { padding:0; }
+.project-team { margin:4px 0; padding:4px 6px; border-radius:9px; }
+.project-team__title { display:flex; align-items:center; gap:9px; width:100%; padding:9px 5px; background:none; border:0; border-radius:7px; text-align:left; font-size:12px; }
+.project-team__title span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.project-team__title.active,.project-team__title:hover { background:var(--hover); }
+.project-team details summary { padding:5px 8px; font-size:10px; color:var(--soft); cursor:pointer; }
+.project-team__members { display:grid; gap:3px; padding:5px 8px; }
+.project-team__members button { display:flex; align-items:center; gap:7px; border:0; background:none; border-radius:6px; padding:3px; text-align:left; font-size:11px; color:var(--muted); }
+.project-team__members button:hover { background:var(--hover); }
+.sidebar-empty { margin:8px 10px 16px; font-size:11px; line-height:1.6; color:var(--soft); }
+.chat-team-members { display:flex; gap:12px; flex-wrap:wrap; margin:0 24px 12px; }
+.chat-team-members > span { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); }
+.sidebar-collapsed .project-team details,.sidebar-collapsed .project-team__title span,.sidebar-collapsed .sidebar-empty { display:none; }
+.sidebar-collapsed .project-team__title { justify-content:center; }
+@media(max-width:640px) {
+  .chrome-layout .sidebar-agent-history { display:block; }
+  .chrome-layout .individual-entry__new { display:grid; }
+  .chrome-layout .individual-entry__row .roster-row { padding:5px 26px 5px 8px; }
+  .chrome-layout .project-team details,.chrome-layout .project-team__title span,.chrome-layout .sidebar-empty { display:block; }
+  .chrome-layout .project-team__title { justify-content:flex-start; }
+  .chrome-layout .team-group-toggle { justify-content:flex-start; padding:10px 9px; }
+  .chrome-layout .team-group-toggle span,.chrome-layout .team-group-toggle small,.chrome-layout .team-group-toggle > svg:last-child { display:block; }
+  .agent-history { margin:0 12px 8px; }
+  .agent-dialog { padding:18px; }
+  .agent-dialog__grid { grid-template-columns:1fr; }
+}

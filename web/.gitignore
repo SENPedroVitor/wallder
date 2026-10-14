@@ -1,0 +1,12 @@
+node_modules/
+.wendler/
+dist/
+.reference/
+.artifacts/
+*.local
+*.log
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+sites/wendler/

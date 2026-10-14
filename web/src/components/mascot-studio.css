@@ -1,0 +1,18 @@
+.mascot-studio { margin-top: 28px; }
+.mascot-studio__preview { display: flex; align-items: center; gap: 36px; border: 1px solid var(--line); border-radius: 20px; padding: 28px; background: var(--surface-alt); }
+.mascot-studio__preview h2 { font-size: 24px; margin: 10px 0; }
+.mascot-studio p { font-size: 13px; line-height: 1.7; color: var(--muted); max-width: 520px; }
+.mascot-studio__actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.mascot-studio small { color: var(--muted); font-size: 11px; }
+.mascot-studio__section { margin-top: 30px; }
+.mascot-studio h3 { font-size: 15px; margin: 0 0 14px; }
+.mascot-studio__states, .mascot-studio__eyes { display: grid; grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); gap: 9px; }
+.mascot-studio__states button, .mascot-studio__eyes button { display: flex; align-items: center; gap: 8px; padding: 10px 8px; min-height: 64px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--text); font: inherit; font-size: 11px; text-align: left; cursor: pointer; }
+.mascot-studio button[aria-pressed=true] { border-color: var(--accent); background: var(--surface-alt); box-shadow: inset 0 0 0 1px var(--accent); }
+.mascot-studio button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.mascot-studio__eyes { margin-top: 14px; }
+@media (max-width: 620px) {
+  .mascot-studio__preview { flex-direction: column; gap: 14px; padding: 20px; align-items: flex-start; }
+  .mascot-studio__preview > .mascot { align-self: center; }
+  .mascot-studio__states, .mascot-studio__eyes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

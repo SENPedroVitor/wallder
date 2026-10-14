@@ -1,0 +1,53 @@
+services:
+  browser:
+    image: lscr.io/linuxserver/firefox@sha256:1d8fc33b44f2d1c819c59af62d28724e3b32025b0f4dd2d525c0624b43947ada
+    container_name: wendler-browser
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/Sao_Paulo
+      FIREFOX_CLI: --remote-debugging-port=9222 about:blank
+    volumes:
+      - ./browser:/config
+    ports:
+      - "127.0.0.1:3012:3000"
+      - "127.0.0.1:9223:9223"
+    shm_size: 512mb
+    mem_limit: 2900m
+    memswap_limit: 2900m
+    cpus: 1.5
+    restart: unless-stopped
+  browser-wire:
+    image: alpine/socat@sha256:fb3862c949af7c79996d0e514ee96128644d840835ed5368eeecb14a869de361
+    container_name: wendler-browser-wire
+    network_mode: service:browser
+    command: TCP-LISTEN:9223,fork,reuseaddr TCP:127.0.0.1:9222
+    mem_limit: 64m
+    restart: unless-stopped
+    depends_on: [browser]
+  steam:
+    image: lscr.io/linuxserver/firefox@sha256:1d8fc33b44f2d1c819c59af62d28724e3b32025b0f4dd2d525c0624b43947ada
+    container_name: wendler-steam
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/Sao_Paulo
+      FIREFOX_CLI: --remote-debugging-port=9222 https://store.steampowered.com/
+    volumes:
+      - ./steam:/config
+    ports:
+      - "127.0.0.1:3013:3000"
+      - "127.0.0.1:9224:9223"
+    shm_size: 512mb
+    mem_limit: 2900m
+    memswap_limit: 2900m
+    cpus: 1.5
+    restart: unless-stopped
+  steam-wire:
+    image: alpine/socat@sha256:fb3862c949af7c79996d0e514ee96128644d840835ed5368eeecb14a869de361
+    container_name: wendler-steam-wire
+    network_mode: service:steam
+    command: TCP-LISTEN:9223,fork,reuseaddr TCP:127.0.0.1:9222
+    mem_limit: 64m
+    restart: unless-stopped
+    depends_on: [steam]

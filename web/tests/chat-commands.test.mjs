@@ -1,0 +1,5 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import {isClearCommand,restartConversation} from '../src/design/chatCommands.ts'
+test('clear commands are exact and never consume an ordinary message',()=>{for(const text of ['/clear',' /q ','/CLEAR'])assert.equal(isClearCommand(text),true);for(const text of ['como uso /clear?','/quiet','/clear todas'])assert.equal(isClearCommand(text),false)})
+test('a clean conversation keeps agent and project but starts with a fresh identity and no transcript',()=>{const before={id:'old',agent:'pam',members:['pam','west'],title:'Projeto',projectId:'project',private:true,pinned:true,messages:[{sender:'you',text:'anterior'}],updated:1};const fresh=restartConversation(before,'new',2);assert.equal(fresh.id,'new');assert.equal(fresh.agent,'pam');assert.equal(fresh.projectId,'project');assert.deepEqual(fresh.messages,[]);assert.equal(fresh.private,true);assert.equal(fresh.pinned,false);assert.equal(before.messages.length,1);assert.equal(before.id,'old')})

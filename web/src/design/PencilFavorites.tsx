@@ -1,0 +1,16 @@
+import { useState } from 'react'
+import { CanvasScene } from './CanvasScene'
+import { PencilRecordEditor } from './PencilRecordEditor'
+import { makeId, type RecordEntry } from './workspace'
+
+const categories=['Esportes','Artistas','Séries','Aniversários']
+export function PencilFavorites({records,onSave,onBack,onReminders}:{records:RecordEntry[];onSave:(record:RecordEntry)=>void;onBack:()=>void;onReminders:()=>void}){
+ const [category,setCategory]=useState('Esportes'),[draft,setDraft]=useState<RecordEntry|null>(null),[error,setError]=useState('')
+ const visible=records.filter(record=>!record.archived&&(category==='Aniversários'?record.kind==='aniversario':record.kind==='favorito'&&(record.fields.Categoria??'Esportes')===category))
+ return <section className="pencil-memories waddle-scene-page"><CanvasScene id="Q2ngU5" crop={false} bindings={{...Object.fromEntries(categories.flatMap(name=>[[name+' — texto',{action:'Categoria: '+name}],[name+' — botão',{style:{'background-color':category===name?'#E8D92F':'light-dark(#F2F2F2,var(--w-side))'}}]])),'Adicionar favorito — texto':{text:category==='Aniversários'?'Cadastrar aniversário':'Adicionar favorito',action:'Adicionar favorito'},'Próxima etapa do fluxo':{text:'Voltar às conversas',action:'Voltar às conversas'}}} decorate={root=>{
+  for(const node of [...root.children] as HTMLElement[])if(/^Favorito (futebol|NBA|NHL) —/.test(node.dataset.pencilName||''))node.remove()
+  const list=document.createElement('div');list.className='pencil-memory-list';root.append(list)
+  for(const record of visible){const row=document.createElement('button');row.className='pencil-record-row';row.dataset.label='edit:'+record.id;const text=document.createElement('span'),title=document.createElement('strong'),description=document.createElement('small'),action=document.createElement('span');title.textContent=record.title;description.textContent=Object.entries(record.fields).filter(([,value])=>value).slice(0,3).map(([key,value])=>key+': '+value).join(' · ');action.textContent='Editar';text.append(title,description);row.append(text,action);list.append(row)}
+  if(!visible.length){const empty=document.createElement('p');empty.className='pencil-record-empty';empty.textContent='Nenhum favorito nesta seleção.';list.append(empty)}
+ }} decorationKey={JSON.stringify(visible)} onAction={event=>{if(event.label.startsWith('Categoria: ')){setCategory(event.label.slice(11));return}if(event.label==='Voltar às conversas'){onBack();return}if(event.label==='Configurar lembretes'){onReminders();return}if(event.label==='Adicionar favorito'){setDraft({id:makeId(),kind:category==='Aniversários'?'aniversario':'favorito',title:'',fields:{Categoria:category},updated:Date.now()});return}if(event.label.startsWith('edit:')){const record=visible.find(item=>item.id===event.label.slice(5));if(record)setDraft({...record,fields:{...record.fields}})}}}/>{draft&&<PencilRecordEditor record={draft} error={error} onDraft={setDraft} onCancel={()=>{setDraft(null);setError('')}} onExtras={()=>setError('As alterações são aplicadas ao salvar.')} onSave={record=>{if(!record.title.trim()){setError('Informe o nome antes de salvar.');return}if(record.kind==='aniversario'&&!record.fields.Data?.trim()){setError('Informe a data do aniversário.');return}onSave({...record,updated:Date.now()});setDraft(null);setError('')}}/>}</section>
+}
