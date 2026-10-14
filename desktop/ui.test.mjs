@@ -19,7 +19,7 @@ test('island renders and its real controls dispatch the intended actions across 
     await page.evaluateOnNewDocument(() => {
       window.fixture = { online: true, ready: true, tasks: [], agents: [{ id: 'west', name: 'Ash' }, { id: 'pam', name: 'Pam' }] }
       window.actions = []
-      window.wendlerIsland = { snapshot: async () => window.fixture, pointer: () => {}, onToggle: () => () => {}, hide: () => window.actions.push({ type: 'hide' }), open: value => window.actions.push({ type: 'open', ...value }), action: async value => { window.actions.push(value); return { ok: true } }, copyPix: async () => {} }
+      window.wendlerIsland = { snapshot: async () => window.fixture, pointer: () => {}, onToggle: () => () => {}, hide: () => window.actions.push({ type: 'hide' }), open: value => window.actions.push({ type: 'open', ...value }), action: async value => { window.actions.push(value); return { ok: true } }, onCollapse: callback => { window.collapseIsland=callback;return ()=>{} }, unfollow: async id => {window.fixture.sports=window.fixture.sports.filter(game=>game.id!==id)}, copyPix: async () => {} }
     })
     await page.goto('http://127.0.0.1:' + server.address().port, { waitUntil: 'networkidle0' })
     await page.waitForSelector('[data-state="idle"]')
@@ -40,6 +40,16 @@ test('island renders and its real controls dispatch the intended actions across 
     await page.evaluate(() => { window.fixture.online = false })
     await page.waitForFunction(() => [...document.querySelectorAll('button')].find(node => node.textContent === 'Autorizar')?.disabled)
     await page.click('[aria-label="Recolher ilha"]'); await page.mouse.move(0, 0); await page.waitForSelector('[data-state="offline"]')
+    await page.evaluate(()=>{window.fixture.online=true;window.fixture.tasks=[];window.fixture.sports=[{id:'12345',league:'soccer/all',leagueName:'Futebol',state:'in',detail:"36'",checkedAt:Date.now(),home:{name:'LASK Linz',abbreviation:'LAS',score:0},away:{name:'Liverpool',abbreviation:'LIV',score:2}}]})
+    await page.waitForSelector('[data-state="sports"]')
+    assert.equal(await page.$eval('.compact-sports strong',node=>node.textContent),'0 : 2')
+    await page.click('[aria-label="Expandir placar"]');await page.waitForSelector('.island-score');await new Promise(resolve=>setTimeout(resolve,500))
+    await page.evaluate(()=>window.collapseIsland());await page.mouse.move(0,0);await page.waitForSelector('[data-state="sports"]')
+    await page.evaluate(()=>{window.fixture.sports[0].away.score=3;window.fixture.sports[0].stale=true})
+    await page.waitForFunction(()=>document.querySelector('.compact-sports strong')?.textContent==='0 : 3')
+    assert.ok(await page.$eval('.compact-sports',node=>node.textContent.includes('Sem atualização')))
+    await page.click('[aria-label="Expandir placar"]');await page.waitForSelector('.island-score');await new Promise(resolve=>setTimeout(resolve,500))
+    await page.click('[aria-label="Parar de acompanhar LASK Linz e Liverpool"]');await page.waitForFunction(()=>!document.querySelector('.island-score'))
     assert.equal(errors.length, 0, errors.join('\n'))
   } finally { await browser.close(); await new Promise(resolve => server.close(resolve)) }
 })

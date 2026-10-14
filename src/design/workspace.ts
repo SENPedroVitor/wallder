@@ -6,7 +6,7 @@ import { createId } from '../ids.ts'
 export { catalog }
 export type Screen = { id: string; name: string }
 export const agents = personalities as { id: MascotAgent; name: string; role: string; personality: string; suggestion: string }[]
-export type Message = ChatMessage & { widget?: { screen?: string; sample?: boolean; type?: "shopping"|"pix"|"weather"|"spending"|"focus"|"market"|"tasks"|"canvas"; data?: unknown } }
+export type Message = ChatMessage & { widget?: { screen?: string; sample?: boolean; type?: "sports"|"shopping"|"pix"|"weather"|"spending"|"focus"|"market"|"tasks"|"canvas"; data?: unknown } }
 export type Chat = {id:string;title:string;agent:MascotAgent;messages:Message[];updated:number;members?:MascotAgent[];archived?:boolean;pinned?:boolean;private?:boolean;projectId?:string}
 export type Workspace = {pagePrefs?:Record<string,Record<string,unknown>>;profile:{name:string;nickname:string;avatar:string;bio?:string;language?:string;timezone?:string};theme:'light'|'dark';prefs:Record<string,Record<string,unknown>>;chats:Chat[];sidebarAgents:MascotAgent[];selected:string|null;onboarded:boolean;contextEpoch?:string;[key:string]:unknown}
 export type RecordEntry = {id:string;kind:string;title:string;fields:Record<string,string>;updated:number;archived?:boolean}

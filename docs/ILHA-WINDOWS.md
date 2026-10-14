@@ -41,3 +41,13 @@ A pausa e a retomada de tarefas, temperatura, GPU e ações automáticas de otim
 Compilação web e desktop, testes de atividade, decisões, cancelamento, privacidade, abertura da conversa correta e renderização dos principais estados. Teste adicional na janela nativa confirmou expansão, ausência de erros no renderer e permanência sobre outras janelas. Uma mensagem real ao Ash atravessou o backend e apareceu como atividade em execução e depois como resposta concluída. Nenhuma compra foi iniciada para estes testes.
 
 ![Ilha nativa em execução no Windows](screenshots/windows-ilha-expandida.png)
+
+## Placares e movimento
+
+A ilha também acompanha até três partidas consultadas pelo Livro ou por outro agente com `wendler_sports`. A consulta inicial usa a data de Brasília e a competição indicada; se a competição não for conhecida, o agente consulta futebol geral. A fonte atual é o feed de placares da ESPN, acessado por HTTPS no servidor, sem chave. Esse feed público não tem garantia de disponibilidade ou de atualização instantânea; não é o MCP oficial da ESPN. A cobertura depende do campeonato.
+
+O servidor reutiliza leituras por no máximo 15 segundos; a ilha consulta o servidor a cada 2,5 segundos quando não há tarefas em execução. O card do chat atualiza a cada 20 segundos. Esses intervalos são de consulta, não uma promessa de atraso máximo do fornecedor. O relógio é o informado pela fonte, sem simular minutos. Partidas agendadas não recebem 0 a 0 fictício. Falhas de consulta mantêm o último dado identificado como sem atualização, com o horário da leitura; uma leitura com mais de 45 segundos também recebe essa indicação.
+
+O acompanhamento é salvo no servidor e retomado após reinício, por até 36 horas; o usuário pode encerrá-lo pelo botão do placar. Conversas privadas não podem iniciar esse acompanhamento compartilhado. A aprovação de ações dos agentes continua tendo prioridade sobre o placar.
+
+Largura, altura e cantos agora usam uma única transição interrompível de 420 ms. A abertura pelo cursor tem espera de 180 ms e respeita a preferência do Windows de reduzir movimento. Clicar fora da ilha recolhe o painel mesmo quando ela não recebeu foco. O aplicativo lê apenas o estado do botão principal do mouse no Windows, sem registrar teclas, texto ou histórico de cliques. O comportamento foi validado com um clique real em outra janela.

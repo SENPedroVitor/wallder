@@ -22,23 +22,37 @@ export function Island() {
   const [expanded, setExpanded] = useState(false), [pinned, setPinned] = useState(false), [showPix, setShowPix] = useState(false), [showPc, setShowPc] = useState(false)
   const [selectedId, setSelectedId] = useState(null), [dismissed, setDismissed] = useState([]), [clock, setClock] = useState(Date.now()), [pending, setPending] = useState(false), [notice, setNotice] = useState('')
   const hoverTimer = useRef(), collapseTimer = useRef(), allowHover = useRef(0), inside = useRef(false)
-  const surface = useRef(null), surfaceHeight = useRef(44), morph = useRef(null)
+  const surface = useRef(null), surfaceBounds = useRef(null), morph = useRef(null)
   const tasks = snapshot.tasks || [], running = tasks.filter(task => task.status === 'running'), task = chooseTask(tasks, selectedId, dismissed, clock)
   const state = islandState({ online: snapshot.online, ready: snapshot.ready, task, expanded, showPix, showPc, activeCount: running.length })
+  const games = snapshot.sports || []
+  const featuredGame = games.find(game => game.state === 'in') || games[0]
+  const sportsVisible = ['idle','offline'].includes(state) && featuredGame
+  const displayState = sportsVisible ? 'sports' : state
+  const gameStale = game => !snapshot.online || game.stale || clock-game.checkedAt>45000
+  const stopFollowing = async game => { try { await bridge.unfollow(game.id); setSnapshot(previous=>({...previous,sports:(previous.sports||[]).filter(item=>item.id!==game.id)})) } catch(error){setNotice(error.message)} }
   const online = snapshot.online && snapshot.ready
   useLayoutEffect(() => {
     const node = surface.current
     if (!node) return
+    const previous = surfaceBounds.current
     morph.current?.cancel()
-    const height = node.getBoundingClientRect().height, previous = surfaceHeight.current
-    surfaceHeight.current = height
-    if (previous !== height && !matchMedia('(prefers-reduced-motion: reduce)').matches) morph.current = node.animate([{ height: previous + 'px', minHeight: '0px' }, { height: height + 'px', minHeight: '0px' }], { duration: 450, easing: 'cubic-bezier(.22,1,.36,1)' })
-    return () => morph.current?.cancel()
-  }, [state, task?.id, task?.approval?.id, notice])
+    node.style.minHeight = ''
+    const target = node.getBoundingClientRect(), radius = getComputedStyle(node).borderRadius
+    if (!previous || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (Math.abs(previous.width-target.width)<1 && Math.abs(previous.height-target.height)<1) return
+    node.style.minHeight = '0px'
+    const animation = node.animate([
+      { width: previous.width+'px', height: previous.height+'px', borderRadius:previous.radius },
+      { width: target.width+'px', height: target.height+'px', borderRadius:radius }
+    ], { duration:420, easing:'cubic-bezier(.16,1,.3,1)' })
+    morph.current=animation
+    animation.finished.then(()=>{if(morph.current===animation)node.style.minHeight=''}).catch(()=>{})
+  }, [displayState, task?.id, task?.approval?.id, notice, games.length])
   useEffect(() => {
     const node = surface.current
     if (!node) return
-    const update = () => { const bounds = node.getBoundingClientRect(); bridge.surface?.({ x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height, radius: parseFloat(getComputedStyle(node).borderRadius) || 0 }) }
+    const update = () => { const bounds = node.getBoundingClientRect(), radius=getComputedStyle(node).borderRadius; surfaceBounds.current={width:bounds.width,height:bounds.height,radius}; bridge.surface?.({ x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height, radius: parseFloat(radius) || 0 }) }
     const observer = new ResizeObserver(update); observer.observe(node); update()
     return () => observer.disconnect()
   }, [])
@@ -53,13 +67,14 @@ export function Island() {
     const pointer = event => { const next = !!event.target?.closest?.('.island'); if (inside.current !== next) { inside.current = next; bridge.pointer(next) } }
     const leave = () => { inside.current = false; bridge.pointer(false) }
     window.addEventListener('pointermove', pointer); window.addEventListener('blur', leave); document.addEventListener('mouseleave', leave)
+    const uncollapse = bridge.onCollapse?.(() => { clearTimeout(hoverTimer.current); clearTimeout(collapseTimer.current); setExpanded(false); setPinned(false); setShowPc(false); setShowPix(false); allowHover.current=Date.now()+1000 })
     const untoggle = bridge.onToggle(() => { setExpanded(value => !value); setPinned(value => !value); setShowPc(false); setShowPix(false) })
-    return () => { stopped = true; clearTimeout(timer); clearTimeout(hoverTimer.current); clearTimeout(collapseTimer.current); window.removeEventListener('pointermove', pointer); window.removeEventListener('blur', leave); document.removeEventListener('mouseleave', leave); untoggle(); bridge.pointer(false) }
+    return () => { stopped = true; clearTimeout(timer); clearTimeout(hoverTimer.current); clearTimeout(collapseTimer.current); window.removeEventListener('pointermove', pointer); window.removeEventListener('blur', leave); document.removeEventListener('mouseleave', leave); untoggle(); uncollapse?.(); bridge.pointer(false) }
   }, [])
   const open = () => { setExpanded(true); setPinned(true) }
   const collapse = () => { setExpanded(false); setPinned(false); setShowPc(false); setShowPix(false); allowHover.current = Date.now() + 1000 }
-  const enter = () => { clearTimeout(collapseTimer.current); clearTimeout(hoverTimer.current); bridge.pointer(true); inside.current = true; if (Date.now() > allowHover.current) hoverTimer.current = setTimeout(() => setExpanded(true), 600) }
-  const leave = () => { clearTimeout(hoverTimer.current); if (!pinned && !showPix && !showPc) collapseTimer.current = setTimeout(() => setExpanded(false), 450) }
+  const enter = () => { clearTimeout(collapseTimer.current); clearTimeout(hoverTimer.current); bridge.pointer(true); inside.current = true; if (Date.now() > allowHover.current) hoverTimer.current = setTimeout(() => setExpanded(true), 180) }
+  const leave = () => { clearTimeout(hoverTimer.current); if (!pinned && !showPix && !showPc) collapseTimer.current = setTimeout(() => setExpanded(false), 220) }
   const action = async input => {
     if (pending || !online) return
     setPending(true); setNotice('')
@@ -76,8 +91,9 @@ export function Island() {
   const statusLabel = !snapshot.online ? 'Sem conexão com o servidor' : !snapshot.ready ? 'Agentes indisponíveis' : 'Equipe conectada'
   return <div className="island-host">
     {!window.wendlerIsland && <div className="browser-label">Prévia no navegador · janela Windows disponível pelo aplicativo</div>}
-    <section ref={surface} className={'island island--' + state} data-state={state} aria-label="Ilha dos agentes Wendler" onPointerEnter={enter} onPointerLeave={leave} onKeyDown={event => { if (event.key === 'Escape') collapse() }}>
-      {['idle', 'offline'].includes(state) && <button className="compact-trigger idle-trigger" onClick={open} aria-label="Expandir ilha"><Mascot id="west" size={30}/><span>{online ? 'Equipe conectada' : snapshot.online ? 'Agente indisponível' : 'Sem conexão'}</span>{online ? <span className="status-dot"/> : <WifiOff size={14}/>}</button>}
+    <section ref={surface} className={'island island--' + displayState} data-state={displayState} aria-label="Ilha dos agentes Wendler" onPointerEnter={enter} onPointerLeave={leave} onKeyDown={event => { if (event.key === 'Escape') collapse() }}>
+      {!sportsVisible && ['idle', 'offline'].includes(state) && <button className="compact-trigger idle-trigger" onClick={open} aria-label="Expandir ilha"><Mascot id="west" size={30}/><span>{online ? 'Equipe conectada' : snapshot.online ? 'Agente indisponível' : 'Sem conexão'}</span>{online ? <span className="status-dot"/> : <WifiOff size={14}/>}</button>}
+      {sportsVisible && <button className="compact-sports" onClick={open} aria-label="Expandir placar"><Mascot id="livro" size={34}/><span className="sports-team">{featuredGame.home.abbreviation}<br/><small>{gameStale(featuredGame)?'Sem atualização':featuredGame.detail}</small></span><strong key={featuredGame.home.score+':'+featuredGame.away.score} className="score-value">{featuredGame.home.score??'—'} : {featuredGame.away.score??'—'}</strong><span className="sports-team">{featuredGame.away.abbreviation}<br/><small>{new Date(featuredGame.checkedAt).toLocaleTimeString('pt-BR')}</small></span></button>}
       {state === 'working' && <div className="compact-working"><button className="compact-trigger working-trigger" onClick={open}><Mascot id={task.agentId} name={agentName} size={50} active/><span className="task-heading"><strong>{agentName}</strong><small>{task.activity}</small></span><span className="elapsed">{elapsed(task.startedAt, clock)}</span></button><button className="circle-button interrupt-button" onClick={() => action({ type: 'cancel', id: task.id })} disabled={pending} aria-label="Interromper resposta"><Square size={14}/></button></div>}
       {state === 'parallel' && <button className="compact-trigger parallel-trigger" onClick={open}><span className="avatar-stack">{running.slice(0, 3).map(item => <Mascot key={item.id} id={item.agentId} name={item.agentName} size={36} active/>)}</span><span>{running.length} trabalhando</span><Bars/></button>}
       {state === 'approval' && <div className="compact-alert"><button className="compact-trigger alert-trigger" onClick={open}><Mascot id={task.agentId} name={agentName} size={44}/><span className="task-heading"><strong>{review.title}</strong><small className="accent">Aguardando sua autorização</small></span></button><button className="pill" disabled={pending || !online} onClick={() => action({ type: 'approval', id: review.id, decision: 'decline' })}>Recusar</button><button className="pill primary" onClick={open}>Revisar</button></div>}
@@ -91,8 +107,9 @@ export function Island() {
           {!review && task.status === 'running' && <div className="progress-track" role="progressbar" aria-label="Agente trabalhando" aria-valuetext="Progresso não informado pelo executor"><i/></div>}
           {!review && task.status !== 'running' && task.summary && <p className="task-summary">{task.summary}</p>}
           <div className="task-actions">{review ? <><button className="pill" disabled={pending || !online} onClick={() => action({ type: 'approval', id: review.id, decision: 'decline' })}>Recusar</button><button className="pill primary" disabled={pending || !online} onClick={() => action({ type: 'approval', id: review.id, decision: 'accept' })}>{pending ? 'Enviando…' : 'Autorizar'}</button></> : <>{task.status === 'running' && <button className="pill" disabled={pending || !online} onClick={() => action({ type: 'cancel', id: task.id })}>{pending ? 'Interrompendo…' : 'Interromper'}</button>}<button className="pill white" onClick={openTask}>{task.status === 'running' ? 'Ver conversa' : 'Ver resposta'}</button><button className="pill" onClick={() => bridge.open({ type: 'browser' })}><Monitor size={13}/> Ver tela</button>{task.pix && <button className="pill primary" onClick={openQr}>Ver QR</button>}</>}</div>
-        </article> : <article className="empty-card"><Mascot id="west" size={44}/><div><strong>{statusLabel}</strong><p>{online ? 'As próximas atividades aparecem aqui.' : 'Confira a conexão do Tailscale. A ilha tenta reconectar automaticamente.'}</p></div></article>}
+        </article> : !games.length ? <article className="empty-card"><Mascot id="west" size={44}/><div><strong>{statusLabel}</strong><p>{online ? 'As próximas atividades aparecem aqui.' : 'Confira a conexão do Tailscale. A ilha tenta reconectar automaticamente.'}</p></div></article> : null}
         {!task && recent.length > 0 && <div className="recent-tasks">{recent.map(item => <button key={item.id} onClick={() => { setDismissed(value => value.filter(id => id !== item.id)); setSelectedId(item.id); bridge.open({ conversationId: item.conversationId }) }}><Mascot id={item.agentId} size={24}/><span>{item.agentName} · {item.activity}</span><ArrowUpRight size={13}/></button>)}</div>}
+        {games.length > 0 && <div className="island-scores">{games.map(game=><article className="island-score" key={game.id}><div className="score-heading"><Mascot id="livro" size={22}/><span className={gameStale(game)?'score-stale':''}>{gameStale(game)?'Sem atualização':game.state==='in'?'Em andamento · '+game.detail:game.detail} · {game.leagueName}</span><button className="icon-button" onClick={()=>stopFollowing(game)} aria-label={'Parar de acompanhar '+game.home.name+' e '+game.away.name}><X size={12}/></button></div><div className="score-line"><span>{game.home.name}</span><strong key={game.home.score+':'+game.away.score} className="score-value">{game.home.score??'—'} : {game.away.score??'—'}</strong><span>{game.away.name}</span></div><div className="score-footer"><span>ESPN · leitura às {new Date(game.checkedAt).toLocaleTimeString('pt-BR')}{gameStale(game)?' · última leitura':''}</span><button onClick={()=>bridge.open({conversationId:game.conversationId})}>Ver conversa <ArrowUpRight size={11}/></button></div></article>)}</div>}
         <footer className="island-footer"><span><i className={'connection-dot' + (online ? ' connected' : '')}/>{online ? 'Servidor conectado' : 'Servidor desconectado'}</span><button onClick={() => { setShowPc(true); setPinned(true) }}><MonitorCog size={13}/> Este PC</button><button onClick={() => bridge.hide()} title="Reabrir pela bandeja do Windows ou Ctrl+Alt+Espaço"><Settings2 size={13}/> Ocultar</button></footer>
       </div>}
       {state === 'pix-expanded' && <div className="pix-content"><header className="island-header"><Mascot id={task.agentId} name={agentName} size={42}/><div className="task-heading"><strong>{agentName} · Pagar com Pix</strong><small>{task.pix.item}</small></div><button className="icon-button" onClick={() => { setShowPix(false); setExpanded(true) }} aria-label="Voltar"><ChevronLeft size={16}/></button></header><div className="pix-body"><img src={task.pix.image} width={160} height={160} alt="QR Pix retornado pelo processador da loja"/><div><span className="pix-label">Valor do Pix</span><strong className="pix-total">{formatMoney(task.pix.pix ?? task.pix.total)}</strong><p>Confira os dados no banco. A validade é definida pela loja; exibir o QR não confirma pagamento.</p>{task.pix.code && <button className="pill primary" disabled={!online || clock - task.updatedAt > 5 * 60 * 1000} onClick={async () => { try { await bridge.copyPix(task.id); setNotice('Código Pix copiado') } catch (error) { setNotice(error.message) } }}><Clipboard size={14}/> Copiar código</button>}<button className="text-link" onClick={openTask}>Abrir no painel <ArrowUpRight size={13}/></button></div></div></div>}

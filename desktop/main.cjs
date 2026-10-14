@@ -7,9 +7,16 @@ const server = 'https://faux-poweredge-t110-ii.tail212b91.ts.net'
 let window, tray, online = false, latest = { ready: false, agents: [], tasks: [] }, lastSuccess = 0, latency = null
 let cpu = sampleCpu(), cpuPercent = 0, visible = true, pollTimer, cursorTimer, ignoring = true
 let surface = { x: 260, y: 22, width: 200, height: 44, radius: 22 }
+// Read only the primary mouse button, so a click outside also works when the
+// non-activating overlay never received keyboard focus. No keyboard hook.
+const mouseButton = process.platform === 'win32' ? require('koffi').load('user32.dll').func('short __stdcall GetAsyncKeyState(int vKey)') : null
+let mouseWasDown = false
 function updatePointer() {
   if (!window || window.isDestroyed() || !visible) return
   const ignore = !pointInSurface(screen.getCursorScreenPoint(), window.getBounds(), surface)
+  const down = mouseButton ? (mouseButton(1) & 0x8000) !== 0 : false
+  if (down && !mouseWasDown && ignore) window.webContents.send('island:collapse')
+  mouseWasDown = down
   if (ignore !== ignoring) { ignoring = ignore; window.setIgnoreMouseEvents(ignore, { forward: true }); window.setAlwaysOnTop(true, 'pop-up-menu') }
 }
 function sampleCpu() { return os.cpus().reduce((total, cpu) => ({ idle: total.idle + cpu.times.idle, total: total.total + Object.values(cpu.times).reduce((a, b) => a + b, 0) }), { idle: 0, total: 0 }) }
@@ -39,6 +46,7 @@ async function boot() {
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
   window.webContents.on('will-navigate', event => event.preventDefault())
   window.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false))
+  window.on('blur', () => window.webContents.send('island:collapse'))
   window.on('show', () => window.setAlwaysOnTop(true, 'pop-up-menu'))
   window.webContents.on('did-finish-load', () => { window.showInactive(); window.setAlwaysOnTop(true, 'pop-up-menu') })
   await window.loadFile(path.join(__dirname, 'dist/index.html'))
@@ -52,10 +60,10 @@ async function boot() {
     { type: 'separator' }, { label: 'Sair da ilha', click: () => app.quit() },
   ]))
   tray.on('double-click', toggle)
-  globalShortcut.register('CommandOrControl+Alt+Space', () => { if (!visible) toggle(); window.webContents.send('island:toggle') })
+  globalShortcut.register('CommandOrControl+Alt+Space', () => { if (!visible) toggle(); window.focus(); window.webContents.send('island:toggle') })
   screen.on('display-metrics-changed', position); screen.on('display-removed', position)
   poll()
-  cursorTimer = setInterval(updatePointer, 40)
+  cursorTimer = setInterval(updatePointer, 16)
 }
 ipcMain.handle('island:snapshot', event => { trusted(event); return { ...latest, online, lastSuccess, latency, pc: { cpuPercent, memoryUsed: os.totalmem() - os.freemem(), memoryTotal: os.totalmem(), uptime: os.uptime(), host: os.hostname(), platform: process.platform } } })
 ipcMain.on('island:pointer', event => { trusted(event); updatePointer() })
@@ -69,6 +77,7 @@ ipcMain.on('island:surface', (event, bounds) => {
 ipcMain.on('island:hide', event => { trusted(event); if (visible) toggle() })
 ipcMain.handle('island:action', async (event, input) => { trusted(event); const { validateAction } = await import(pathToFileURL(path.join(__dirname, 'model.mjs')).href); const action = validateAction(input); const current = latest.tasks.find(task => input.type === 'approval' ? task.approval?.id === input.id : task.id === input.id && task.status === 'running'); if (!online || !current) throw Error('A tarefa mudou. Aguarde a atualização.'); return request(action.path, action.body) })
 ipcMain.handle('island:open', (event, input) => { trusted(event); if (input?.type === 'browser') return shell.openExternal(server + '/computer/'); const id = typeof input?.conversationId === 'string' && /^[\w:-]{1,100}$/.test(input.conversationId) ? input.conversationId : ''; return shell.openExternal(server + (id ? '/?conversation=' + encodeURIComponent(id) : '/')) })
+ipcMain.handle('island:unfollow', (event, id) => { trusted(event); if (!latest.sports?.some(game=>game.id===id)) throw Error('Partida não encontrada.'); return request('/api/sports/follow',{action:'unfollow',eventId:id}) })
 ipcMain.handle('island:copy-pix', (event, id) => { trusted(event); const task = latest.tasks.find(task => task.id === id); if (!online || !task?.pix?.code || Date.now() - task.updatedAt > 5 * 60 * 1000) throw Error('Atualize o pedido no painel antes de copiar.'); clipboard.writeText(task.pix.code); return true })
 if (!app.requestSingleInstanceLock()) app.quit()
 else { app.on('second-instance', () => { if (!visible) toggle() }); app.whenReady().then(boot).catch(error => { console.error(error); app.quit() }) }

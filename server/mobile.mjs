@@ -5,7 +5,7 @@ import { frontendStore, mutateWorkspaceStore } from './frontend-store.mjs'
 const key = 'wendler:frontend:v1'
 const error = (message, status = 400) => Object.assign(new Error(message), { status })
 const identifier = value => typeof value === 'string' && /^[\w-]{1,100}$/.test(value)
-const allowedWidgets = new Set(['shopping', 'pix', 'weather', 'focus', 'market', 'tasks', 'spending', 'canvas'])
+const allowedWidgets = new Set(['sports', 'shopping', 'pix', 'weather', 'focus', 'market', 'tasks', 'spending', 'canvas'])
 const memoryHash = text => { let hash = 2166136261; for (let i = 0; i < text.length; i++) hash = Math.imul(hash ^ text.charCodeAt(i), 16777619); return (hash >>> 0).toString(16) }
 
 export function createMobileService({ dataDir, agents, startRun, status, timeoutMs = 360000 }) {

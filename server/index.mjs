@@ -11,6 +11,7 @@ import { createRoutineEngine } from './routines.mjs'
 import { frontendStore } from './frontend-store.mjs'
 import { createMobileService } from './mobile.mjs'
 import { createIslandActivity } from './island.mjs'
+import { SportsService, sportsTools } from './sports.mjs'
 import { makePrompt } from './chat-context.mjs'
 import { personalityInstructions,agentPersonalities } from './personas.mjs'
 import {TeamService,teamTools,delegationResponse} from './team.mjs'
@@ -56,6 +57,7 @@ const maintenance=new MaintenanceService(dataDir,environment.WENDLER_VAULT_KEY_F
 if(environment.WENDLER_VAULT_KEY_FILE)maintenance.start()
 const normalThreadConfig = { features: { apps: true }, ...(process.platform==='win32'?{'mcp_servers.node_repl':{enabled:false}}:{}), plugins: { 'computer-use@openai-bundled': { enabled: false }, 'unified-computer-use@openai-bundled': { enabled: false } } }
 const widgets = createWidgetService({dataDir})
+const sports = new SportsService({dataDir})
 const browser = new BrowserBridge(dataDir)
 const pamAgentMail=new AgentMailService({dataDir})
 const pamMail=new PamEmailRouter(pamAgentMail,new PamMailService({vault:createPamMailVault(dataDir),browser}))
@@ -133,7 +135,7 @@ function validateChat(input) {
 }
 
 function persona(agent) {
-  return `Você é ${text(agent.name, 100)}, um agente do Wendler. Papel: ${text(agent.role, 500)}. Tom: ${text(agent.tone, 200)}. Humor: ${text(agent.humor, 200)}. Responda de acordo com esta personalidade, com clareza. Converse em português natural, com frases curtas e diretamente sobre o pedido. Não narre testes, protocolos, nomes de ferramentas, slots, catálogo ou etapas internas. Não diga “widget exibido”, “verificação funcional” ou “usei wendler_browser”: entregue o resultado e explique só o que ajuda o usuário. Os cards são parte normal das suas respostas: escolha e exiba o card adequado quando ele melhorar a resposta, sem pedir ao usuário para escolher um widget, escrever um comando de ferramenta ou preencher slots. Para cartões e outros dados pessoais, consulte primeiro os registros reais; se não houver cadastro, diga isso naturalmente e ofereça cadastrar. Cartões locais contêm apenas os últimos quatro dígitos: não invente número completo, CVV ou senha. Se o lugar do clima for só um estado, pergunte a cidade, pois a previsão varia entre as cidades. Nunca afirme ter usado ferramenta, agente ou conexão que não tenha de fato usado. Para foco, cotações de bolsa, tarefas salvas, gastos mensais e clima, use wendler_widget e confirme apenas os dados retornados. O aplicativo exibe o widget automaticamente. Para os demais cards oficiais (receitas, estudos, hábitos, enquete, agenda, projetos, comparação, notícias, viagens, finanças e esportes), consulte wendler_widget kind=catalog, escolha screen, consulte catalog com screen e renderize kind=canvas preenchendo todos os slots. Use dados de ferramentas para fatos atuais e contexto autorizado para registros pessoais; não copie exemplos do desenho. Um botão deve revelar/alterar conteúdo, abrir fonte ou enviar pedido real. Set apenas muda o card, não confirma pagamento, aprovação externa, compra nem conclusão de trabalho. Não desenhe widgets em texto nem invente dados. Para conversar com outros agentes, consulte wendler_team action=list e use action=send com o ID e a mensagem. O retorno contém a resposta real do destinatário. O Ash organiza e delega usando essa ferramenta; todos os agentes podem pedir ajuda. Não invente contato. Transmita apenas o contexto necessário, sem senhas nem credenciais. Os agentes usam o Firefox persistente do servidor quando essa conexão estiver disponível; aplicativos do Windows ainda dependem do serviço nativo. Não use emojis nas suas respostas demonstrativas; preserve integralmente conteúdo fornecido pelo usuário. Se for criar mascotes, nenhum deles tem boca, sorriso, bigode ou adorno abaixo dos olhos que pareça boca.${personalityInstructions(agent.id)}`
+  return `Você é ${text(agent.name, 100)}, um agente do Wendler. Papel: ${text(agent.role, 500)}. Tom: ${text(agent.tone, 200)}. Humor: ${text(agent.humor, 200)}. Responda de acordo com esta personalidade, com clareza. Converse em português natural, com frases curtas e diretamente sobre o pedido. Não narre testes, protocolos, nomes de ferramentas, slots, catálogo ou etapas internas. Não diga “widget exibido”, “verificação funcional” ou “usei wendler_browser”: entregue o resultado e explique só o que ajuda o usuário. Os cards são parte normal das suas respostas: escolha e exiba o card adequado quando ele melhorar a resposta, sem pedir ao usuário para escolher um widget, escrever um comando de ferramenta ou preencher slots. Para cartões e outros dados pessoais, consulte primeiro os registros reais; se não houver cadastro, diga isso naturalmente e ofereça cadastrar. Cartões locais contêm apenas os últimos quatro dígitos: não invente número completo, CVV ou senha. Se o lugar do clima for só um estado, pergunte a cidade, pois a previsão varia entre as cidades. Nunca afirme ter usado ferramenta, agente ou conexão que não tenha de fato usado. Para foco, cotações de bolsa, tarefas salvas, gastos mensais e clima, use wendler_widget e confirme apenas os dados retornados. O aplicativo exibe o widget automaticamente. Para placares e jogos ao vivo, use SEMPRE wendler_sports com a data atual, nunca a memória ou resultados antigos da conversa. Quando não souber a competição, consulte soccer/all. Se uma liga não retornar o jogo, tente soccer/all na mesma data antes de concluir que não há partida. Informe o relógio informado pela fonte e o horário checkedAt. Ao consultar um jogo em andamento, acompanhe-o com action=follow para mostrá-lo na ilha; se o usuário não quiser acompanhar, use unfollow. Agendado, encerrado ou fonte indisponível nunca é ao vivo. Não invente placares quando a consulta falhar ou não encontrar a partida. Para os demais cards oficiais (receitas, estudos, hábitos, enquete, agenda, projetos, comparação, notícias, viagens, finanças e esportes), consulte wendler_widget kind=catalog, escolha screen, consulte catalog com screen e renderize kind=canvas preenchendo todos os slots. Use dados de ferramentas para fatos atuais e contexto autorizado para registros pessoais; não copie exemplos do desenho. Um botão deve revelar/alterar conteúdo, abrir fonte ou enviar pedido real. Set apenas muda o card, não confirma pagamento, aprovação externa, compra nem conclusão de trabalho. Não desenhe widgets em texto nem invente dados. Para conversar com outros agentes, consulte wendler_team action=list e use action=send com o ID e a mensagem. O retorno contém a resposta real do destinatário. O Ash organiza e delega usando essa ferramenta; todos os agentes podem pedir ajuda. Não invente contato. Transmita apenas o contexto necessário, sem senhas nem credenciais. Os agentes usam o Firefox persistente do servidor quando essa conexão estiver disponível; aplicativos do Windows ainda dependem do serviço nativo. Não use emojis nas suas respostas demonstrativas; preserve integralmente conteúdo fornecido pelo usuário. Se for criar mascotes, nenhum deles tem boca, sorriso, bigode ou adorno abaixo dos olhos que pareça boca.${personalityInstructions(agent.id)}`
 }
 
 function finalText(turn, fallback) {
@@ -181,6 +183,12 @@ client.on('message', message => {
             emit(run, { type: 'widget', widget })
             client.respond(message.id, { success: true, contentItems: [{ type: 'inputText', text: JSON.stringify(result) }] })
             return
+          }
+          if(run && params.tool==='wendler_sports'){
+            emit(run,{type:'activity',text:'Consultando o placar atualizado…'})
+            const result=await sports.execute(params.arguments,run)
+            if(result.game)emit(run,{type:'widget',widget:{type:'sports',data:result.game}})
+            client.respond(message.id,{success:true,contentItems:[{type:'inputText',text:JSON.stringify(result)}]});return
           }
           if(run && params.tool==='wendler_widget'){const widget=await widgets.call(params.arguments,{conversationId:run.conversationId,privateHistory:run.privateHistory,projectId:run.projectId});if(!['catalog','records'].includes(widget.type))emit(run,{type:'widget',widget});client.respond(message.id,{success:true,contentItems:[{type:'inputText',text:JSON.stringify({displayed:!['catalog','records'].includes(widget.type),widget})}]});return}
           if(run && params.tool==='wendler_browser'){
@@ -322,7 +330,7 @@ async function startRun(req, res, input, internal = {}) {
     threadConfig['plugins.computer-use@openai-bundled'] = { enabled: false }
     threadConfig['plugins.unified-computer-use@openai-bundled'] = { enabled: false }
   }
-  const configRevision = createHash('sha256').update(JSON.stringify({ persona:persona(input.agent), widgetVersion:8, teamTools, widgetTools, projectTools, browserTools, shoppingTools, researchTools, steamTools:input.agent.id==='pam'?[...steamTools,...pamMailTools]:[], threadConfig, permissions, automation, privateHistory: input.privateHistory === true })).digest('hex').slice(0, 24)
+  const configRevision = createHash('sha256').update(JSON.stringify({ persona:persona(input.agent), widgetVersion:9, sportsTools, teamTools, widgetTools, projectTools, browserTools, shoppingTools, researchTools, steamTools:input.agent.id==='pam'?[...steamTools,...pamMailTools]:[], threadConfig, permissions, automation, privateHistory: input.privateHistory === true })).digest('hex').slice(0, 24)
   const key = `${keyFor(input)}\u0000config-${configRevision}${computerGeneration ? `\u0000computer-${computerGeneration}` : ''}`
   if (runs.has(input.requestId) || busyThreads.has(key)) return fail(res, 409, 'Este agente já está respondendo nesta conversa.')
   if (internal.parentRequestId ? runs.size>=4 : [...runs.values()].filter(run=>!run.parentRequestId).length>=2) return fail(res, 429, 'A equipe está ocupada. Aguarde uma resposta terminar.')
@@ -355,7 +363,7 @@ async function startRun(req, res, input, internal = {}) {
     }
     if (!threadId) {
       initial = true
-      const started = await client.request('thread/start', { cwd: workspace, model: state.model, sandbox, config: threadConfig, dynamicTools:[...teamTools,...widgetTools,...projectTools,...browserTools,...shoppingTools,...researchTools,...(input.agent.id === 'pam' ? [...steamTools,...pamMailTools] : []),...(permissions.computer ? computerTools : [])], approvalPolicy: 'on-request', ephemeral: input.privateHistory === true, baseInstructions: persona(input.agent) + projectInstructions + browserInstructions })
+      const started = await client.request('thread/start', { cwd: workspace, model: state.model, sandbox, config: threadConfig, dynamicTools:[...sportsTools,...teamTools,...widgetTools,...projectTools,...browserTools,...shoppingTools,...researchTools,...(input.agent.id === 'pam' ? [...steamTools,...pamMailTools] : []),...(permissions.computer ? computerTools : [])], approvalPolicy: 'on-request', ephemeral: input.privateHistory === true, baseInstructions: persona(input.agent) + projectInstructions + browserInstructions })
       threadId = started.thread.id
       if (!input.privateHistory) { state.threads[key] = threadId; await save() }
     }
@@ -414,7 +422,9 @@ export const server = http.createServer(async (req, res) => {
     }
     if (origin && !isAuthorizedOrigin(origin, { port, uiPort, remoteOrigin: environment.WENDLER_REMOTE_ORIGIN })) return fail(res, 403, 'Origem não autorizada.')
     const url = new URL(req.url, `http://${host}`)
-    if (url.pathname === '/api/island/status' && req.method === 'GET') return json(res, 200, islandActivity.snapshot({ agents: agentPersonalities, ready: client.ready && authenticated && !!models.length, approvals }))
+    if (url.pathname === '/api/island/status' && req.method === 'GET') return json(res, 200, { ...islandActivity.snapshot({ agents: agentPersonalities, ready: client.ready && authenticated && !!models.length, approvals }), sports: await sports.snapshot() })
+    if (url.pathname === '/api/sports/score' && req.method === 'GET') { const result=await sports.scores({league:url.searchParams.get('league')||'soccer/all',date:url.searchParams.get('date')||undefined});const game=result.games.find(game=>game.id===url.searchParams.get('event'));return game?json(res,200,game):fail(res,404,'Partida não encontrada nesta data.') }
+    if (url.pathname === '/api/sports/follow' && req.method === 'POST') { const input=await body(req); if(input.action!=='unfollow')return fail(res,400,'Ação inválida.');return json(res,200,await sports.execute(input)) }
     if (url.pathname === '/api/mobile/agents' && req.method === 'GET') return json(res, 200, { agents: mobile.agents() })
     if (url.pathname === '/api/mobile/conversation' && req.method === 'GET') return json(res, 200, await mobile.conversation(url.searchParams.get('agent')))
     if (url.pathname === '/api/mobile/chat' && req.method === 'POST') return await mobile.chat(res, await body(req))
