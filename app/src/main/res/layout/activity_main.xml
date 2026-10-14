@@ -1,88 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#FAFAFA">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/agent_screen" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#000000" android:padding="24dp">
+    <TextView android:id="@+id/choose_agent" android:layout_width="wrap_content" android:layout_height="48dp" android:paddingHorizontal="16dp" android:gravity="center" android:text="West" android:textColor="#9A9A9F" android:textSize="14sp" android:fontFamily="sans-serif" android:background="@drawable/bg_agent_selector" android:drawableEnd="@drawable/ic_agent_chevron" android:drawablePadding="10dp" android:contentDescription="Trocar mascote" android:focusable="true" android:clickable="true" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" />
+    <FrameLayout android:id="@+id/mascot_stage" android:layout_width="240dp" android:layout_height="240dp" android:contentDescription="Mascote West" android:importantForAccessibility="yes" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.5">
+        <ImageView android:id="@+id/mascot_body" android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/mascot_west_body" android:importantForAccessibility="no" />
+        <ImageView android:id="@+id/mascot_eyes" android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/mascot_west_eyes" android:importantForAccessibility="no" />
+    </FrameLayout>
+    <androidx.constraintlayout.widget.Guideline android:id="@+id/voice_line" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" app:layout_constraintGuide_percent="0.76" />
+    <FrameLayout android:id="@+id/mic_ring" android:layout_width="96dp" android:layout_height="96dp" android:background="@drawable/bg_voice_ring" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="@id/voice_line" app:layout_constraintBottom_toTopOf="@id/voice_line">
+        <ImageButton android:id="@+id/talk_button" android:layout_width="72dp" android:layout_height="72dp" android:layout_gravity="center" android:background="@drawable/bg_voice_button" android:src="@drawable/ic_voice_mic" android:padding="21dp" android:contentDescription="Toque para falar" />
+    </FrameLayout>
+    <ImageButton android:id="@+id/mute_button" android:layout_width="48dp" android:layout_height="48dp" android:layout_marginStart="16dp" android:background="@drawable/bg_agent_selector" android:src="@drawable/ic_voice_mic" android:padding="14dp" android:alpha="0.6" android:contentDescription="Silenciar microfone" app:layout_constraintStart_toEndOf="@id/mic_ring" app:layout_constraintTop_toTopOf="@id/mic_ring" app:layout_constraintBottom_toBottomOf="@id/mic_ring" />
+    <TextView android:id="@+id/voice_status" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="Toque para falar" android:textColor="#8A8F9A" android:textSize="15sp" android:fontFamily="sans-serif" android:gravity="center" android:accessibilityLiveRegion="polite" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@id/mic_ring" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Header -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="52dp"
-        android:paddingHorizontal="20dp"
-        android:paddingBottom="12dp">
-
-        <!-- App title -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Waddle"
-            android:textSize="28sp"
-            android:textColor="#171717"
-            android:fontFamily="@font/inter_bold"
-            android:letterSpacing="-0.02"
-            android:layout_marginBottom="12dp" />
-
-        <!-- Search bar -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_search_bar"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="14dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:text="⌕"
-                android:textSize="18sp"
-                android:textColor="#AAAAAA"
-                android:gravity="center"
-                android:layout_marginEnd="8dp" />
-
-            <EditText
-                android:id="@+id/edit_search"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@null"
-                android:hint="Buscar agentes"
-                android:textColorHint="#909090"
-                android:textSize="15sp"
-                android:textColor="#252525"
-                android:inputType="text"
-                android:imeOptions="actionSearch"
-                android:maxLines="1" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#E8E8E8" />
-
-    <!-- Agent list -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_agents"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="80dp" />
-
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FAFAFA"
-        app:itemTextColor="@drawable/nav_item_color"
-        app:itemIconTint="@drawable/nav_item_color"
-        app:menu="@menu/bottom_nav_menu" />
-
-</LinearLayout>

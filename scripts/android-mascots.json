@@ -1,0 +1,1198 @@
+[
+  {
+    "type": "frame",
+    "id": "i83Dx",
+    "x": 61,
+    "y": 22,
+    "name": "West — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "Syo4c",
+        "layoutPosition": "absolute",
+        "x": 12.6,
+        "y": 48,
+        "name": "Corpo 1",
+        "geometry": "M36.5 0c20.158 0 36.5 10.297 36.5 23 0 12.703-12.842 13-33 13-20.158 0-40-0.297-40-13 0-12.703 16.342-23 36.5-23z",
+        "viewBox": [
+          0,
+          0,
+          73,
+          36
+        ],
+        "fill": "#EDE545",
+        "width": 118.8,
+        "height": 56.4
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 2.4,
+        "id": "YEWKb",
+        "layoutPosition": "absolute",
+        "x": 67.8,
+        "y": 64.8,
+        "name": "Olhos 2",
+        "fill": "#FFFFFF",
+        "width": 3.6,
+        "height": 24
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 2.4,
+        "id": "b5FWw1",
+        "layoutPosition": "absolute",
+        "x": 89.4,
+        "y": 64.8,
+        "name": "Olhos 3",
+        "fill": "#FFFFFF",
+        "width": 3.6,
+        "height": 24
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "WZdOz",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Pam — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "qNPCr",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M22 33q0-6 7-3l35 14 35-14q7-3 7 3l0 66q0 7-7 7l-70 0q-7 0-7-7z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#CBA787",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "qWaiv",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 2",
+        "fill": "#48352C",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "N3iSa",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#48352C",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "Z3C7Q",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Batman — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "ZStUv",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M24 99l0-76 21 20q19-7 38 0l21-20 0 76q-39 13-80 0z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#343C50",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "LFaDs",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 2",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "G3c51",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "Ac3lQ",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Indiana Jones — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "ZS10f",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M22 81c-5-28 14-51 42-51 30 0 48 22 43 50-3 18-21 22-44 21-26 2-39-4-41-20z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#73513D",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "path",
+        "id": "VRgEN",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Detalhe 2",
+        "geometry": "M38 43l4-19q10-6 22 1 14-7 23 1l4 17z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#B98955",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 4.5,
+        "id": "M333XQ",
+        "layoutPosition": "absolute",
+        "x": 28.125,
+        "y": 47.875,
+        "name": "Detalhe 3",
+        "fill": "#B98955",
+        "width": 88,
+        "height": 6
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "l7BfXS",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 4",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "E6aYPW",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 5",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "jD5lr",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Songbird — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "XouWY",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M24 93l0-43q0-21 21-21l31 0 26 23 0 39q0 12-12 12l-52 0q-14 0-14-10z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#8A69CB",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "path",
+        "id": "MfzPF",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Detalhe 2",
+        "geometry": "M76 29l0 22 26 1z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#BAA5E8",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "QDYY6",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "ZZClZ",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 4",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "b3yPn",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Kyle Rayner — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "F0iIh",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M20 66c-4-30 26-43 52-37 27 2 42 26 31 52-8 24-33 29-59 17-17-6-24-16-24-32z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#24C965",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "T471j",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 2",
+        "fill": "#17382A",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "euzJV",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#17382A",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "OR9Hg",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Rorschach — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "lXnFB",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M33 30q31-9 62 0l9 52q-8 22-40 27-32-5-40-27z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#DBD8CF",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "path",
+        "id": "qovrH",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Detalhe 2",
+        "geometry": "M38 45q10-6 15 3l-4 42q-10 1-14-12z m52 0q-10-6-15 3l4 42q10 1 14-12z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#343539",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "CUtwE",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "epZD8",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 4",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "ccCgn",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Homer — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "Q0JbN",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M18 75q-1-37 37-41 34-6 50 25 14 30-10 43-18 12-54 1-23-7-23-28z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#E6B94E",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "V18h7",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 2",
+        "fill": "#473615",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "H3LwGZ",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#473615",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "path",
+        "id": "uELyt",
+        "layoutPosition": "absolute",
+        "x": 2,
+        "y": 2,
+        "name": "Homer — dois fiozinhos de cabelo",
+        "geometry": "M43 35q-4-21 10-19 12 1 9 16m-8 0q-4-23 12-20 14 2 8 20",
+        "viewBox": [
+          1.7777778,
+          1.7777778,
+          124.4444444,
+          124.4444444
+        ],
+        "width": 140,
+        "height": 140,
+        "stroke": "#473615",
+        "strokeWidth": 2.9250000000000003,
+        "strokeLinejoin": "round",
+        "strokeLinecap": "round"
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "lqjXj",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Dumbledore — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "b9CKrw",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M22 81c-5-28 14-51 42-51 30 0 48 22 43 50-3 18-21 22-44 21-26 2-39-4-41-20z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#33333D",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "path",
+        "id": "XbUFB",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Detalhe 2",
+        "geometry": "M23 88q12 6 23 2 10 4 18 8 11-7 23-6 12-4 20-6l-6 16q-14 2-23 7l-14 8-15-8q-18-1-24-8z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#F0EDE7",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "pEAxc",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "d3QFZu",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 4",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "aAeOF",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "C-3PO — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "rectangle",
+        "cornerRadius": 30.375,
+        "id": "XdVo2",
+        "layoutPosition": "absolute",
+        "x": 34.875,
+        "y": 29.25,
+        "name": "Corpo 1",
+        "fill": "#B99343",
+        "width": 74.25,
+        "height": 91.125
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "G77Cv",
+        "layoutPosition": "absolute",
+        "x": 27,
+        "y": 63,
+        "name": "Detalhe 2",
+        "fill": "#8D6D30",
+        "width": 7.875,
+        "height": 28.125
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "q2iEQ",
+        "layoutPosition": "absolute",
+        "x": 109.125,
+        "y": 63,
+        "name": "Detalhe 3",
+        "fill": "#8D6D30",
+        "width": 7.875,
+        "height": 28.125
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "ii7Yh",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 4",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "xFqSa",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 5",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "v09AX",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Sheldon Cooper — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "Ji1AU",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M64 19l46 69q12 20-46 20-58 0-46-20z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#2E596C",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "AWw3E",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 2",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "kbCWE",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "eEqDK",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Ted Mosby — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "Y2NdQD",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Ted — nuvem amarela",
+        "geometry": "M221.98 112.32c24.02 42.68-13.98 89.68-60 76.26-22.98 23.42-60.98 25.42-90 1-38.98 15.42-79.98-21.58-65.68-77.26 5.7-10.32 14.7-18.32 24.55-23.8-3.85-33.52 15.15-62.52 51.54-65.27 18.61-3.25 37.61 2.75 50.73 14.6 35.88-13.85 76.88 10.15 72.61 56.47 6.27 3.68 12.27 10.68 16.25 18z",
+        "viewBox": [
+          -15,
+          -15,
+          259,
+          259
+        ],
+        "fill": "#FF9800",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "eQjcX",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#1A1917",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "Maz0G",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 4",
+        "fill": "#1A1917",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "DtyHH",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Reed Richards — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "hIJXR",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M14 50q0-14 17-14l64 0q16 0 16 16l0 9q0 11-13 11l-16 0 0 19q0 16-18 16l-9 0q-12 0-12-13l0-19-14 0q-15 0-15-14z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#4C95B8",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "dv8yY",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 2",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "pC5lQ",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "eff5A",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Ultron — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "MS6yu",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M42 23l44 0 22 23-8 49-20 15-32 0-20-15-8-49z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#697781",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "path",
+        "id": "SLQHm",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Detalhe 2",
+        "geometry": "M42 23l44 0-8 12-28 0z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#A4B1B8",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "tJfqG",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "WxGch",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 4",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "IiH3B",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Capitão América — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "P73T9e",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M24 30q40-12 80 0l-4 44q-4 26-36 42-32-16-36-42z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#3966A1",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "path",
+        "id": "CCWiq",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Detalhe 2",
+        "geometry": "M28 84q36 14 72 0l-4 12q-32 15-64 0z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#BE6265",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "FVxWL",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "G81APG",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 4",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "B7MB6",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Marília — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "CKtor",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M34 100l0-51q0-26 30-26 30 0 30 26l0 51z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#BA709E",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 5.625,
+        "id": "E1Mjr",
+        "layoutPosition": "absolute",
+        "x": 28.125,
+        "y": 109.125,
+        "name": "Detalhe 2",
+        "fill": "#BA709E",
+        "width": 87.75,
+        "height": 11.25
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "V6bqO",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "d6VQbg",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 4",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "Vi1k3",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Hal Jordan — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "SvwMw",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M64 17q38 22 41 52 0 22-41 41-41-19-41-41 3-30 41-52z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#28966F",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "qvPE2",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 2",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "Sehs0",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  },
+  {
+    "type": "frame",
+    "id": "FZyfm",
+    "layoutPosition": "absolute",
+    "x": 30,
+    "y": 23,
+    "name": "Tony Stark — mascote editável",
+    "reusable": true,
+    "width": 144,
+    "height": 144,
+    "layout": "none",
+    "children": [
+      {
+        "type": "path",
+        "id": "M8nQa",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Corpo 1",
+        "geometry": "M39 23l50 0 18 20-4 43-19 22-40 0-19-22-4-43z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#AF5354",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "path",
+        "id": "mMl6p",
+        "layoutPosition": "absolute",
+        "x": 0,
+        "y": 0,
+        "name": "Detalhe 2",
+        "geometry": "M33 45l13-8 36 0 13 8-5 41-13 12-26 0-13-12z",
+        "viewBox": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "fill": "#D6AD68",
+        "width": 144,
+        "height": 144
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "o6GoDb",
+        "layoutPosition": "absolute",
+        "x": 55.125,
+        "y": 66.375,
+        "name": "Olhos 3",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      },
+      {
+        "type": "rectangle",
+        "cornerRadius": 3.375,
+        "id": "FcPud",
+        "layoutPosition": "absolute",
+        "x": 78.75,
+        "y": 66.375,
+        "name": "Olhos 4",
+        "fill": "#FFFDF5",
+        "width": 6.75,
+        "height": 25.875
+      }
+    ]
+  }
+]

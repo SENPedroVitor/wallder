@@ -6,9 +6,9 @@ O projeto reúne a interface web, o backend e um aplicativo nativo exclusivo par
 
 ## Aplicativo Android
 
-O Android será também o corpo físico do mascote: um celular dedicado, com fundo preto, o personagem na tela e interação por voz. As tarefas serão executadas pelo backend no servidor.
+O Android funciona como a tela dedicada do mascote: fundo preto, personagem centralizado, seletor de mascotes e controles para falar ou silenciar o microfone. As formas vetoriais foram extraídas dos desenhos originais do Pencil. O mascote respira suavemente e pisca; a seleção e o estado de silêncio são salvos no aparelho.
 
-Essa experiência ainda está em desenvolvimento. O código Android atual contém telas de entrada, lista de agentes, conversa e rotinas. Suas respostas são simuladas localmente; a conexão das conversas com o backend e o modo de mascote dedicado ainda precisam ser implementados. A presença de uma tela ou biblioteca de rede não significa que a integração esteja funcionando.
+A tela dedicada é a entrada do APK. O botão de falar usa o reconhecimento de voz do Android, quando disponível e autorizado pelo usuário; silenciar ou sair do aplicativo interrompe a escuta. A conexão dessa voz ao backend e as respostas faladas do agente ainda não estão implementadas. As telas antigas de lista, chat e rotinas permanecem no código legado, mas não fazem parte da entrada atual. Nenhuma resposta simulada é emitida pela tela do mascote.
 
 ## Telas reais
 
