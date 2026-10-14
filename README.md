@@ -14,7 +14,23 @@ O celular precisa estar na mesma rede Tailscale do servidor. Nenhuma chave de mo
 
 ## Telas reais
 
-As imagens de referência de outro produto foram retiradas desta apresentação. Novas capturas serão adicionadas após a revisão dos desenhos e a conferência das telas em execução. Os desenhos do Pencil são referências de design, não capturas do aplicativo.
+As imagens abaixo mostram o código atual do Wendler. Não são desenhos do Pencil nem referências de outro produto.
+
+### Web para computador
+
+Capturas da interface em execução no servidor em 14/10/2026. A área central foi recortada para não publicar os dados pessoais e prévias de outras conversas da barra lateral. A resposta da segunda imagem foi produzida pelo agente real.
+
+![Interface web — início de uma conversa](docs/screenshots/web-desktop-inicio.png)
+
+![Interface web — conversa com o Ash em execução](docs/screenshots/web-desktop-conversa.png)
+
+### Aplicativo nativo Android
+
+**Prévia do layout nativo no Android Studio**, gerada a partir do XML e dos recursos do aplicativo atual. Esta imagem ainda não é uma captura do APK em execução: o emulador estava offline. A linha pontilhada é uma guia do editor e não aparece no aplicativo. A captura será substituída por uma imagem do aparelho quando a execução estiver disponível.
+
+<img src="docs/screenshots/android-mascote-preview.png" width="306" alt="Prévia do layout nativo Android: fundo preto, mascote, seletor e botão de conversa por texto" />
+
+[Ver a captura original no Android Studio](docs/screenshots/android-studio-preview.png)
 
 ## Organização
 
