@@ -2,12 +2,15 @@ import { useCallback, useRef, useState, type SetStateAction } from 'react'
 import { useLocalStore } from '../useLocalStore'
 import { frontendKey, loadWorkspace, type Chat, type Workspace } from './workspace'
 import { prepareWorkspaceMutation } from './workspaceMutation'
+import { conversationFromLink } from './conversationLink'
 
 const selectionKey = 'wendler:selected-chat:v1'
 
 export function useWorkspace() {
   const [stored, save, error] = useLocalStore(frontendKey, loadWorkspace)
   const [selection, setSelection] = useState<string | null>(() => {
+    const linked = conversationFromLink(stored.chats, window.location.search)
+    if (linked) return linked
     try { const saved = localStorage.getItem(selectionKey); return saved === null ? stored.selected : saved || null } catch { return stored.selected }
   })
   const [privateChats, setPrivateChats] = useState<Chat[]>([])

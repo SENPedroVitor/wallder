@@ -10,6 +10,7 @@ import { BrowserBridge, browserTools } from './browser.mjs'
 import { createRoutineEngine } from './routines.mjs'
 import { frontendStore } from './frontend-store.mjs'
 import { createMobileService } from './mobile.mjs'
+import { createIslandActivity } from './island.mjs'
 import { makePrompt } from './chat-context.mjs'
 import { personalityInstructions,agentPersonalities } from './personas.mjs'
 import {TeamService,teamTools,delegationResponse} from './team.mjs'
@@ -86,7 +87,8 @@ let routineEngine
 
 const json = (res, status, value) => { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(value)) }
 const fail = (res, status, message) => json(res, status, { error: message })
-const emit = (run, event) => { if (!run.res.destroyed && !run.res.writableEnded) run.res.write(`${JSON.stringify(event)}\n`) }
+const islandActivity = createIslandActivity()
+const emit = (run, event) => { islandActivity.observe(run, event); if (!run.res.destroyed && !run.res.writableEnded) run.res.write(`${JSON.stringify(event)}\n`) }
 const text = (value, max = 10000) => typeof value === 'string' ? value.slice(0, max) : ''
 const keyFor = input => `${input.conversationId}\u0000${input.agent.id}\u0000${input.mode || 'chat'}${input.contextEpoch ? `\u0000epoch-${input.contextEpoch}` : ''}`
 
@@ -412,6 +414,7 @@ export const server = http.createServer(async (req, res) => {
     }
     if (origin && !isAuthorizedOrigin(origin, { port, uiPort, remoteOrigin: environment.WENDLER_REMOTE_ORIGIN })) return fail(res, 403, 'Origem não autorizada.')
     const url = new URL(req.url, `http://${host}`)
+    if (url.pathname === '/api/island/status' && req.method === 'GET') return json(res, 200, islandActivity.snapshot({ agents: agentPersonalities, ready: client.ready && authenticated && !!models.length, approvals }))
     if (url.pathname === '/api/mobile/agents' && req.method === 'GET') return json(res, 200, { agents: mobile.agents() })
     if (url.pathname === '/api/mobile/conversation' && req.method === 'GET') return json(res, 200, await mobile.conversation(url.searchParams.get('agent')))
     if (url.pathname === '/api/mobile/chat' && req.method === 'POST') return await mobile.chat(res, await body(req))

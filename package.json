@@ -12,6 +12,8 @@
     "autostart:install": "node scripts/autostart.mjs",
     "autostart:remove": "node scripts/autostart.mjs --remove",
     "server": "node server/index.mjs",
+    "island:build": "vite build --config desktop/vite.config.mjs",
+    "island": "node scripts/start-island.mjs",
     "test": "node --experimental-strip-types --test tests/*.test.mjs server/*.test.mjs"
   },
   "dependencies": {

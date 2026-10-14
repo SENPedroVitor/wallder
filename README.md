@@ -69,3 +69,9 @@ Consulte [`docs/RUNTIME-LOCAL.md`](docs/RUNTIME-LOCAL.md) para configurar o runt
 
 Credenciais, dados pessoais, sessões de navegador e chaves de criptografia pertencem à configuração privada do ambiente e não devem ser incluídos no repositório.
 
+
+## Ilha dos agentes para Windows
+
+A ilha acompanha as atividades do servidor em uma janela transparente no topo do computador, com mascotes originais, expansão animada, tarefas paralelas, autorizações, interrupção e acesso à conversa. Também pode exibir o QR Pix realmente emitido por uma tarefa. CPU e memória são lidas do Windows local; temperatura, GPU e otimizações automáticas ainda não estão integradas.
+
+Abra com `pnpm island`; use **Ctrl + Alt + Espaço** para expandir ou recolher. A instalação e os limites desta primeira versão estão em [Ilha para Windows](docs/ILHA-WINDOWS.md).

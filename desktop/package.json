@@ -1,0 +1,14 @@
+{
+  "name": "wendler-island",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Ilha dos agentes Wendler para Windows",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "build": "node ../node_modules/vite/bin/vite.js build --config vite.config.mjs",
+    "dev": "node ../node_modules/vite/bin/vite.js --config vite.config.mjs",
+    "setup": "node node_modules/electron/install.js"
+  },
+  "devDependencies": { "electron": "44.7.2" }
+}
