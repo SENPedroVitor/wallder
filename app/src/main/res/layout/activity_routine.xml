@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="48dp"
+        android:paddingBottom="16dp"
+        android:paddingHorizontal="16dp">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_arrow_back"
+            android:tint="#252525" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rotina"
+                android:textSize="17sp"
+                android:textColor="#252525"
+                android:fontFamily="@font/inter_semibold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ativa"
+                android:textSize="14sp"
+                android:textColor="#252525" />
+        </LinearLayout>
+
+        <Switch
+            android:id="@+id/switch_active"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:thumbTint="#E8D92F"
+            android:trackTint="#F0E878" />
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#ECECEC" />
+
+    <!-- Routine content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Name field -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nome"
+                android:textSize="13sp"
+                android:textColor="#858585"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:id="@+id/tv_routine_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Radar de inteligência artificial"
+                android:textSize="15sp"
+                android:textColor="#252525"
+                android:layout_marginBottom="20dp" />
+
+            <!-- Instruction field -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Instrução"
+                android:textSize="13sp"
+                android:textColor="#858585"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:id="@+id/tv_routine_instruction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pesquisar informações sobre o mundo da IA e trazer principais lançamentos"
+                android:textSize="15sp"
+                android:textColor="#252525"
+                android:lineSpacingMultiplier="1.4"
+                android:layout_marginBottom="20dp" />
+
+            <!-- Schedule field -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quando executar"
+                android:textSize="13sp"
+                android:textColor="#858585"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:id="@+id/tv_routine_schedule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Todos os dias às 10:01"
+                android:textSize="15sp"
+                android:textColor="#252525"
+                android:layout_marginBottom="20dp" />
+
+            <!-- History field -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Histórico de execuções"
+                android:textSize="13sp"
+                android:textColor="#858585"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nenhuma execução ainda"
+                android:textSize="15sp"
+                android:textColor="#929292"
+                android:layout_marginBottom="40dp" />
+
+            <!-- Action buttons -->
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Testar"
+                android:textSize="16sp"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/inter_semibold"
+                android:background="@drawable/bg_button_primary"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Excluir"
+                android:textSize="16sp"
+                android:textColor="#B04545"
+                android:fontFamily="@font/inter_semibold"
+                android:background="@drawable/bg_button_destructive" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
