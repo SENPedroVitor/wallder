@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FAFAFA"
+    android:gravity="center">
+
+    <!-- West mascot shape (simplified) -->
+    <View
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:background="@drawable/shape_west_mascot"
+        android:layout_marginBottom="24dp" />
+
+    <!-- App name -->
+    <TextView
+        android:id="@+id/text_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Waddle"
+        android:textSize="44sp"
+        android:textColor="#171717"
+        android:fontFamily="@font/inter_semibold"
+        android:letterSpacing="-0.04"
+        android:alpha="0"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Tagline -->
+    <TextView
+        android:id="@+id/text_tagline"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:text="Sua equipe de agentes, sempre pronta.\nConverse com West e coloque suas ideias em ação."
+        android:textSize="16sp"
+        android:textColor="#737373"
+        android:lineSpacingMultiplier="1.5"
+        android:gravity="center"
+        android:alpha="0"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Note -->
+    <TextView
+        android:id="@+id/text_note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Um lugar para criar, organizar e fazer acontecer."
+        android:textSize="13sp"
+        android:textColor="#8A8A8A"
+        android:alpha="0" />
+
+</LinearLayout>

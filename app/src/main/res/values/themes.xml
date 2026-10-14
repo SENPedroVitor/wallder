@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Waddle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/waddle_yellow</item>
+        <item name="colorPrimaryVariant">@color/waddle_yellow_light</item>
+        <item name="colorOnPrimary">@color/waddle_dark</item>
+        <item name="colorSurface">@color/waddle_surface</item>
+        <item name="colorOnSurface">@color/waddle_text</item>
+        <item name="android:windowBackground">@color/waddle_background</item>
+        <item name="android:statusBarColor">@color/waddle_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/waddle_background</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+
+    <style name="Theme.Waddle.Splash" parent="Theme.Waddle">
+        <item name="android:windowBackground">@color/waddle_surface</item>
+    </style>
+
+    <!-- Text styles -->
+    <style name="TextAppearance.Waddle.Title" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:textColor">@color/waddle_dark</item>
+        <item name="android:fontFamily">@font/inter_bold</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+
+    <style name="TextAppearance.Waddle.Body" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textColor">@color/waddle_text</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:lineSpacingMultiplier">1.4</item>
+    </style>
+
+    <style name="TextAppearance.Waddle.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@color/waddle_text_secondary</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+</resources>

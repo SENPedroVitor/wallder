@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <!-- Chat header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="48dp"
+        android:paddingBottom="12dp"
+        android:paddingHorizontal="16dp">
+
+        <!-- Back button -->
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_arrow_back"
+            android:contentDescription="Voltar"
+            android:tint="#252525" />
+
+        <!-- Agent avatar -->
+        <View
+            android:id="@+id/view_agent_avatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/shape_agent_avatar"
+            android:backgroundTint="#E8D92F"
+            android:layout_marginHorizontal="10dp" />
+
+        <TextView
+            android:id="@+id/tv_avatar_initial"
+            android:layout_width="32dp"
+            android:layout_height="wrap_content"
+            android:text="W"
+            android:textSize="14sp"
+            android:textColor="#383838"
+            android:layout_marginStart="-36dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="center" />
+
+        <!-- Agent info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_agent_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="West"
+                android:textSize="17sp"
+                android:textColor="#252525"
+                android:fontFamily="@font/inter_semibold" />
+
+            <TextView
+                android:id="@+id/tv_agent_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Disponível"
+                android:textSize="12sp"
+                android:textColor="#888888" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#ECECEC" />
+
+    <!-- Messages area -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Empty state (first conversation - West) -->
+        <LinearLayout
+            android:id="@+id/empty_state"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <!-- West mascot large -->
+            <View
+                android:layout_width="100dp"
+                android:layout_height="60dp"
+                android:background="@drawable/shape_west_mascot"
+                android:layout_marginBottom="20dp" />
+
+            <TextView
+                android:layout_width="280dp"
+                android:layout_height="wrap_content"
+                android:text="Mande sua primeira mensagem"
+                android:textSize="22sp"
+                android:textColor="#202020"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="280dp"
+                android:layout_height="wrap_content"
+                android:text="Escolha um visual e dê um nome à sua nova companhia."
+                android:textSize="15sp"
+                android:textColor="#737373"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.4"
+                android:layout_marginBottom="24dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="COMECE COM UMA IDEIA"
+                android:textSize="11sp"
+                android:textColor="#8A8A8A"
+                android:fontFamily="@font/inter_semibold"
+                android:letterSpacing="0.08"
+                android:layout_marginBottom="12dp" />
+        </LinearLayout>
+
+        <!-- Suggestion cards (shown in empty state) -->
+        <LinearLayout
+            android:id="@+id/suggestion_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|bottom"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="12dp"
+            android:visibility="gone">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/suggestion_card_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FAFAFA"
+                app:strokeColor="#E8E8E8"
+                app:strokeWidth="1dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Projeto Acervo"
+                        android:textSize="15sp"
+                        android:textColor="#404040"
+                        android:fontFamily="@font/inter_semibold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pergunte ao Ted quais foram as músicas mais escutadas na semana"
+                        android:textSize="14sp"
+                        android:textColor="#737373"
+                        android:lineSpacingMultiplier="1.3"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/suggestion_card_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FAFAFA"
+                app:strokeColor="#E8E8E8"
+                app:strokeWidth="1dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Caixa de entrada"
+                        android:textSize="15sp"
+                        android:textColor="#404040"
+                        android:fontFamily="@font/inter_semibold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Resume mensagens e ajuda a priorizar o seu dia."
+                        android:textSize="14sp"
+                        android:textColor="#737373"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+        <!-- Message list -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_messages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingVertical="12dp"
+            android:clipToPadding="false" />
+
+    </FrameLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#ECECEC" />
+
+    <!-- Input bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="12dp">
+
+        <EditText
+            android:id="@+id/edit_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_input_field"
+            android:hint="Mensagem para West"
+            android:textColorHint="#A0A0A0"
+            android:textSize="15sp"
+            android:textColor="#252525"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:maxLines="4"
+            android:inputType="textMultiLine"
+            android:imeOptions="actionSend" />
+
+        <!-- Mic button (visible when no text) -->
+        <ImageButton
+            android:id="@+id/btn_mic"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_mic_button"
+            android:src="@drawable/ic_mic"
+            android:contentDescription="Microfone"
+            android:tint="#E8D92F" />
+
+        <!-- Send button (visible when has text) -->
+        <ImageButton
+            android:id="@+id/btn_send"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_send_button"
+            android:src="@drawable/ic_send"
+            android:contentDescription="Enviar"
+            android:tint="#FFFFFF"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</LinearLayout>
