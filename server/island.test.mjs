@@ -2,6 +2,13 @@ import {test} from 'node:test'
 import assert from 'node:assert/strict'
 import {createIslandActivity} from './island.mjs'
 const agents=[{id:'west',name:'Ash',role:'Coordenação'},{id:'pam',name:'Pam',role:'Organização'}]
+test('travel activity carries route context only for non-private real runs',()=>{
+ const service=createIslandActivity(),journey={kind:'bus',origin:'Unaí',destination:'Brasília',stage:'researching'}
+ service.observe({requestId:'bus',agentId:'pam'},{type:'activity',text:'Conferindo a página…',journey})
+ service.observe({requestId:'private-bus',agentId:'pam',privateHistory:true},{type:'activity',text:'Conferindo a página…',journey})
+ const tasks=service.snapshot({agents,ready:true}).tasks
+ assert.equal(tasks.find(task=>task.id==='bus').journey.destination,'Brasília');assert.equal(tasks.find(task=>task.id==='private-bus').journey,undefined)
+})
 test('island reports actual activity and unknown progress stays unknown',()=>{
  let clock=1000;const service=createIslandActivity({now:()=>clock}),run={requestId:'run',agentId:'pam',conversationId:'chat',requestedAt:900}
  service.observe(run,{type:'activity',text:'Pesquisando…',phase:'researching'})
