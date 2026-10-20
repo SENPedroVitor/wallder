@@ -43,7 +43,7 @@ test('chat layout stays stable, grouped navigation works, composer grows, and br
    return { sideWidth: side.width, listHeight: list.clientHeight, overflow: list.scrollHeight - list.clientHeight, fieldHeight: box.height, font: parseFloat(getComputedStyle(field).fontSize), x: box.x }
   })
   const initial = await layout(); assert.ok(initial.listHeight > 400); assert.ok(initial.overflow <= 2, 'ten agents use full height without a short inner scroll'); assert.ok(initial.fieldHeight >= 42); assert.ok(initial.font >= 14)
-  const choose = name => page.locator('.pencil-sidebar-agents button').filter({ hasText: name }).click()
+  const choose = name => name === 'Ash' ? page.getByRole('button', { name: 'Conversar com Ash', exact: true }).click() : page.locator('.pencil-sidebar-agents button').filter({ hasText: name }).click()
   for (const name of ['Indiana Jones', 'Kyle Rayner', 'Ted Mosby']) {
    await choose(name); const current = await layout()
    assert.equal(current.sideWidth, initial.sideWidth); assert.equal(current.listHeight, initial.listHeight); assert.equal(current.fieldHeight, initial.fieldHeight)

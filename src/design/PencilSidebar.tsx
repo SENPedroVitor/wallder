@@ -27,11 +27,12 @@ export function PencilSidebar({ data, agents, current, busy, menu, onMenu, onAge
   document.addEventListener('pointerdown', dismiss)
   return () => document.removeEventListener('pointerdown', dismiss)
  }, [menu])
+ const sidebarIds = data.sidebarAgents.filter(id => id !== 'west')
+ const ash = agents.find(agent => agent.id === 'west')
  const changeGroup = (value: MenuGroup | null) => { setGroup(value); requestAnimationFrame(() => popup.current?.querySelector<HTMLButtonElement>('button')?.focus()) }
  return <aside className="pencil-sidebar" aria-label="Navegação">
-  <header className="pencil-sidebar-heading"><strong>Waddle</strong><button type="button" aria-label="Nova conversa" title="Nova conversa" onClick={onNew}><Plus size={18}/></button></header>
-  <label className="pencil-sidebar-search"><Search size={15}/><input aria-label="Buscar agentes" placeholder="Buscar agentes" value={search} onChange={event => setSearch(event.target.value)}/></label>
-  <nav className="pencil-sidebar-agents" aria-label="Seus agentes">{data.sidebarAgents.filter(id => !search || agents.find(a => a.id === id)?.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())).map(id => {
+  <header className="pencil-sidebar-heading"><button type="button" className={current === 'west' ? 'selected' : ''} aria-label={'Conversar com '+(ash?.name || 'Ash')} aria-current={current === 'west' ? 'page' : undefined} title={ash?.name || 'Ash'} onClick={() => onAgent('west')}><CanvasMascot agent="west" photo={data.prefs.west?.photo as string | undefined} color={data.prefs.west?.color as string | undefined} size={26}/></button><label className="pencil-sidebar-search"><Search size={15}/><input aria-label="Buscar agentes" placeholder="Buscar" value={search} onChange={event => setSearch(event.target.value)}/></label><button type="button" aria-label="Nova conversa" title="Nova conversa" onClick={onNew}><Plus size={18}/></button></header>
+  <nav className="pencil-sidebar-agents" aria-label="Seus agentes">{sidebarIds.filter(id => !search || agents.find(a => a.id === id)?.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())).map(id => {
    const agent = agents.find(a => a.id === id); if (!agent) return null
    const chat = latest.get(id)
    return <button type="button" key={id} aria-current={id === current ? 'page' : undefined} onClick={() => onAgent(id)} className={id === current ? 'selected' : ''}>
@@ -39,7 +40,7 @@ export function PencilSidebar({ data, agents, current, busy, menu, onMenu, onAge
     <span><strong>{agent.name}</strong>{chat?.messages.length ? <small>{chat.messages.at(-1)?.text.slice(0, 60)}</small> : null}</span>
     {chat && busy[chat.id] ? <span className="pencil-agent-busy" aria-label="Respondendo"/> : null}
    </button>
-  })}{search && !data.sidebarAgents.some(id => agents.find(a => a.id === id)?.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) && <p className="pencil-sidebar-no-results">Nenhum agente encontrado.</p>}</nav>
+  })}{search && !sidebarIds.some(id => agents.find(a => a.id === id)?.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) && <p className="pencil-sidebar-no-results">Nenhum agente encontrado.</p>}</nav>
   <div className="pencil-sidebar-footer" ref={footer}>
    <button ref={trigger} type="button" className="pencil-sidebar-profile" aria-label="Menu da conta" aria-haspopup="menu" aria-expanded={menu} onClick={onMenu}>{data.profile.avatar ? <img src={data.profile.avatar} alt=""/> : <CanvasMascot agent="west" size={26}/>}<span>{data.profile.name || 'Visitante'}</span><ChevronsUpDown size={14}/></button>
    {menu && <div ref={popup} className="pencil-sidebar-menu" role="menu" aria-label={group ? groups[group].title : 'Menu da conta'} onKeyDown={event => {
