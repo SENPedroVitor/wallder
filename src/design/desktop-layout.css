@@ -39,3 +39,6 @@ html,body,#root{margin:0;min-height:100%;background:var(--w-bg)}
 .pencil-app-frame .waddle-app .waddle-composer .voice-trigger svg{width:18px;height:18px}
 :root[data-theme=dark] .pencil-app-frame .waddle-app .waddle-composer>div:last-child{border-color:#55565d;background:#252527}
 :root[data-theme=dark] .pencil-app-frame .waddle-app .waddle-composer>div:last-child:focus-within{border-color:#a5a7b0}
+
+.pencil-app-frame .waddle-app .waddle-composer>div:last-child>button,.pencil-app-frame .waddle-app .waddle-composer .voice-input{margin-bottom:4px}
+.pencil-app-frame .waddle-app .waddle-composer .voice-input{height:34px;align-items:center}
