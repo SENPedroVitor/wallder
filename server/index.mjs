@@ -218,6 +218,7 @@ client.on('message', message => {
           if(run && params.tool==='wendler_sports'){
             emit(run,{type:'activity',text:'Consultando o placar atualizado…'})
             const result=await sports.execute(params.arguments,run)
+            if(params.arguments.action==='scores')emit(run,{type:'widget',widget:{type:'sports-list',data:result}})
             if(result.game)emit(run,{type:'widget',widget:{type:'sports',data:result.game}})
             client.respond(message.id,{success:true,contentItems:[{type:'inputText',text:JSON.stringify(result)}]});return
           }
@@ -461,6 +462,7 @@ export const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/audio/status' && req.method === 'GET') return json(res,200,await audioProxy.status())
     if (url.pathname === '/api/audio/transcribe' && req.method === 'POST') return await audioProxy.transcribe(req,res)
     if (url.pathname === '/api/island/status' && req.method === 'GET') return json(res, 200, { ...islandActivity.snapshot({ agents: agentPersonalities, ready: client.ready && authenticated && !!models.length, approvals }), sports: await sports.snapshot() })
+    if (url.pathname === '/api/sports/scores' && req.method === 'GET') return json(res,200,await sports.scores({league:url.searchParams.get('league')||'soccer/all',date:url.searchParams.get('date')||undefined}))
     if (url.pathname === '/api/sports/score' && req.method === 'GET') { const result=await sports.scores({league:url.searchParams.get('league')||'soccer/all',date:url.searchParams.get('date')||undefined});const game=result.games.find(game=>game.id===url.searchParams.get('event'));return game?json(res,200,game):fail(res,404,'Partida não encontrada nesta data.') }
     if (url.pathname === '/api/sports/follow' && req.method === 'POST') { const input=await body(req); if(input.action!=='unfollow')return fail(res,400,'Ação inválida.');return json(res,200,await sports.execute(input)) }
     if (url.pathname === '/api/mobile/agents' && req.method === 'GET') return json(res, 200, { agents: mobile.agents() })

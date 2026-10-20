@@ -1,3 +1,6 @@
+import { tableCells, tableHeader } from './markdownTable'
+import { SavedSportsTable } from '../design/SportsFixtures'
+import { savedFixtureRows } from '../design/sportsPresentation'
 import type { ReactNode } from 'react'
 function InlineText({ text }: { text: string }) {
   return <>{text.split(/(`[^`\n]+`|\*\*[^*\n]+\*\*|\[[^\]\n]+\]\(https?:\/\/[^\s)]+\))/g).map((part, index) => {
@@ -8,7 +11,8 @@ function InlineText({ text }: { text: string }) {
     return part
   })}</>
 }
-export default function FormattedText({ text }: { text: string }) {
+export default function FormattedText({ text, at }: { text: string; at?: number }) {
+  const date = at && Number.isFinite(at) ? new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(at)) : undefined
   const lines = text.replace(/\r\n/g, '\n').split('\n')
   const blocks: ReactNode[] = []
   let cursor = 0
@@ -23,6 +27,14 @@ export default function FormattedText({ text }: { text: string }) {
       while (cursor < lines.length && !/^\s*```\s*$/.test(lines[cursor])) code.push(lines[cursor++])
       if (cursor < lines.length) cursor++
       blocks.push(<div key={key} className="chat-code-block"><div className="chat-code-label">{fence[1] || 'Código'}</div><pre tabIndex={0} aria-label={`Bloco de código ${fence[1]}`}><code>{code.join('\n')}</code></pre></div>); continue
+    }
+    const table = tableHeader(lines, cursor)
+    if (table) {
+      cursor += 2; const rows: string[][] = []
+      while (cursor < lines.length && lines[cursor].trim() && lines[cursor].includes('|')) { const cells = tableCells(lines[cursor++]); rows.push(table.headers.map((_, index) => cells[index] || '')) }
+      if (savedFixtureRows(table.headers, rows)) blocks.push(<SavedSportsTable key={key} headers={table.headers} rows={rows} date={date}/>)
+      else blocks.push(<div key={key} className="chat-table-scroll" tabIndex={0} role="region" aria-label="Tabela da mensagem"><table><thead><tr>{table.headers.map((header, index) => <th key={index} scope="col" style={{textAlign:table.align[index]}}><InlineText text={header}/></th>)}</tr></thead><tbody>{rows.map((row, index) => <tr key={index}>{row.map((cell, column) => <td key={column} style={{textAlign:table.align[column]}}><InlineText text={cell}/></td>)}</tr>)}</tbody></table></div>)
+      continue
     }
     const heading = line.match(/^(#{1,6})\s+(.*)$/)
     if (heading) { const Heading = heading[1].length === 1 ? 'h3' : heading[1].length === 2 ? 'h4' : 'h5'; blocks.push(<Heading key={key}><InlineText text={heading[2]} /></Heading>); cursor++; continue }
@@ -42,7 +54,7 @@ export default function FormattedText({ text }: { text: string }) {
       blocks.push(ordered ? <ol key={key} start={Number.parseInt(list[1])}>{items}</ol> : <ul key={key}>{items}</ul>); continue
     }
     const paragraph = [line]; cursor++
-    while (cursor < lines.length && lines[cursor].trim() && !isBlock(lines[cursor])) paragraph.push(lines[cursor++])
+    while (cursor < lines.length && lines[cursor].trim() && !isBlock(lines[cursor]) && !tableHeader(lines, cursor)) paragraph.push(lines[cursor++])
     blocks.push(<p key={key}><InlineText text={paragraph.join('\n')} /></p>)
   }
   return <>{blocks}</>
