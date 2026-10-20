@@ -1,3 +1,4 @@
+import { claimBrowserPreview } from './browser-monitor.mjs'
 import { launchFirefox } from './firefox.mjs'
 import {claimRemoteControl,releaseRemoteControl} from './remote-firefox.mjs'
 import { chromium } from 'playwright-core'
@@ -31,6 +32,7 @@ export class BrowserBridge {
       const generation=this.generation
       this.visible=visible;this.browserChoice=browser;this.profileMode=profileMode;const launched=browser==='firefox'?await launchFirefox(this.dataDir,{visible,profileMode}):await chromium.launchPersistentContext(path.join(this.dataDir,'browser-profile'),{channel:'msedge',headless:!visible,viewport:{width:1280,height:800},acceptDownloads:false})
       if(generation!==this.generation){await launched.close();throw new Error('Navegador interrompido antes de iniciar.')}
+      claimBrowserPreview(this)
       this.context=launched
       this.page=this.context.initialPage||this.context.pages()[0]||await this.context.newPage();this.generation++;this.owner=null;this.grant=null
       const context=this.context
@@ -42,13 +44,13 @@ export class BrowserBridge {
       this.event(browser==='firefox'?'Firefox iniciado · '+this.context.profileName:'Edge iniciado. Perfil próprio do Wendler.');return this.status()
     })
   }
-  async stop() {releaseRemoteControl(this.context,this.remoteLeaseId);this.remoteLeaseId=null;this.grant=null;this.generation++;this.observation=null;const context=this.context;this.context=null;this.page=null;this.owner=null;await context?.close();return this.status()}
+  async stop() {claimBrowserPreview(this);releaseRemoteControl(this.context,this.remoteLeaseId);this.remoteLeaseId=null;this.grant=null;this.generation++;this.observation=null;const context=this.context;this.context=null;this.page=null;this.owner=null;await context?.close();return this.status()}
   async navigate(url){
     const address=browserUrl(url);this.lastError=null;this.observation=null
     try{const response=await this.page.goto(address,{waitUntil:'domcontentloaded',timeout:30000});if(response&&response.status()>=400)throw new Error('HTTP '+response.status()+' retornado pelo site.');this.event('Site aberto: '+new URL(this.page.url()).hostname)}catch(error){this.lastError={url:address,message:error.message,at:new Date().toISOString()};this.event('Não foi possível abrir '+new URL(address).hostname+': '+error.message);throw new Error('Falha ao abrir '+address+': '+error.message)}
   }
   releaseScope(scope){releaseRemoteControl(this.context,scope.requestId||scope.conversationId);if(this.owner!==scope.conversationId)return;this.owner=null;this.observation=null;this.grant=null;this.generation++}
-  async openForUser(url) { return this.serialized(async()=>{if(!this.page)throw new Error('Inicie o navegador primeiro.');if(this.owner)throw new Error('Pare a sessão antes de navegar manualmente enquanto uma conversa usa o navegador.');await this.navigate(url);return this.observe()}) }
+  async openForUser(url) { return this.serialized(async()=>{if(!this.page)throw new Error('Inicie o navegador primeiro.');if(this.owner)throw new Error('Pare a sessão antes de navegar manualmente enquanto uma conversa usa o navegador.');claimBrowserPreview(this);await this.navigate(url);return this.observe()}) }
   authorize(input) {
     if(!this.context)throw new Error('Inicie o navegador antes de autorizar uma sessão.')
     if(input?.mode==='manual'){this.grant=null;return this.status()}
@@ -74,6 +76,7 @@ export class BrowserBridge {
     if(!this.context)throw new Error('Inicie o navegador no painel de serviços locais.')
     if(this.owner && this.owner!==scope.conversationId)throw new Error('Este navegador está em uso por outra conversa. Pare a sessão antes de trocar de conversa.')
     this.owner??=scope.conversationId
+    claimBrowserPreview(this,scope.conversationId)
   }
   review(args, scope = {}) {
     if(args.action==='open')return {confirmation:false,title:'Abrir site',details:{url:browserUrl(args.url)}}

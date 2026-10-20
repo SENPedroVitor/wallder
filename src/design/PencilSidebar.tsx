@@ -1,28 +1,60 @@
-import { useState } from 'react'
-import { Plus } from 'lucide-react'
-import { CanvasMascot, CanvasScene } from './CanvasScene'
+import { useEffect, useRef, useState } from 'react'
+import { ArrowLeft, ChevronRight, ChevronsUpDown, Folder, History, Link, Plus, Search, Settings, Users } from 'lucide-react'
+import { CanvasMascot } from './CanvasScene'
 import type { Workspace, Chat } from './workspace'
 import type { MascotAgent } from '../components/Mascot'
 
-type Agent={id:MascotAgent;name:string}
-export function PencilSidebar({variant,data,agents,current,busy,menu,onMenu,onAgent,onNew,onSearch,onNavigate}:{variant:'empty'|'chat'|'widget';data:Workspace;agents:Agent[];current:MascotAgent;busy:Record<string,boolean>;menu:boolean;onMenu:()=>void;onAgent:(id:MascotAgent)=>void;onNew:()=>void;onSearch:()=>void;onNavigate:(label:string)=>void}){
- const [search,setSearch]=useState('')
- const id=variant==='empty'?'s8DdPp':variant==='widget'?'nARBK':'Cg59o',width=variant==='empty'?176:variant==='widget'?152:200
- const latest=(id:string):Chat|undefined=>data.chats.filter(c=>c.agent===id&&!c.archived).sort((a,b)=>b.updated-a.updated)[0]
- const navigation=['Seus agentes','Perfil','Conta','Aparência','Notificações','Privacidade','Permissões','Projetos','Rotinas','Meus registros','Meus favoritos','Memória dos agentes','Conexões','Plugins','Histórico e itens fixados','Buscar no seu espaço']
- return <aside className={'pencil-sidebar pencil-sidebar--'+variant} style={{width}} aria-label="Navegação"><CanvasScene id={id} crop={false} clip={{left:0,top:0,width,height:600}} bindings={{'Nome do usuário':{text:data.profile.name,action:'Perfil'},Perfil:{text:data.profile.name,action:'Perfil'},Usuário:{text:data.profile.name,action:'Perfil'},'Inicial do perfil':{text:data.profile.name.slice(0,1)},'Iniciais de Pedro':{text:data.profile.name.slice(0,2)},'Acesso a plugins':{action:'Plugins'},'Nova conversa':{action:'Nova conversa'},'Placeholder de busca':{text:''},'Estado da lista':{text:''}}} decorate={root=>{
-  for(const node of [...root.children] as HTMLElement[]){const name=node.dataset.pencilName||'',y=parseFloat(node.style.top)||0;if(y>=65&&y<525&&(/(?:avatar da lista|— nome$|— horário|— prévia|— navegação|— nome na navegação|Conversa selecionada)/.test(name)||(variant==='empty'&&name==='Título do cabeçalho')||(variant==='empty'&&name==='West — conjunto de formas'&&y>65)))node.remove()}
-  if(variant==='empty')root.querySelector('[data-pencil-id="wXmTc"]')?.remove()
-  root.style.background='transparent'
-  for(const node of [...root.children] as HTMLElement[]){const height=parseFloat(node.style.height)||0,width=parseFloat(node.style.width)||0;if((parseFloat(node.style.top)||0)>=525||(height>=590&&width<=220))node.remove()}
-  const links=root.querySelector<HTMLElement>('[data-pencil-name="Links do espaço"]');if(links)links.remove()
-  if(data.profile.avatar){const avatar=root.querySelector<HTMLElement>('[data-pencil-name="Avatar de Pedro"],[data-pencil-name="Avatar do perfil"]');if(avatar){avatar.style.backgroundImage='url("'+data.profile.avatar+'")';avatar.style.backgroundSize='cover';root.querySelector<HTMLElement>('[data-pencil-name="Inicial do perfil"],[data-pencil-name="Iniciais de Pedro"]')?.remove()}}
- }} decorationKey={data.profile.avatar} onAction={event=>{if(event.label==='Perfil')onMenu();else if(event.label==='Nova conversa')onNew();else if(event.label==='Buscar no seu espaço')onSearch();else onNavigate(event.label)}}/>
- <>{variant==='chat'&&<input className="pencil-sidebar-search" aria-label="Buscar agentes" placeholder="Buscar agentes" value={search} onChange={event=>setSearch(event.target.value)}/>}</>
- <div className="pencil-sidebar-agents">{data.sidebarAgents.filter(id=>!search||agents.find(a=>a.id===id)?.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())).map(id=>{const agent=agents.find(a=>a.id===id);if(!agent)return null;const chat=latest(id);return <button key={id} onClick={()=>onAgent(id)} className={id===current?'selected':''}><CanvasMascot agent={id} photo={data.prefs[id]?.photo as string|undefined} color={data.prefs[id]?.color as string|undefined} size={variant==='widget'?22:26}/><span><strong>{agent.name}</strong>{variant==='chat'&&chat?.messages.length?<small>{chat.messages.at(-1)?.text.slice(0,37)}</small>:null}</span>{variant==='chat'&&chat?.messages.length?<time>{busy[chat.id]?'Agora':new Date(chat.updated).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</time>:null}</button>})}</div>
- {variant==='widget'&&<nav className="pencil-sidebar-links">{['Projetos','Rotinas','Conexões'].map(label=><button key={label} onClick={()=>onNavigate(label)}>{label}</button>)}</nav>}
- {variant!=='chat'&&<button className="pencil-sidebar-new" aria-label="Nova conversa" onClick={onNew}><Plus size={14}/></button>}
- <button className="pencil-sidebar-profile" aria-label="Perfil" onClick={onMenu}>{data.profile.avatar?<img src={data.profile.avatar} alt="Foto da conta"/>:<CanvasMascot agent="west" size={26}/>}<span>{data.profile.name||'Visitante'}</span></button>
- {menu&&<div className="pencil-sidebar-menu" role="menu">{navigation.map(label=><button key={label} role="menuitem" onClick={()=>onNavigate(label)}>{label}</button>)}</div>}
+type Agent = { id: MascotAgent; name: string }
+const groups = {
+ space: { title: 'Seu espaço', items: ['Projetos', 'Rotinas', 'Meus registros', 'Meus favoritos', 'Memória dos agentes'] },
+ connections: { title: 'Conexões', items: ['Conexões', 'Plugins'] },
+ settings: { title: 'Configurações', items: ['Perfil', 'Conta', 'Aparência', 'Notificações', 'Privacidade', 'Permissões'] },
+}
+type MenuGroup = keyof typeof groups
+export function PencilSidebar({ data, agents, current, busy, menu, onMenu, onAgent, onNew, onSearch, onNavigate }: {
+ data: Workspace; agents: Agent[]; current: MascotAgent; busy: Record<string, boolean>; menu: boolean;
+ onMenu: () => void; onAgent: (id: MascotAgent) => void; onNew: () => void; onSearch: () => void; onNavigate: (label: string) => void
+}) {
+ const [search, setSearch] = useState(''), [group, setGroup] = useState<MenuGroup | null>(null)
+ const dismissMenu = useRef(onMenu); dismissMenu.current = onMenu
+ const footer = useRef<HTMLDivElement>(null), trigger = useRef<HTMLButtonElement>(null), popup = useRef<HTMLDivElement>(null)
+ const latest = new Map<string, Chat>()
+ for (const chat of data.chats) if (!chat.archived && (!latest.has(chat.agent) || latest.get(chat.agent)!.updated < chat.updated)) latest.set(chat.agent, chat)
+ useEffect(() => {
+  if (!menu) { setGroup(null); return }
+  popup.current?.querySelector<HTMLButtonElement>('button')?.focus()
+  const dismiss = (event: PointerEvent) => { if (!footer.current?.contains(event.target as Node)) dismissMenu.current() }
+  document.addEventListener('pointerdown', dismiss)
+  return () => document.removeEventListener('pointerdown', dismiss)
+ }, [menu])
+ const changeGroup = (value: MenuGroup | null) => { setGroup(value); requestAnimationFrame(() => popup.current?.querySelector<HTMLButtonElement>('button')?.focus()) }
+ return <aside className="pencil-sidebar" aria-label="Navegação">
+  <header className="pencil-sidebar-heading"><strong>Waddle</strong><button type="button" aria-label="Nova conversa" title="Nova conversa" onClick={onNew}><Plus size={18}/></button></header>
+  <label className="pencil-sidebar-search"><Search size={15}/><input aria-label="Buscar agentes" placeholder="Buscar agentes" value={search} onChange={event => setSearch(event.target.value)}/></label>
+  <nav className="pencil-sidebar-agents" aria-label="Seus agentes">{data.sidebarAgents.filter(id => !search || agents.find(a => a.id === id)?.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())).map(id => {
+   const agent = agents.find(a => a.id === id); if (!agent) return null
+   const chat = latest.get(id)
+   return <button type="button" key={id} aria-current={id === current ? 'page' : undefined} onClick={() => onAgent(id)} className={id === current ? 'selected' : ''}>
+    <CanvasMascot agent={id} photo={data.prefs[id]?.photo as string | undefined} color={data.prefs[id]?.color as string | undefined} size={26}/>
+    <span><strong>{agent.name}</strong>{chat?.messages.length ? <small>{chat.messages.at(-1)?.text.slice(0, 60)}</small> : null}</span>
+    {chat && busy[chat.id] ? <span className="pencil-agent-busy" aria-label="Respondendo"/> : null}
+   </button>
+  })}{search && !data.sidebarAgents.some(id => agents.find(a => a.id === id)?.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) && <p className="pencil-sidebar-no-results">Nenhum agente encontrado.</p>}</nav>
+  <div className="pencil-sidebar-footer" ref={footer}>
+   <button ref={trigger} type="button" className="pencil-sidebar-profile" aria-label="Menu da conta" aria-haspopup="menu" aria-expanded={menu} onClick={onMenu}>{data.profile.avatar ? <img src={data.profile.avatar} alt=""/> : <CanvasMascot agent="west" size={26}/>}<span>{data.profile.name || 'Visitante'}</span><ChevronsUpDown size={14}/></button>
+   {menu && <div ref={popup} className="pencil-sidebar-menu" role="menu" aria-label={group ? groups[group].title : 'Menu da conta'} onKeyDown={event => {
+    const buttons = [...event.currentTarget.querySelectorAll<HTMLButtonElement>('button')], index = buttons.indexOf(document.activeElement as HTMLButtonElement)
+    if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); if (group) changeGroup(null); else { onMenu(); trigger.current?.focus() } }
+    if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) { event.preventDefault(); buttons[event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowUp' ? -1 : 1) + buttons.length) % buttons.length]?.focus() }
+   }}>
+    {group ? <><button type="button" role="menuitem" onClick={() => changeGroup(null)}><ArrowLeft size={15}/>{groups[group].title}</button><div className="pencil-menu-divider" role="separator"/>{groups[group].items.map(label => <button type="button" key={label} role="menuitem" onClick={() => onNavigate(label)}>{label}</button>)}</> : <>
+     <button type="button" role="menuitem" onClick={() => { onMenu(); onSearch() }}><Search size={16}/>Buscar no seu espaço</button>
+     <button type="button" role="menuitem" onClick={() => onNavigate('Histórico e itens fixados')}><History size={16}/>Histórico e itens fixados</button>
+     <button type="button" role="menuitem" onClick={() => onNavigate('Seus agentes')}><Users size={16}/>Seus agentes</button>
+     <div className="pencil-menu-divider" role="separator"/>
+     {([{ key: 'space', Icon: Folder }, { key: 'connections', Icon: Link }, { key: 'settings', Icon: Settings }] as const).map(({ key, Icon }) => <button type="button" key={key} role="menuitem" onClick={() => changeGroup(key)}><Icon size={16}/>{groups[key].title}<ChevronRight className="pencil-menu-chevron" size={14}/></button>)}
+    </>}
+   </div>}
+  </div>
  </aside>
 }

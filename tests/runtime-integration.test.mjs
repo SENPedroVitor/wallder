@@ -78,6 +78,14 @@ try {
   })
   assert.equal(existingChat.status, 503, 'Existing permanent chat IDs must pass validation before unavailable Codex is reported')
 
+  for (const query of ['', '?conversationId=chat-ted']) {
+    const response = await fetch(base + '/api/browser/monitor' + query)
+    assert.equal(response.status, 200)
+    const frame = await response.json()
+    assert.equal(frame.active, false)
+    assert.equal(frame.image, undefined)
+  }
+
   const tooLarge = await fetch(`${base}/api/chat`, {
     method: 'POST', headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ requestId: 'oversize', conversationId: 'test', agent: 'west', message: 'x'.repeat(2_000_000) }),

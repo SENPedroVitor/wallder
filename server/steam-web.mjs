@@ -1,3 +1,4 @@
+import { claimBrowserPreview } from './browser-monitor.mjs'
 import path from "node:path";
 import { mkdir, readFile, writeFile, rename } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
@@ -113,6 +114,7 @@ export class SteamWebService {
       visible,
       profileMode: "dedicated",
     });
+    claimBrowserPreview(this);
     this.lastAuthCheck=0;this.authVerified=false;
     this.visible = visible;
     const pending=await this.pending();
@@ -186,6 +188,7 @@ export class SteamWebService {
   async configure(action, { checked = false } = {}) {
     return this.serial(async () => {
       if (this.owner) throw Error("Aguarde a Pam terminar a tarefa.");
+      if (["login","background","disconnect"].includes(action)) claimBrowserPreview(this);
       if (action === "login") {
         await this.start(true);
         await this.page.goto("https://store.steampowered.com/login/", {
@@ -426,6 +429,7 @@ export class SteamWebService {
         );
       await this.start(false);
       claimRemoteControl(this.context,run.requestId);
+      claimBrowserPreview(this,run.conversationId);
       if (run.cancelled) throw Error("Tarefa interrompida.");
       if(args.action==='prepare_qr')return this.prepareQr(run,authorize);
       if(args.action==='fill_profile')return this.fillProfile(run,authorize);

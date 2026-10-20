@@ -1,3 +1,4 @@
+import { conversationBrowserPreview } from './browser-monitor.mjs'
 import http from 'node:http'
 import { mkdir, readFile, writeFile, rename, readdir, realpath, stat } from 'node:fs/promises'
 import path from 'node:path'
@@ -514,7 +515,7 @@ export const server = http.createServer(async (req, res) => {
     if(url.pathname.startsWith('/api/browser/')){
       if(req.method==='GET'&&url.pathname==='/api/browser/status')return json(res,200,browser.status())
       if(req.method==='GET'&&url.pathname==='/api/browser/frame')return json(res,200,await browser.preview())
-      if(req.method==='GET'&&url.pathname==='/api/browser/monitor')return json(res,200,steam.context&&(!browser.context||steam.owner)?await steam.preview():await browser.preview())
+      if(req.method==='GET'&&url.pathname==='/api/browser/monitor')return json(res,200,await conversationBrowserPreview([browser,steam],url.searchParams.get('conversationId')))
       if(req.method==='POST'&&url.pathname==='/api/browser/start')return json(res,200,await browser.start(await body(req)))
       if(req.method==='POST'&&url.pathname==='/api/browser/authorize')return json(res,200,browser.authorize(await body(req)))
       if(req.method==='POST'&&url.pathname==='/api/browser/open')return json(res,200,await browser.openForUser((await body(req)).url))
