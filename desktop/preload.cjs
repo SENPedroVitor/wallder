@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('wendlerIsland', {
   pointer: inside => ipcRenderer.send('island:pointer', inside === true),
   surface: bounds => ipcRenderer.send('island:surface', bounds),
   open: input => ipcRenderer.invoke('island:open', input),
+  dismiss: id => ipcRenderer.invoke('island:dismiss',id),
   unfollow: id => ipcRenderer.invoke('island:unfollow', id),
   copyPix: id => ipcRenderer.invoke('island:copy-pix', id),
   hide: () => ipcRenderer.send('island:hide'),

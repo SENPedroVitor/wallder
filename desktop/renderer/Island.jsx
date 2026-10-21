@@ -2,7 +2,7 @@ import { JourneyMotion } from './JourneyMotion'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { ArrowUpRight, Check, ChevronLeft, Clipboard, Cpu, LoaderCircle, Monitor, MonitorCog, Settings2, Square, WifiOff, X } from 'lucide-react'
 import { chooseTask, elapsed, islandState } from '../model.mjs'
-import { Mascot } from './Mascot'
+import { Mascot,MascotAppearanceContext } from './Mascot'
 
 const bridge = window.wendlerIsland || {
   snapshot: async () => { const response = await fetch('/api/island/status'); if (!response.ok) throw Error('Servidor indisponível'); return { ...await response.json(), online: true } },
@@ -24,7 +24,7 @@ export function Island() {
   const [selectedId, setSelectedId] = useState(null), [dismissed, setDismissed] = useState([]), [clock, setClock] = useState(Date.now()), [pending, setPending] = useState(false), [notice, setNotice] = useState(''), [removingId, setRemovingId] = useState(null)
   const hoverTimer = useRef(), collapseTimer = useRef(), allowHover = useRef(0), inside = useRef(false)
   const surface = useRef(null), surfaceBounds = useRef(null), morph = useRef(null)
-  const tasks = snapshot.tasks || [], running = tasks.filter(task => task.status === 'running'), task = chooseTask(tasks, selectedId, dismissed, clock)
+  const tasks = (snapshot.tasks || []).filter(item=>!dismissed.includes(item.id)&&(!item.finishedAt||clock-item.finishedAt<(item.pix?300000:60000))), running = tasks.filter(task => task.status === 'running'), task = chooseTask(tasks, selectedId, dismissed, clock)
   const state = islandState({ online: snapshot.online, ready: snapshot.ready, task, expanded, showPix, showPc, activeCount: running.length })
   const games = snapshot.sports || []
   const featuredGame = games.find(game => game.state === 'in') || games[0]
@@ -83,14 +83,15 @@ export function Island() {
     catch (error) { setNotice(error.message || 'Não foi possível concluir a ação.') }
     finally { setPending(false) }
   }
-  const dismiss = () => { if (task) setDismissed(value => [...value, task.id].slice(-100)); collapse() }
-  const openTask = () => bridge.open({ conversationId: task?.conversationId })
+  const dismissItem = async item => {if(!item||item.status==='running')return;setDismissed(value=>[...value,item.id].slice(-100));try{await bridge.dismiss?.(item.id)}catch(error){setNotice(error.message)}}
+  const dismiss = () => {void dismissItem(task);collapse()}
+  const openTask = () => {void dismissItem(task);return bridge.open({ conversationId: task?.conversationId })}
   const agentName = task?.agentName || 'Wendler'
   const review = task?.approval
   const openQr = () => { setShowPix(true); setPinned(true); setExpanded(false) }
   const recent = tasks.filter(item => item.status !== 'running').slice(0, 4)
   const statusLabel = !snapshot.online ? 'Sem conexão com o servidor' : !snapshot.ready ? 'Agentes indisponíveis' : 'Equipe conectada'
-  return <div className="island-host">
+  return <MascotAppearanceContext.Provider value={snapshot.agents||[]}><div className="island-host">
     {!window.wendlerIsland && <div className="browser-label">Prévia no navegador · janela Windows disponível pelo aplicativo</div>}
     <section ref={surface} className={'island island--' + displayState} data-state={displayState} aria-label="Ilha dos agentes Wendler" onPointerEnter={enter} onPointerLeave={leave} onKeyDown={event => { if (event.key === 'Escape') collapse() }}>
       {!sportsVisible && ['idle', 'offline'].includes(state) && <button className="compact-trigger idle-trigger" onClick={open} aria-label="Expandir ilha"><Mascot id="west" size={30}/><span>{online ? 'Equipe conectada' : snapshot.online ? 'Agente indisponível' : 'Sem conexão'}</span>{online ? <span className="status-dot"/> : <WifiOff size={14}/>}</button>}
@@ -108,9 +109,9 @@ export function Island() {
           {review && <Details details={review.details}/>}
           {!review && task.status === 'running' && <div className="progress-track" role="progressbar" aria-label="Agente trabalhando" aria-valuetext="Progresso não informado pelo executor"><i/></div>}
           {!review && task.status !== 'running' && task.summary && <p className="task-summary">{task.summary}</p>}
-          <div className="task-actions">{review ? <><button className="pill" disabled={pending || !online} onClick={() => action({ type: 'approval', id: review.id, decision: 'decline' })}>Recusar</button><button className="pill primary" disabled={pending || !online} onClick={() => action({ type: 'approval', id: review.id, decision: 'accept' })}>{pending ? 'Enviando…' : 'Autorizar'}</button></> : <>{task.status === 'running' && <button className="pill" disabled={pending || !online} onClick={() => action({ type: 'cancel', id: task.id })}>{pending ? 'Interrompendo…' : 'Interromper'}</button>}<button className="pill white" onClick={openTask}>{task.status === 'running' ? 'Ver conversa' : 'Ver resposta'}</button><button className="pill" onClick={() => bridge.open({ type: 'browser' })}><Monitor size={13}/> Ver tela</button>{task.pix && <button className="pill primary" onClick={openQr}>Ver QR</button>}</>}</div>
+          <div className="task-actions">{review ? <><button className="pill" disabled={pending || !online} onClick={() => action({ type: 'approval', id: review.id, decision: 'decline' })}>Recusar</button><button className="pill primary" disabled={pending || !online} onClick={() => action({ type: 'approval', id: review.id, decision: 'accept' })}>{pending ? 'Enviando…' : 'Autorizar'}</button></> : <>{task.status === 'running' && <button className="pill" disabled={pending || !online} onClick={() => action({ type: 'cancel', id: task.id })}>{pending ? 'Interrompendo…' : 'Interromper'}</button>}{task.status!=='running'&&<button className="pill" onClick={dismiss}>Dispensar notificação</button>}<button className="pill white" onClick={openTask}>{task.status === 'running' ? 'Ver conversa' : 'Ver resposta'}</button><button className="pill" onClick={() => bridge.open({ type: 'browser' })}><Monitor size={13}/> Ver tela</button>{task.pix && <button className="pill primary" onClick={openQr}>Ver QR</button>}</>}</div>
         </article> : !games.length ? <article className="empty-card"><Mascot id="west" size={44}/><div><strong>{statusLabel}</strong><p>{online ? 'As próximas atividades aparecem aqui.' : 'Confira a conexão do Tailscale. A ilha tenta reconectar automaticamente.'}</p></div></article> : null}
-        {!task && recent.length > 0 && <div className="recent-tasks">{recent.map(item => <button key={item.id} onClick={() => { setDismissed(value => value.filter(id => id !== item.id)); setSelectedId(item.id); bridge.open({ conversationId: item.conversationId }) }}><Mascot id={item.agentId} size={24}/><span>{item.agentName} · {item.activity}</span><ArrowUpRight size={13}/></button>)}</div>}
+        {!task && recent.length > 0 && <div className="recent-tasks">{recent.map(item => <div className="recent-notification" key={item.id}><button onClick={() => { setDismissed(value => value.filter(id => id !== item.id)); setSelectedId(item.id); void dismissItem(item); bridge.open({ conversationId: item.conversationId }) }}><Mascot id={item.agentId} size={24}/><span>{item.agentName} · {item.activity}</span><ArrowUpRight size={13}/></button><button className="icon-button" aria-label={"Dispensar notificação de "+item.agentName} onClick={()=>void dismissItem(item)}><X size={13}/></button></div>)}</div>}
         {games.length > 0 && <div className="island-scores">{games.map(game=><article className="island-score" key={game.id}><div className="score-heading"><Mascot id="livro" size={22}/><span className={gameStale(game)?'score-stale':''}>{gameStale(game)?'Sem atualização':game.state==='in'?'Em andamento · '+game.detail:game.detail} · {game.leagueName}</span><button className="icon-button" onClick={()=>stopFollowing(game)} disabled={!!removingId} title="Remover da ilha" aria-label={'Parar de acompanhar '+game.home.name+' e '+game.away.name}><X size={12}/></button></div><div className="score-line"><span>{game.home.name}</span><strong key={game.home.score+':'+game.away.score} className="score-value">{game.home.score??'—'} : {game.away.score??'—'}</strong><span>{game.away.name}</span></div><div className="score-footer"><span>ESPN · leitura às {new Date(game.checkedAt).toLocaleTimeString('pt-BR')}{gameStale(game)?' · última leitura':''}</span><button onClick={()=>bridge.open({conversationId:game.conversationId})}>Ver conversa <ArrowUpRight size={11}/></button></div></article>)}</div>}
         <footer className="island-footer"><span><i className={'connection-dot' + (online ? ' connected' : '')}/>{online ? 'Servidor conectado' : 'Servidor desconectado'}</span><button onClick={() => { setShowPc(true); setPinned(true) }}><MonitorCog size={13}/> Este PC</button><button onClick={() => bridge.hide()} title="Reabrir pela bandeja do Windows ou Ctrl+Alt+Espaço"><Settings2 size={13}/> Ocultar</button></footer>
       </div>}
@@ -118,5 +119,5 @@ export function Island() {
       {state === 'pc' && <div className="pc-content"><header className="island-header"><Mascot id="homer" name="Homer" size={42}/><div className="task-heading"><strong>Este computador</strong><small>Leitura local · {snapshot.pc?.host || 'disponível no Windows'}</small></div><button className="icon-button" onClick={() => { setShowPc(false); setExpanded(true) }} aria-label="Voltar"><ChevronLeft size={16}/></button></header><div className="pc-metrics"><div><Cpu size={18}/><span>CPU</span><strong>{snapshot.pc ? snapshot.pc.cpuPercent + '%' : 'Indisponível'}</strong></div><div><Monitor size={18}/><span>Memória</span><strong>{snapshot.pc ? Math.round(snapshot.pc.memoryUsed / snapshot.pc.memoryTotal * 100) + '%' : 'Indisponível'}</strong></div><div><ArrowUpRight size={18}/><span>Servidor</span><strong>{snapshot.online && snapshot.latency != null ? snapshot.latency + ' ms' : 'Sem conexão'}</strong></div></div><p className="pc-caption">CPU e memória são deste Windows. Temperatura, GPU e otimizações automáticas ainda não estão conectadas.</p><div className="task-actions"><button className="pill white" onClick={() => bridge.open({})}>Abrir Waddle</button><button className="pill" onClick={() => bridge.open({ type: 'browser' })}>Ver computador do servidor</button></div></div>}
       {notice && <div className="island-notice" role="status">{notice}<button className="icon-button" onClick={() => setNotice('')} aria-label="Fechar aviso"><X size={12}/></button></div>}
     </section>
-  </div>
+  </div></MascotAppearanceContext.Provider>
 }

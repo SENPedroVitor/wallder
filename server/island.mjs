@@ -26,14 +26,15 @@ export function createIslandActivity({ now = Date.now } = {}) {
     const finished = [...tasks.values()].filter(task => task.finishedAt).sort((a, b) => b.finishedAt - a.finishedAt)
     for (const task of finished.slice(24)) tasks.delete(task.id)
   }
-  function snapshot({ agents, ready, approvals = new Map() }) {
-    return { version: 1, serverTime: now(), ready, agents: agents.map(({ id, name, role }) => ({ id, name, role })), tasks: [...tasks.values()].map(task => {
-      const result = { ...task, agentName: agents.find(agent => agent.id === task.agentId)?.name || task.agentId }
+  function acknowledge({id,conversationId,through=now()}) { for(const task of tasks.values())if(task.finishedAt && (id?task.id===id:task.conversationId===conversationId&&task.finishedAt<=Math.min(through,now())))task.dismissed=true;return {ok:true} }
+  function snapshot({ agents, ready, approvals = new Map(), prefs={} }) {
+    return { version: 1, serverTime: now(), ready, agents: agents.map(({ id, name, role }) => ({ id, name: typeof prefs[id]?.name==='string'?prefs[id].name.slice(0,100):name, role, color:['yellow','violet','green','blue','sand'].includes(prefs[id]?.color)?prefs[id].color:undefined })), tasks: [...tasks.values()].filter(task=>!task.dismissed && (!task.finishedAt || now()-task.finishedAt<(task.pix?300000:60000))).map(task => {
+      const result = { ...task, agentName: prefs[task.agentId]?.name || agents.find(agent => agent.id === task.agentId)?.name || task.agentId }
       // A decision may already have been made from another interface.
       if (result.approval && !approvals.has(result.approval.id)) delete result.approval
       if (result.private) { delete result.summary; delete result.pix; delete result.conversationId }
       return result
     }).sort((a, b) => b.startedAt - a.startedAt) }
   }
-  return { observe, snapshot }
+  return { observe, snapshot, acknowledge }
 }

@@ -32,3 +32,14 @@ test('approval from another interface disappears and no QR is fabricated',()=>{
  service.observe(run,{type:'widget',widget:{type:'pix',data:{image:'https://untrusted.example/qr',total:1}}})
  assert.equal(service.snapshot({agents,ready:true}).tasks[0].pix,undefined)
 })
+
+test('completed notices expire on reads and explicit dismissal without hiding active work',()=>{
+ let clock=1000;const service=createIslandActivity({now:()=>clock}),run={requestId:'reply',agentId:'pam',conversationId:'chat'};
+ service.observe(run,{type:'done',status:'completed',text:'done'});service.observe({...run,requestId:'active'},{type:'activity',text:'working'});
+ service.acknowledge({conversationId:'chat',through:999});assert.equal(service.snapshot({agents,ready:true}).tasks.length,2);
+ service.acknowledge({conversationId:'chat',through:1000});assert.deepEqual(service.snapshot({agents,ready:true}).tasks.map(task=>task.id),['active']);
+ service.acknowledge({id:'active'});assert.equal(service.snapshot({agents,ready:true}).tasks.length,1);
+ service.observe({...run,requestId:'second'},{type:'done',status:'completed'});clock=61001;assert.deepEqual(service.snapshot({agents,ready:true}).tasks.map(task=>task.id),['active']);
+ service.observe({...run,requestId:'third'},{type:'done',status:'completed'});service.acknowledge({id:'third'});assert.deepEqual(service.snapshot({agents,ready:true}).tasks.map(task=>task.id),['active']);
+ const snapshot=service.snapshot({agents,ready:true,prefs:{pam:{color:'blue',name:'Pam nova'}}});assert.equal(snapshot.agents.find(agent=>agent.id==='pam').color,'blue');assert.equal(snapshot.tasks[0].agentName,'Pam nova');assert.equal(snapshot.agents.find(agent=>agent.id==='west').color,undefined);
+})

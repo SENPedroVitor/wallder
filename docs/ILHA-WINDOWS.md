@@ -54,3 +54,13 @@ Largura, altura e cantos agora usam uma única transição interrompível de 420
 
 O placar compacto tem um botão X com a descrição ‘Remover placar da ilha’. Ele encerra o acompanhamento no servidor e mantém a conversa e o histórico. O painel expandido oferece a mesma ação em cada partida.
 
+
+## Notificações e personalização — 20/10/2026
+
+A ilha consulta a cor e o nome personalizados no armazenamento compartilhado do servidor. A cor é aplicada aos corpos originais, mantendo olhos e acessórios. Alterações aparecem na próxima consulta da ilha.
+
+Respostas concluídas, interrompidas e com erro deixam de aparecer após sessenta segundos, inclusive na lista expandida. A notificação compacta permanece por até vinte segundos. QR Pix mantém o prazo especial de cinco minutos. Tarefas em execução e autorizações pendentes não são apagadas por esse prazo.
+
+O botão de dispensar remove a notificação no servidor e na ilha, sem apagar a conversa. Abrir uma resposta pela ilha também a dispensa. O site confirma leitura quando o final da conversa está visível, a aba está visível e a janela tem foco. O limite da leitura usa a data da última resposta já recebida, para não dispensar respostas futuras; conversas privadas não enviam confirmação de leitura para a ilha.
+
+Verificação: TypeScript, builds web e desktop, testes de atividade/expiração/dispensa e teste no navegador da cor personalizada e botão de dispensar aprovados. Ilha reiniciada no Windows e backend publicado no servidor.

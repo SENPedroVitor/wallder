@@ -17,9 +17,9 @@ test('island renders and its real controls dispatch the intended actions across 
     const page = await browser.newPage(); await page.setViewport({ width: 720, height: 500 })
     const errors = []; page.on('pageerror', error => errors.push(error.message))
     await page.evaluateOnNewDocument(() => {
-      window.fixture = { online: true, ready: true, tasks: [], agents: [{ id: 'west', name: 'Ash' }, { id: 'pam', name: 'Pam' }] }
+      window.fixture = { online: true, ready: true, tasks: [], agents: [{ id: 'west', name: 'Ash' }, { id: 'pam', name: 'Pam',color:'blue' }] }
       window.actions = []
-      window.wendlerIsland = { snapshot: async () => window.fixture, pointer: () => {}, onToggle: () => () => {}, hide: () => window.actions.push({ type: 'hide' }), open: value => window.actions.push({ type: 'open', ...value }), action: async value => { window.actions.push(value); return { ok: true } }, onCollapse: callback => { window.collapseIsland=callback;return ()=>{} }, unfollow: async id => {window.fixture.sports=window.fixture.sports.filter(game=>game.id!==id)}, copyPix: async () => {} }
+      window.wendlerIsland = { snapshot: async () => window.fixture, pointer: () => {}, onToggle: () => () => {}, dismiss:async id=>{window.actions.push({type:'dismiss',id});window.fixture.tasks=window.fixture.tasks.filter(task=>task.id!==id)},hide: () => window.actions.push({ type: 'hide' }), open: value => window.actions.push({ type: 'open', ...value }), action: async value => { window.actions.push(value); return { ok: true } }, onCollapse: callback => { window.collapseIsland=callback;return ()=>{} }, unfollow: async id => {window.fixture.sports=window.fixture.sports.filter(game=>game.id!==id)}, copyPix: async () => {} }
     })
     await page.goto('http://127.0.0.1:' + server.address().port, { waitUntil: 'networkidle0' })
     await page.waitForSelector('[data-state="idle"]')
@@ -27,7 +27,7 @@ test('island renders and its real controls dispatch the intended actions across 
     assert.ok(await page.$eval('.island', node => node.textContent.includes('Equipe conectada')))
     await page.click('[aria-label="Recolher ilha"]'); await page.mouse.move(0, 0)
     await page.evaluate(() => { window.fixture.tasks = [{ id: 'test-run', agentId: 'pam', agentName: 'Pam', conversationId: 'test-chat', status: 'running', startedAt: Date.now(), activity: 'Pesquisando fontes reais' }] })
-    await page.waitForSelector('[data-state="working"]'); await new Promise(resolve => setTimeout(resolve, 500))
+    await page.waitForSelector('[data-state="working"]');await page.waitForFunction(()=>[...document.querySelectorAll('[data-pencil-name]')].some(node=>/corpo/i.test(node.dataset.pencilName||'')&&(getComputedStyle(node).backgroundColor==='rgb(102, 137, 189)'||[...node.querySelectorAll('path')].some(shape=>getComputedStyle(shape).fill==='rgb(102, 137, 189)')))); await new Promise(resolve => setTimeout(resolve, 500))
     await page.evaluate(()=>{window.fixture.tasks[0].journey={kind:'bus',origin:'Unaí',destination:'Brasília',stage:'researching'}})
     await page.waitForSelector('.journey-vehicle')
     assert.ok(await page.$eval('.working-trigger',node=>node.textContent.includes('Unaí → Brasília')))
@@ -53,6 +53,7 @@ test('island renders and its real controls dispatch the intended actions across 
     assert.ok(await page.$eval('.compact-sports',node=>node.textContent.includes('Sem atualização')))
     await page.click('[aria-label="Remover placar da ilha"]');await page.mouse.move(0,0);await page.waitForSelector('[data-state="idle"]')
     assert.equal(await page.$('.island-score'),null)
+    await page.evaluate(()=>{window.fixture.tasks=[{id:'notice',agentId:'pam',agentName:'Pam',conversationId:'chat',status:'completed',startedAt:Date.now()-1000,finishedAt:Date.now(),activity:'Resposta concluída'}]});await page.waitForSelector('[data-state="completed"]');await page.evaluate(()=>[...document.querySelectorAll('button')].find(button=>button.getAttribute('aria-label')==='Dispensar aviso').click());await page.waitForSelector('[data-state="idle"]');assert.ok(await page.evaluate(()=>window.actions.some(action=>action.type==='dismiss'&&action.id==='notice')));
     assert.equal(errors.length, 0, errors.join('\n'))
   } finally { await browser.close(); await new Promise(resolve => server.close(resolve)) }
 })
