@@ -1,3 +1,4 @@
+import { DesignService, designTools } from './design.mjs'
 import { conversationBrowserPreview } from './browser-monitor.mjs'
 import http from 'node:http'
 import { mkdir, readFile, writeFile, rename, readdir, realpath, stat } from 'node:fs/promises'
@@ -63,6 +64,7 @@ if(environment.WENDLER_VAULT_KEY_FILE)maintenance.start()
 const normalThreadConfig = { features: { apps: true }, ...(process.platform==='win32'?{'mcp_servers.node_repl':{enabled:false}}:{}), plugins: { 'computer-use@openai-bundled': { enabled: false }, 'unified-computer-use@openai-bundled': { enabled: false } } }
 const widgets = createWidgetService({dataDir})
 const sports = new SportsService({dataDir})
+const design = new DesignService({dataDir})
 const audioProxy = createAudioProxy()
 const browser = new BrowserBridge(dataDir)
 const pamAgentMail=new AgentMailService({dataDir})
@@ -217,6 +219,12 @@ client.on('message', message => {
             emit(run,{type:'widget',widget})
             client.respond(message.id,{success:true,contentItems:[{type:'inputText',text:JSON.stringify({displayed:true,kind:journey.kind,source:content.journey.source,checkedAt:content.journey.checkedAt,notice:'Card mostrado com os dados da página. Não houve reserva nem compra.'})}]});return
           }
+          if(run && params.tool==='wendler_design'){
+            emit(run,{type:'activity',text:'Construindo a tela no Imhotep…'})
+            const result=await design.execute(params.arguments,run)
+            if(params.arguments.action==='present')emit(run,{type:'widget',widget:{type:'design',data:result}})
+            client.respond(message.id,{success:true,contentItems:[{type:'inputText',text:JSON.stringify(result)}]});return
+          }
           if(run && params.tool==='wendler_sports'){
             emit(run,{type:'activity',text:'Consultando o placar atualizado…'})
             const result=await sports.execute(params.arguments,run)
@@ -370,7 +378,7 @@ async function startRun(req, res, input, internal = {}) {
     threadConfig['plugins.computer-use@openai-bundled'] = { enabled: false }
     threadConfig['plugins.unified-computer-use@openai-bundled'] = { enabled: false }
   }
-  const configRevision = createHash('sha256').update(JSON.stringify({ persona:persona(input.agent), widgetVersion:10, travelTools, sportsTools, teamTools, widgetTools, projectTools, browserTools, shoppingTools, researchTools, steamTools:input.agent.id==='pam'?[...steamTools,...pamMailTools,...gmailTools]:[], threadConfig, permissions, automation, privateHistory: input.privateHistory === true })).digest('hex').slice(0, 24)
+  const configRevision = createHash('sha256').update(JSON.stringify({ persona:persona(input.agent), widgetVersion:11,designTools, travelTools, sportsTools, teamTools, widgetTools, projectTools, browserTools, shoppingTools, researchTools, steamTools:input.agent.id==='pam'?[...steamTools,...pamMailTools,...gmailTools]:[], threadConfig, permissions, automation, privateHistory: input.privateHistory === true })).digest('hex').slice(0, 24)
   const key = `${keyFor(input)}\u0000config-${configRevision}${computerGeneration ? `\u0000computer-${computerGeneration}` : ''}`
   if (runs.has(input.requestId) || busyThreads.has(key)) return fail(res, 409, 'Este agente já está respondendo nesta conversa.')
   if (internal.parentRequestId ? runs.size>=4 : [...runs.values()].filter(run=>!run.parentRequestId).length>=2) return fail(res, 429, 'A equipe está ocupada. Aguarde uma resposta terminar.')
@@ -403,7 +411,7 @@ async function startRun(req, res, input, internal = {}) {
     }
     if (!threadId) {
       initial = true
-      const started = await client.request('thread/start', { cwd: workspace, model: state.model, sandbox, config: threadConfig, dynamicTools:[...travelTools,...sportsTools,...teamTools,...widgetTools,...projectTools,...browserTools,...shoppingTools,...researchTools,...(input.agent.id === 'pam' ? [...steamTools,...pamMailTools,...gmailTools] : []),...(permissions.computer ? computerTools : [])], approvalPolicy: 'on-request', ephemeral: input.privateHistory === true, baseInstructions: persona(input.agent) + projectInstructions + browserInstructions })
+      const started = await client.request('thread/start', { cwd: workspace, model: state.model, sandbox, config: threadConfig, dynamicTools:[...(input.agent.id==='kendrick'?designTools:[]),...travelTools,...sportsTools,...teamTools,...widgetTools,...projectTools,...browserTools,...shoppingTools,...researchTools,...(input.agent.id === 'pam' ? [...steamTools,...pamMailTools,...gmailTools] : []),...(permissions.computer ? computerTools : [])], approvalPolicy: 'on-request', ephemeral: input.privateHistory === true, baseInstructions: persona(input.agent) + projectInstructions + browserInstructions })
       threadId = started.thread.id
       if (!input.privateHistory) { state.threads[key] = threadId; await save() }
     }
@@ -471,6 +479,7 @@ export const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/audio/transcribe' && req.method === 'POST') return await audioProxy.transcribe(req,res)
     if(url.pathname==='/api/island/acknowledge'&&req.method==='POST'){const input=await body(req);if(!input||(!input.id&&!input.conversationId)||[input.id,input.conversationId].some(value=>value!==undefined&&(typeof value!=='string'||!/^[\w:-]{1,100}$/.test(value)))||(input.through!==undefined&&!Number.isFinite(input.through)))return fail(res,400,'Notificação inválida.');return json(res,200,islandActivity.acknowledge(input))}
     if (url.pathname === '/api/island/status' && req.method === 'GET') return json(res, 200, { ...islandActivity.snapshot({ prefs:await readFile(path.join(dataDir,'frontend.json'),'utf8').then(JSON.parse).then(value=>value['wendler:frontend:v1']?.value?.prefs||{}).catch(()=>({})), agents: agentPersonalities, ready: client.ready && authenticated && !!models.length, approvals }), sports: await sports.snapshot() })
+    if (url.pathname === '/api/design/asset' && req.method === 'GET') { const value=await design.asset(url);res.writeHead(200,{'Content-Type':value.type,'Content-Disposition':'attachment; filename="imhotep.'+value.extension+'"','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});return res.end(value.bytes) }
     if (url.pathname === '/api/sports/scores' && req.method === 'GET') return json(res,200,await sports.scores({league:url.searchParams.get('league')||'soccer/all',date:url.searchParams.get('date')||undefined}))
     if (url.pathname === '/api/sports/score' && req.method === 'GET') { const result=await sports.scores({league:url.searchParams.get('league')||'soccer/all',date:url.searchParams.get('date')||undefined});const game=result.games.find(game=>game.id===url.searchParams.get('event'));return game?json(res,200,game):fail(res,404,'Partida não encontrada nesta data.') }
     if (url.pathname === '/api/sports/follow' && req.method === 'POST') { const input=await body(req); if(input.action!=='unfollow')return fail(res,400,'Ação inválida.');return json(res,200,await sports.execute(input)) }

@@ -27,7 +27,7 @@ export function PencilSidebar({ data, agents, current, busy, menu, onMenu, onAge
   document.addEventListener('pointerdown', dismiss)
   return () => document.removeEventListener('pointerdown', dismiss)
  }, [menu])
- const sidebarIds = data.sidebarAgents.filter(id => id !== 'west')
+ const sidebarIds = [...new Set([...data.sidebarAgents, 'kendrick' as const])].filter(id => id !== 'west')
  const ash = agents.find(agent => agent.id === 'west')
  const changeGroup = (value: MenuGroup | null) => { setGroup(value); requestAnimationFrame(() => popup.current?.querySelector<HTMLButtonElement>('button')?.focus()) }
  return <aside className="pencil-sidebar" aria-label="Navegação">

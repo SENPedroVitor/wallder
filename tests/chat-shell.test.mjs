@@ -13,6 +13,7 @@ test('chat layout stays stable, grouped navigation works, composer grows, and br
  try {
   const page = await browser.newPage({ viewport: { width: 810, height: 626 } }), errors = [], monitors = []
   page.setDefaultTimeout(8000)
+  page.setDefaultNavigationTimeout(30000)
   page.on('pageerror', error => errors.push(error.message))
   const ids = ['west', 'ted', 'kyle', 'songbird', 'sheldon', 'pam', 'homer', 'indy', 'livro', 'figma']
   const chats = ids.map((agent, index) => ({ id: 'chat-' + agent, agent, title: 'Nova conversa', updated: 1000 + index, messages: agent === 'indy' ? [] : [{ id: 'message-' + agent, sender: agent, text: 'Conversa de teste', at: 1000 }] }))

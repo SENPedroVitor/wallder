@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { agentPersonalities, personalityInstructions } from '../server/personas.mjs'
 
 test('every supported agent has durable instructions and unknown identities are rejected', () => {
-  assert.equal(new Set(agentPersonalities.map(agent => agent.id)).size, 20)
+  assert.equal(new Set(agentPersonalities.map(agent => agent.id)).size, 21)
   for (const agent of agentPersonalities) {
     const instructions = personalityInstructions(agent.id)
     assert.ok(instructions.length > 300)

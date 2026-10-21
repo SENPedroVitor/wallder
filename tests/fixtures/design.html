@@ -1,0 +1,4 @@
+<!doctype html><html lang="pt-BR"><meta charset="UTF-8"><title>Prévia de design — teste isolado</title><div id="root"></div><script type="module">
+import React from'react';import{createRoot}from'react-dom/client';import{DesignPreview}from'/src/design/DesignPreview.tsx';import'/src/design/waddle.css';
+createRoot(document.getElementById('root')).render(React.createElement('main',{className:'waddle-app',style:{display:'block',padding:16,height:'auto',width:'100%'}},React.createElement(DesignPreview,{data:{projectId:'test-project',revision:2,name:'Projeto de teste',frameId:'screen',frameName:'Dashboard',conversationId:'test-chat'}})))
+</script></html>

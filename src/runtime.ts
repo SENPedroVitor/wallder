@@ -83,7 +83,7 @@ export function useRuntime() {
       const bounded = (entries: ContextEntry[] = []) => entries.slice(-30).map(entry => ({ speaker: entry.speaker.slice(0, 100), text: entry.text.slice(0, 8000) }))
       const response = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...input, context: bounded(input.context), sharedContext: bounded(input.sharedContext), requestId }), signal: controller.signal })
       await readRuntimeStream(response, value => {
-        if (value.type === 'widget' && value.widget && typeof value.widget === 'object') { const widget=value.widget as {type:string;data:unknown};if(['sports-list','sports','shopping','pix','focus','market','tasks','weather','canvas','spending'].includes(widget.type))onWidget?.(widget) }
+        if (value.type === 'widget' && value.widget && typeof value.widget === 'object') { const widget=value.widget as {type:string;data:unknown};if(['design','sports-list','sports','shopping','pix','focus','market','tasks','weather','canvas','spending'].includes(widget.type))onWidget?.(widget) }
         if (value.type === 'delta' && typeof value.text === 'string') { text += value.text; update({ text, activity: 'Escrevendo…' }) }
         if (value.type === 'activity') update({ activity: String(value.text || 'Trabalhando…') })
         if (value.type === 'approval') update({ activity: 'Aguardando sua autorização', approval: { id: String(value.id), title: String(value.title || 'Autorizar ação'), details: value.details } })

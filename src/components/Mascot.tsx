@@ -126,7 +126,8 @@ export default function Mascot({ agent, state = 'idle', size = 88, className = '
   const suffix = active ? '' : '-static'
   const specialEyes = selectedState === 'searching' ? 'squint' : selectedState === 'reviewing' ? 'slash' : selectedState === 'waiting' ? 'dash' : undefined
   const sourceEyes = selectedEyes ?? specialEyes
-  const src = sourceEyes
+  const kendrickStates:Record<string,string>={idle:'idle',listening:'listening',thinking:'thinking',writing:'working',success:'success',alert:'attention',error:'offline',asleep:'offline',searching:'thinking',reviewing:'thinking',waiting:'listening'}
+  const src = agent==='kendrick' ? '/kendrick/'+kendrickStates[selectedState]+'.svg' : sourceEyes
     ? `/dotslab/agents/${agent}/eyes/${sourceEyes}${suffix}.svg`
     : `/dotslab/agents/${agent}/${selectedState}${suffix}.svg`
 

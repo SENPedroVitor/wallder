@@ -1,4 +1,5 @@
 export const dotslabAgents = {
+  kendrick: { name: 'Kendrick', shape: 'drop', color: '#242424' },
   west: { name: 'Ash', shape: 'round', color: '#eee934' },
   ted: { name: 'Ted', shape: 'pebble', color: '#6598ad' },
   indy: { name: 'Indy', shape: 'capsule', color: '#a97245' },
