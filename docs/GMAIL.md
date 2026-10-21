@@ -31,3 +31,7 @@ Referências: https://developers.google.com/identity/protocols/oauth2/web-server
 
 API Gmail ativada no projeto Google Cloud selecionado. Cliente Wendler Gmail pessoal criado, identificado como agente de IA, e importado pelo card real no servidor. Estado verificado: configured=true, connected=false, aguardando autorização da conta. Backend autenticado na IA após publicação. Compilação TypeScript/Vite e testes Gmail, AgentMail, origem e equipe passaram; o conector foi conferido no navegador. Ainda não foi feita leitura nem envio real de e-mail.
 
+
+## Conexão real concluída
+
+Em 20/10/2026, o usuário concluiu a autorização da própria conta no Google. O backend confirmou connected=true. Uma consulta real a mensagens não lidas retornou vinte identificadores e paginação, sem ler ou expor o corpo das mensagens e sem marcar como lidas. Nenhum e-mail de teste foi enviado. A lista de testadores contém somente a conta que autorizou. O modo Testing continua sujeito à expiração de tokens do Google.
