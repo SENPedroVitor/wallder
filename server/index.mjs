@@ -28,6 +28,7 @@ import { permissionContent } from './mcp-approval.mjs'
 import { createAutomationSettings, automaticMcpPermission } from './automation.mjs'
 import { createFigmaBridge } from './figma-local.mjs'
 import { createProtectedData } from './protected-data.mjs'
+import {GmailService,gmailTools} from './gmail.mjs'
 import {createPamMailVault,PamMailService} from './pam-mail.mjs'
 import {AgentMailService,PamEmailRouter,agentMailTools as pamMailTools} from './agentmail.mjs'
 import { SteamWebService, steamWebTools as steamTools } from './steam-web.mjs'
@@ -65,6 +66,7 @@ const sports = new SportsService({dataDir})
 const audioProxy = createAudioProxy()
 const browser = new BrowserBridge(dataDir)
 const pamAgentMail=new AgentMailService({dataDir})
+const personalGmail=new GmailService({dataDir})
 const pamMail=new PamEmailRouter(pamAgentMail,new PamMailService({vault:createPamMailVault(dataDir),browser}))
 const automationSettings = createAutomationSettings(dataDir)
 const figmaLocal = createFigmaBridge({ dataDir, port })
@@ -249,6 +251,7 @@ client.on('message', message => {
             const result=await research.execute(params.arguments,run);
             client.respond(message.id,{success:true,contentItems:[{type:'inputText',text:JSON.stringify(result)}]});return
           }
+          if(run&&params.tool==='wendler_gmail'){run.browserGeneration=browser.generation;const result=await personalGmail.execute(params.arguments,run,review=>new Promise(resolve=>{const id=randomUUID();approvals.set(id,{run,resolve});emit(run,{type:'approval',id,requestId:run.requestId,...review})}));if(run.cancelled)throw Error('Tarefa interrompida.');client.respond(message.id,{success:true,contentItems:[{type:'inputText',text:JSON.stringify(result)}]});return}
           if(run&&params.tool==='wendler_pam_mail'){run.browserGeneration=browser.generation;const result=await pamMail.execute(params.arguments,run,review=>new Promise(resolve=>{const id=randomUUID();approvals.set(id,{run,resolve});emit(run,{type:'approval',id,requestId:run.requestId,...review})}));if(run.cancelled)throw Error('Tarefa interrompida.');client.respond(message.id,{success:true,contentItems:[{type:'inputText',text:JSON.stringify(result)}]});return}
           if(run&&params.tool==='wendler_steam'){
             run.onProgress=text=>{if(!run.cancelled&&!run.finished)emit(run,{type:'activity',text})}
@@ -367,7 +370,7 @@ async function startRun(req, res, input, internal = {}) {
     threadConfig['plugins.computer-use@openai-bundled'] = { enabled: false }
     threadConfig['plugins.unified-computer-use@openai-bundled'] = { enabled: false }
   }
-  const configRevision = createHash('sha256').update(JSON.stringify({ persona:persona(input.agent), widgetVersion:10, travelTools, sportsTools, teamTools, widgetTools, projectTools, browserTools, shoppingTools, researchTools, steamTools:input.agent.id==='pam'?[...steamTools,...pamMailTools]:[], threadConfig, permissions, automation, privateHistory: input.privateHistory === true })).digest('hex').slice(0, 24)
+  const configRevision = createHash('sha256').update(JSON.stringify({ persona:persona(input.agent), widgetVersion:10, travelTools, sportsTools, teamTools, widgetTools, projectTools, browserTools, shoppingTools, researchTools, steamTools:input.agent.id==='pam'?[...steamTools,...pamMailTools,...gmailTools]:[], threadConfig, permissions, automation, privateHistory: input.privateHistory === true })).digest('hex').slice(0, 24)
   const key = `${keyFor(input)}\u0000config-${configRevision}${computerGeneration ? `\u0000computer-${computerGeneration}` : ''}`
   if (runs.has(input.requestId) || busyThreads.has(key)) return fail(res, 409, 'Este agente já está respondendo nesta conversa.')
   if (internal.parentRequestId ? runs.size>=4 : [...runs.values()].filter(run=>!run.parentRequestId).length>=2) return fail(res, 429, 'A equipe está ocupada. Aguarde uma resposta terminar.')
@@ -400,7 +403,7 @@ async function startRun(req, res, input, internal = {}) {
     }
     if (!threadId) {
       initial = true
-      const started = await client.request('thread/start', { cwd: workspace, model: state.model, sandbox, config: threadConfig, dynamicTools:[...travelTools,...sportsTools,...teamTools,...widgetTools,...projectTools,...browserTools,...shoppingTools,...researchTools,...(input.agent.id === 'pam' ? [...steamTools,...pamMailTools] : []),...(permissions.computer ? computerTools : [])], approvalPolicy: 'on-request', ephemeral: input.privateHistory === true, baseInstructions: persona(input.agent) + projectInstructions + browserInstructions })
+      const started = await client.request('thread/start', { cwd: workspace, model: state.model, sandbox, config: threadConfig, dynamicTools:[...travelTools,...sportsTools,...teamTools,...widgetTools,...projectTools,...browserTools,...shoppingTools,...researchTools,...(input.agent.id === 'pam' ? [...steamTools,...pamMailTools,...gmailTools] : []),...(permissions.computer ? computerTools : [])], approvalPolicy: 'on-request', ephemeral: input.privateHistory === true, baseInstructions: persona(input.agent) + projectInstructions + browserInstructions })
       threadId = started.thread.id
       if (!input.privateHistory) { state.threads[key] = threadId; await save() }
     }
@@ -459,6 +462,11 @@ export const server = http.createServer(async (req, res) => {
     }
     if (origin && !isAuthorizedOrigin(origin, { port, uiPort, remoteOrigin: environment.WENDLER_REMOTE_ORIGIN })) return fail(res, 403, 'Origem não autorizada.')
     const url = new URL(req.url, `http://${host}`)
+    if(url.pathname==='/api/gmail/status'&&req.method==='GET')return json(res,200,await personalGmail.status())
+    if(url.pathname==='/api/gmail/config'&&req.method==='POST')return json(res,200,await personalGmail.configure(await body(req)))
+    if(url.pathname==='/api/gmail/connect'&&req.method==='POST')return json(res,200,await personalGmail.begin())
+    if(url.pathname==='/api/gmail/disconnect'&&req.method==='POST')return json(res,200,await personalGmail.disconnect())
+    if(url.pathname==='/api/gmail/callback'&&req.method==='GET'){res.setHeader('Cache-Control','no-store');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Content-Security-Policy',"default-src 'none'");try{await personalGmail.complete(url.searchParams);res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});return res.end('Gmail conectado. Pode fechar esta janela e voltar ao Wendler.')}catch{res.writeHead(400,{'Content-Type':'text/plain; charset=utf-8'});return res.end('Não foi possível conectar o Gmail. Volte ao Wendler e inicie novamente.')}}
     if (url.pathname === '/api/audio/status' && req.method === 'GET') return json(res,200,await audioProxy.status())
     if (url.pathname === '/api/audio/transcribe' && req.method === 'POST') return await audioProxy.transcribe(req,res)
     if (url.pathname === '/api/island/status' && req.method === 'GET') return json(res, 200, { ...islandActivity.snapshot({ agents: agentPersonalities, ready: client.ready && authenticated && !!models.length, approvals }), sports: await sports.snapshot() })

@@ -17,6 +17,7 @@
     "test": "node --experimental-strip-types --test tests/*.test.mjs server/*.test.mjs"
   },
   "dependencies": {
+    "google-auth-library": "^10.9.1",
     "koffi": "^3.3.3",
     "lucide-react": "^0.468.0",
     "playwright-core": "^1.64.0",
